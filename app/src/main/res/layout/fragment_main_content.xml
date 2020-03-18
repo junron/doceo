@@ -14,19 +14,41 @@
 
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarMain"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_collapseMode="pin"
             app:title="Attendance"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filter"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                app:icon="@drawable/ic_baseline_filter_list_24"
+                app:iconGravity="end"
+                app:iconTint="@color/white" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <com.mancj.materialsearchbar.MaterialSearchBar
+            android:id="@+id/searchBar"
+            style="@style/MaterialSearchBarDark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:mt_hint="Filter students" />
     </com.google.android.material.appbar.AppBarLayout>
 
 
     <GridView
-        android:layout_marginTop="56dp"
         android:id="@+id/classListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
         android:numColumns="2" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

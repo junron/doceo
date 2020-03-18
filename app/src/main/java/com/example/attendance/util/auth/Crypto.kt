@@ -8,6 +8,7 @@ import com.example.attendance.util.auth.models.SignedCertificate
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.whispersystems.curve25519.Curve25519
+import java.security.SecureRandom
 
 class Crypto {
     @UnstableDefault
@@ -31,6 +32,12 @@ class Crypto {
                 cipher.calculateSignature(privateKey, message.toByteArray()),
                 Base64.URL_SAFE
             )
+        }
+
+        fun randomString(): String {
+            val bytes = ByteArray(32)
+            SecureRandom().nextBytes(bytes)
+            return String(bytes)
         }
 
         fun String.loadKeyBytes(): ByteArray =

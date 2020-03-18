@@ -1,13 +1,18 @@
 package com.example.attendance.controllers
 
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
+import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.adapters.createAdapter
 import com.example.attendance.models.students
 import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.android.onTextChange
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.mancj.materialsearchbar.MaterialSearchBar
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 
@@ -27,7 +32,6 @@ object MainController : FragmentController {
                             .show()
                     }
                 }
-
             if (UserLoader.userExists()) {
                 UserLoader.loadFirebaseUser {
                     println("Error: $it")
@@ -41,6 +45,39 @@ object MainController : FragmentController {
                         show()
                     }
             }
+            filter.setOnClickListener {
+                toolbarMain.visibility = GONE
+                searchBar.visibility = VISIBLE
+                searchBar.openSearch()
+            }
+            searchBar.setOnKeyListener { _, _, event ->
+                println(event.keyCode)
+                true
+            }
+            val adapter = FilterAdapter(layoutInflater)
+            searchBar.setCustomSuggestionAdapter(adapter)
+            adapter.suggestions = listOf("takes: " to "subject", "from: " to "class")
+            searchBar.searchEditText.onTextChange {
+                adapter.filter.filter(it)
+            }
+            searchBar.setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
+                override fun onButtonClicked(buttonCode: Int) {
+                }
+
+                override fun onSearchStateChanged(enabled: Boolean) {
+                    if (enabled) {
+                        toolbarMain.visibility = GONE
+                        searchBar.visibility = VISIBLE
+                    } else {
+                        toolbarMain.visibility = VISIBLE
+                        searchBar.visibility = GONE
+                    }
+                }
+
+                override fun onSearchConfirmed(text: CharSequence?) {
+                }
+
+            })
         }
     }
 

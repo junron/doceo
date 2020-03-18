@@ -43,7 +43,7 @@ object UserLoader {
     )
 
     fun getUser() = with(getCertificate()) {
-        User(certificate.name, certificate.id, emptyMap())
+        User(certificate.name, certificate.id, certificate.metadata)
     }
 
     fun userExists() = context.filesDir.resolve("user/token").exists()
