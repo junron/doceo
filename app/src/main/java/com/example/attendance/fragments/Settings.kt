@@ -1,13 +1,12 @@
-package com.example.nav_base_2.fragments
+package com.example.attendance.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-import com.example.nav_base_2.R
-import com.example.nav_base_2.controllers.SettingsController
+import androidx.fragment.app.Fragment
+import com.example.attendance.R
+import com.example.attendance.controllers.SettingsController
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

@@ -1,6 +1,8 @@
-package com.example.nav_base_2.controllers
+package com.example.attendance.controllers
 
 import androidx.fragment.app.Fragment
+import com.example.attendance.adapters.createAdapter
+import com.example.attendance.models.students
 import kotlinx.android.synthetic.main.fragment_main_content.*
 
 object MainController : FragmentController {
@@ -9,7 +11,8 @@ object MainController : FragmentController {
     override fun init(context: Fragment) {
         MainController.context = context
         with(context) {
-            toolbar.title = "Nav Base 2"
+            toolbar.title = "Attendance"
+            classListView.adapter = createAdapter(students)
         }
     }
 

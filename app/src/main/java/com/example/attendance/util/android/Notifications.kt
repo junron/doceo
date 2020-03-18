@@ -1,4 +1,4 @@
-package com.example.nav_base_2.util.android
+package com.example.attendance.util.android
 
 
 import android.app.*
@@ -8,8 +8,8 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.nav_base_2.MainActivity
-import com.example.nav_base_2.util.uuid
+import com.example.attendance.MainActivity
+import com.example.attendance.util.uuid
 import java.util.*
 
 

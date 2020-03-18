@@ -1,16 +1,19 @@
-package com.example.nav_base_2
+package com.example.attendance
 
 import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
-import com.example.nav_base_2.util.android.Navigation
-import com.example.nav_base_2.util.android.Preferences
+import com.example.attendance.models.loadStudents
+import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.android.Preferences
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.serialization.UnstableDefault
 
 class MainActivity : AppCompatActivity() {
 
+    @UnstableDefault
     override fun onCreate(savedInstanceState: Bundle?) {
         Preferences.init(this)
         setTheme(
@@ -31,6 +34,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_settings to R.id.settings
             ), navController, bottomAppBarNav
         )
+        loadStudents(this)
     }
 
     fun toggleDarkMode(dark: Boolean) {

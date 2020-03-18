@@ -1,4 +1,4 @@
-package com.example.nav_base_2.util
+package com.example.attendance.util
 
 import java.text.ParseException
 import java.text.SimpleDateFormat

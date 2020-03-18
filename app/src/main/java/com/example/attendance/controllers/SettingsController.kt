@@ -1,9 +1,9 @@
-package com.example.nav_base_2.controllers
+package com.example.attendance.controllers
 
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
-import com.example.nav_base_2.MainActivity
-import com.example.nav_base_2.util.android.Preferences
+import com.example.attendance.MainActivity
+import com.example.attendance.util.android.Preferences
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 object SettingsController : FragmentController {

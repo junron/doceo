@@ -1,4 +1,4 @@
-package com.example.nav_base_2.util.android
+package com.example.attendance.util.android
 
 import androidx.navigation.NavController
 import com.google.android.material.bottomnavigation.BottomNavigationView

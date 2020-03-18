@@ -6,12 +6,12 @@
     app:startDestination="@id/mainContent">
     <fragment
         android:id="@+id/mainContent"
-        android:name="com.example.nav_base_2.fragments.MainContent"
+        android:name="com.example.attendance.fragments.MainContent"
         android:label="fragment_main_content"
         tools:layout="@layout/fragment_main_content" />
     <fragment
         android:id="@+id/settings"
-        android:name="com.example.nav_base_2.fragments.Settings"
+        android:name="com.example.attendance.fragments.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>
