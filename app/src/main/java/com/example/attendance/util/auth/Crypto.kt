@@ -3,10 +3,22 @@ package com.example.attendance.util.auth
 import android.content.Context
 import android.util.Base64
 import com.example.attendance.util.auth.models.CSR
+import com.example.attendance.util.auth.models.Certificate
+import com.example.attendance.util.auth.models.SignedCertificate
+import kotlinx.serialization.UnstableDefault
+import kotlinx.serialization.json.Json
 import org.whispersystems.curve25519.Curve25519
 
 class Crypto {
+    @UnstableDefault
     companion object {
+        private val rootPublicKey = "VTw7JiXnuCIXDlsBZwCWyl53UFQcE5-l2QDNQKsCMjw=".loadKeyBytes()
+
+        fun verifyCertificate(signedCertificate: SignedCertificate): Boolean {
+            val message = Json.stringify(Certificate.serializer(), signedCertificate.certificate)
+            return verify(message, signedCertificate.signature, rootPublicKey)
+        }
+
         fun verify(message: String, signature: String, publicKey: ByteArray): Boolean {
             val cipher = Curve25519.getInstance(Curve25519.BEST)
             val signatureBytes = Base64.decode(signature, Base64.URL_SAFE)
@@ -20,13 +32,14 @@ class Crypto {
                 Base64.URL_SAFE
             )
         }
+
+        fun String.loadKeyBytes(): ByteArray =
+            Base64.decode(this, Base64.URL_SAFE)
     }
 
     private lateinit var privateKey: ByteArray
     private lateinit var publicKey: ByteArray
 
-    private fun String.loadKeyBytes() =
-        Base64.decode(this, Base64.URL_SAFE)
 
     fun loadKeysFromFile(context: Context) {
         publicKey = context.filesDir.resolve("keys/public.key").readText().loadKeyBytes()

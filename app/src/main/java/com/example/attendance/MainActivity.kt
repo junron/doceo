@@ -9,6 +9,8 @@ import com.example.attendance.models.loadStudents
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.auth.SignIn
+import com.example.attendance.util.auth.UserLoader
+import com.google.firebase.FirebaseApp
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.UnstableDefault
 
@@ -16,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     @UnstableDefault
     override fun onCreate(savedInstanceState: Bundle?) {
+        FirebaseApp.initializeApp(this)
         Preferences.init(this)
         setTheme(
             if (Preferences.isDarkMode()) R.style.AppTheme
@@ -24,9 +27,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         updateTextScale()
-
-//        Preload events
-//        Firebase.firestore
 
         val navController = nav_host_fragment.findNavController()
         Navigation.init(
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         )
         loadStudents(this)
         SignIn.init(this)
+        UserLoader.context = this
     }
 
     fun toggleDarkMode(dark: Boolean) {

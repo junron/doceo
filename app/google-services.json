@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "647500465715",
+    "firebase_url": "https://nush-attendance.firebaseio.com",
+    "project_id": "nush-attendance",
+    "storage_bucket": "nush-attendance.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647500465715:android:9a47d1a97cb2d1e1f64546",
+        "android_client_info": {
+          "package_name": "com.example.attendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647500465715-clm85g22irh1t8qbpv606niolre8utpt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvMSSQnTDNV-tkVkGVkMHrrbsUbOS5F_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647500465715-clm85g22irh1t8qbpv606niolre8utpt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
