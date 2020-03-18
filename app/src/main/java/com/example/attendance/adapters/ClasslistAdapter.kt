@@ -13,7 +13,6 @@ import java.util.*
 class ClasslistAdapter(private val students: List<StatefulStudent>) : BaseAdapter() {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        println(count)
         val statefulStudent = getItem(position)
         val (student, state) = statefulStudent
         return with(TextView(parent.context)) {

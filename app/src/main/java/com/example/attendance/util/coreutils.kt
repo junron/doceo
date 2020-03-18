@@ -42,7 +42,7 @@ fun String.toDp(numDp: Int) =
 
 
 fun Date.toStringValue(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this)
-fun String.toDate(): Date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(this)
+fun String.toDate() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(this) as Date
 fun String.formatDate(): String = SimpleDateFormat("dd MMM yyyy").format(toDate())
 
 fun uuid() = UUID.randomUUID().toString()

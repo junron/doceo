@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.attendance.models.loadStudents
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
+import com.example.attendance.util.auth.SignIn
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.UnstableDefault
 
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             ), navController, bottomAppBarNav
         )
         loadStudents(this)
+        SignIn.init(this)
     }
 
     fun toggleDarkMode(dark: Boolean) {

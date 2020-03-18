@@ -14,4 +14,9 @@
         android:name="com.example.attendance.fragments.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.example.attendance.fragments.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" />
 </navigation>
