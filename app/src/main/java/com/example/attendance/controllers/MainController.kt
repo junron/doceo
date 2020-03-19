@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.R
 import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.adapters.createAdapter
+import com.example.attendance.models.FilterParam
 import com.example.attendance.models.students
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.onTextChange
@@ -56,7 +57,7 @@ object MainController : FragmentController {
             }
             val adapter = FilterAdapter(layoutInflater)
             searchBar.setCustomSuggestionAdapter(adapter)
-            adapter.suggestions = listOf("takes: " to "subject", "from: " to "class")
+            adapter.suggestions = FilterParam.filterParams
             searchBar.searchEditText.onTextChange {
                 adapter.filter.filter(it)
             }

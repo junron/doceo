@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import android.widget.Filter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
+import com.example.attendance.models.FilterParam
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter
 import kotlinx.android.synthetic.main.filter_suggestion.view.*
 
 
 class FilterAdapter(inflater: LayoutInflater?) :
-    SuggestionsAdapter<Pair<String, String>, SuggestionHolder>(inflater) {
+    SuggestionsAdapter<FilterParam, SuggestionHolder>(inflater) {
     private var entities = listOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionHolder {
@@ -22,15 +23,15 @@ class FilterAdapter(inflater: LayoutInflater?) :
     override fun getSingleViewHeight() = 45
 
     override fun onBindSuggestionHolder(
-        suggestion: Pair<String, String>,
+        suggestion: FilterParam,
         holder: SuggestionHolder,
         position: Int
     ) {
         with(holder.itemView) {
-            filterParam.text = suggestion.first
-            filterValue.text = suggestion.second
+            filterParam.text = suggestion.key
+            filterValue.text = suggestion.value
+            icon.setImageResource(suggestion.icon)
             setOnClickListener {
-
             }
         }
     }
@@ -43,7 +44,7 @@ class FilterAdapter(inflater: LayoutInflater?) :
         }
 
         override fun publishResults(constraint: CharSequence, results: FilterResults) {
-            suggestions = results.values as? List<Pair<String, String>> ?: return
+            suggestions = results.values as? List<FilterParam> ?: return
             notifyDataSetChanged()
         }
 
