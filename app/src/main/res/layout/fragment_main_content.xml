@@ -34,13 +34,6 @@
                 app:iconTint="@color/white" />
         </androidx.appcompat.widget.Toolbar>
 
-        <com.mancj.materialsearchbar.MaterialSearchBar
-            android:id="@+id/searchBar"
-            style="@style/MaterialSearchBarDark"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:mt_hint="Filter students" />
     </com.google.android.material.appbar.AppBarLayout>
 
 

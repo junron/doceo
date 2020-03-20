@@ -1,30 +1,26 @@
 package com.example.attendance.controllers
 
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
-import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.adapters.createAdapter
-import com.example.attendance.models.FilterParam
 import com.example.attendance.models.students
 import com.example.attendance.util.android.Navigation
-import com.example.attendance.util.android.onTextChange
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.mancj.materialsearchbar.MaterialSearchBar
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 
 @UnstableDefault
 object MainController : FragmentController {
     private lateinit var context: Fragment
+    private var constraints = listOf<String>()
 
     override fun init(context: Fragment) {
         MainController.context = context
         with(context) {
             val classListAdapter = createAdapter(students)
+            classListAdapter.filterStudents(constraints)
             classListView.adapter = classListAdapter
             FirebaseAuth.getInstance()
                 .addAuthStateListener {
@@ -34,11 +30,7 @@ object MainController : FragmentController {
                             .show()
                     }
                 }
-            if (UserLoader.userExists()) {
-                UserLoader.loadFirebaseUser {
-                    println("Error: $it")
-                }
-            } else {
+            if (FirebaseAuth.getInstance().currentUser == null) {
                 Snackbar.make(parentView, "You are not signed in", Snackbar.LENGTH_INDEFINITE)
                     .apply {
                         setAction("Sign In") {
@@ -48,36 +40,14 @@ object MainController : FragmentController {
                     }
             }
             filter.setOnClickListener {
-                toolbarMain.visibility = GONE
-                searchBar.visibility = VISIBLE
-                searchBar.openSearch()
+                Navigation.navigate(R.id.filterFragment)
             }
-            val adapter = FilterAdapter(searchBar, layoutInflater)
-            searchBar.setCustomSuggestionAdapter(adapter)
-            adapter.suggestions = FilterParam.filterParams
-            searchBar.searchEditText.onTextChange {
-                adapter.filter.filter(it)
-                classListAdapter.filterStudents(it.split(" "))
-            }
-            searchBar.setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
-                override fun onButtonClicked(buttonCode: Int) {
-                }
-
-                override fun onSearchStateChanged(enabled: Boolean) {
-                    if (enabled) {
-                        toolbarMain.visibility = GONE
-                        searchBar.visibility = VISIBLE
-                    } else {
-                        toolbarMain.visibility = VISIBLE
-                        searchBar.visibility = GONE
-                    }
-                }
-
-                override fun onSearchConfirmed(text: CharSequence?) {
-                }
-
-            })
         }
+    }
+
+
+    fun updateFilters(constraints: String) {
+        this.constraints = constraints.split(" ")
     }
 
     override fun restoreState() {

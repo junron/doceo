@@ -25,7 +25,7 @@ object SignInController : FragmentController {
                 SignIn.getSignedCertificate(csr) {
                     UserLoader.setUserCredentials(it)
                     UserLoader.loadFirebaseUser { error ->
-                        println("Error: $error")
+                        println("FirebaseAuthError: $error")
                     }
                     Navigation.navigate(R.id.mainContent)
                 }

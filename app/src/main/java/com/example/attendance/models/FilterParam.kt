@@ -1,13 +1,14 @@
 package com.example.attendance.models
 
 import com.example.attendance.R
+import java.io.Serializable
 
-class FilterParam(
+data class FilterParam(
     val key: String,
     val value: String,
     val possibleValues: List<String>,
     val icon: Int
-) {
+) : Serializable {
     companion object {
         val filterParams = listOf(
             FilterParam(
