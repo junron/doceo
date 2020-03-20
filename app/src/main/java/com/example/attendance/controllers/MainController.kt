@@ -2,7 +2,7 @@ package com.example.attendance.controllers
 
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
-import com.example.attendance.adapters.createAdapter
+import com.example.attendance.adapters.ClasslistAdapter.Companion.createAdapter
 import com.example.attendance.models.students
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.UserLoader
@@ -15,6 +15,7 @@ import kotlinx.serialization.UnstableDefault
 object MainController : FragmentController {
     private lateinit var context: Fragment
     private var constraints = listOf<String>()
+    var signedIn = false
 
     override fun init(context: Fragment) {
         MainController.context = context
@@ -24,8 +25,9 @@ object MainController : FragmentController {
             classListView.adapter = classListAdapter
             FirebaseAuth.getInstance()
                 .addAuthStateListener {
-                    if (it.currentUser != null) {
+                    if (it.currentUser != null && !signedIn) {
                         val user = UserLoader.getUser()
+                        signedIn = true
                         Snackbar.make(parentView, "Welcome, ${user.name}!", Snackbar.LENGTH_LONG)
                             .show()
                     }

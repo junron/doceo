@@ -11,6 +11,13 @@ import com.example.attendance.models.StatefulStudent
 import com.example.attendance.models.Student
 
 class ClasslistAdapter(private val originalStudents: List<StatefulStudent>) : BaseAdapter() {
+    companion object {
+        fun createAdapter(students: List<Student>) =
+            ClasslistAdapter(students.map {
+                StatefulStudent(it, 0)
+            })
+    }
+
     private var students = originalStudents
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val statefulStudent = getItem(position)
@@ -61,8 +68,3 @@ class ClasslistAdapter(private val originalStudents: List<StatefulStudent>) : Ba
 
     override fun getCount() = students.size
 }
-
-fun createAdapter(students: List<Student>) =
-    ClasslistAdapter(students.map {
-        StatefulStudent(it, 0)
-    })

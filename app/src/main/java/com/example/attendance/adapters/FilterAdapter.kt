@@ -20,7 +20,6 @@ class FilterAdapter(
         val lastEntity = constraints.split(" ").last()
         if (lastEntity.contains(":")) {
             val (key, value) = lastEntity.split(":")
-            println("$key $value")
             val filterParam = FilterParam.filterParams.firstOrNull {
                 it.key == "$key: "
             } ?: return run {
