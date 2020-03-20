@@ -24,7 +24,8 @@ object MainController : FragmentController {
     override fun init(context: Fragment) {
         MainController.context = context
         with(context) {
-            classListView.adapter = createAdapter(students)
+            val classListAdapter = createAdapter(students)
+            classListView.adapter = classListAdapter
             FirebaseAuth.getInstance()
                 .addAuthStateListener {
                     if (it.currentUser != null) {
@@ -51,15 +52,12 @@ object MainController : FragmentController {
                 searchBar.visibility = VISIBLE
                 searchBar.openSearch()
             }
-            searchBar.setOnKeyListener { _, _, event ->
-                println(event.keyCode)
-                true
-            }
-            val adapter = FilterAdapter(layoutInflater)
+            val adapter = FilterAdapter(searchBar, layoutInflater)
             searchBar.setCustomSuggestionAdapter(adapter)
             adapter.suggestions = FilterParam.filterParams
             searchBar.searchEditText.onTextChange {
                 adapter.filter.filter(it)
+                classListAdapter.filterStudents(it.split(" "))
             }
             searchBar.setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
                 override fun onButtonClicked(buttonCode: Int) {

@@ -64,4 +64,5 @@ dependencies {
     implementation 'com.auth0.android:jwtdecode:1.4.0'
     implementation 'com.google.firebase:firebase-auth:19.3.0'
     implementation 'com.github.mancj:MaterialSearchBar:0.8.5'
+    implementation "com.willowtreeapps:fuzzywuzzy-kotlin:0.9.0"
 }
