@@ -6,13 +6,12 @@ import com.example.attendance.MainActivity
 import com.example.attendance.util.android.Preferences
 import kotlinx.android.synthetic.main.fragment_settings.*
 
-object SettingsController : FragmentController {
-    private lateinit var context: Fragment
+object SettingsController : FragmentController() {
     private var darkMode = true
     private var fontScale = 1F
 
     override fun init(context: Fragment) {
-        SettingsController.context = context
+        super.init(context)
         with(context) {
             darkMode = Preferences.isDarkMode()
             fontScale = Preferences.getTextScale()

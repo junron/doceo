@@ -24,4 +24,9 @@
         android:name="com.example.attendance.fragments.FilterFragment"
         android:label="fragment_filter"
         tools:layout="@layout/fragment_filter" />
+    <fragment
+        android:id="@+id/nearbyFragment"
+        android:name="com.example.attendance.fragments.NearbyFragment"
+        android:label="fragment_nearby"
+        tools:layout="@layout/fragment_nearby" />
 </navigation>

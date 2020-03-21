@@ -10,12 +10,11 @@ import com.example.attendance.util.auth.UserLoader
 import kotlinx.android.synthetic.main.fragment_sign_in.*
 import kotlinx.serialization.UnstableDefault
 
-object SignInController : FragmentController {
-    private lateinit var context: Fragment
+object SignInController : FragmentController() {
 
     @UnstableDefault
     override fun init(context: Fragment) {
-        SignInController.context = context
+        super.init(context)
         with(context) {
             SignIn.signInUser(signinWebview) { token ->
                 val claims = JWT(token).claims
@@ -31,8 +30,5 @@ object SignInController : FragmentController {
                 }
             }
         }
-    }
-
-    override fun restoreState() {
     }
 }

@@ -56,8 +56,8 @@ class ClasslistAdapter(private val originalStudents: List<StatefulStudent>) : Ba
                     value in student.student.combination
                 }
             }
-            notifyDataSetChanged()
         }
+        notifyDataSetChanged()
     }
 
     override fun getItem(position: Int): StatefulStudent {

@@ -11,13 +11,12 @@ import com.example.attendance.util.android.hideKeyboard
 import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_filter.*
 
-object FilterController : FragmentController {
-    private lateinit var context: Fragment
+object FilterController : FragmentController() {
     private lateinit var constraints: String
     private lateinit var adapter: FilterAdapter
 
     override fun init(context: Fragment) {
-        FilterController.context = context
+        super.init(context)
         with(context) {
             adapter = FilterAdapter(filterEditText)
             suggestions.adapter = adapter

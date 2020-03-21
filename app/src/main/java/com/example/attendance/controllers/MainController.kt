@@ -12,13 +12,12 @@ import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 
 @UnstableDefault
-object MainController : FragmentController {
-    private lateinit var context: Fragment
+object MainController : FragmentController() {
     private var constraints = listOf<String>()
     var signedIn = false
 
     override fun init(context: Fragment) {
-        MainController.context = context
+        super.init(context)
         with(context) {
             val classListAdapter = createAdapter(students)
             classListAdapter.filterStudents(constraints)
@@ -50,8 +49,5 @@ object MainController : FragmentController {
 
     fun updateFilters(constraints: String) {
         this.constraints = constraints.split(" ")
-    }
-
-    override fun restoreState() {
     }
 }
