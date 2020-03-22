@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="class"
-            android:textColor="#42FFFFFF"
+            android:textColor="?attr/filterTextColor"
             android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

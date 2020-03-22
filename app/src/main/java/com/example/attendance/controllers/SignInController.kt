@@ -2,6 +2,7 @@ package com.example.attendance.controllers
 
 import androidx.fragment.app.Fragment
 import com.auth0.android.jwt.JWT
+import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.Crypto
@@ -27,6 +28,7 @@ object SignInController : FragmentController() {
                         println("FirebaseAuthError: $error")
                     }
                     Navigation.navigate(R.id.mainContent)
+                    (activity as MainActivity).recreate()
                 }
             }
         }

@@ -49,18 +49,27 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
         return serverChallenge
     }
 
-    private fun respondToChallenge(randomString: String): String {
+    private fun respondToChallenge(randomString: String): String? {
         // Improperly seeded CSPRNGs
-        if (randomString == serverChallenge) return ""
-        return clientCrypto.sign(randomString)
+        if (randomString == serverChallenge) return null
+        return try {
+            clientCrypto.sign(randomString)
+        } catch (e: Exception) {
+            println("Signing exception: $e")
+            null
+        }
     }
 
-    private fun verifyServerResponse(signature: String) =
+    private fun verifyServerResponse(signature: String) = try {
         Crypto.verify(
             serverChallenge,
             signature,
             serverCertificate.certificate.publicKey.loadKeyBytes()
         )
+    } catch (e: Exception) {
+        println("Verification exception: $e")
+        false
+    }
 
     override fun next(message: NearbyMessage) {
         when (state) {
@@ -79,11 +88,15 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
                 )
             }
             1 -> {
+                val response = respondToChallenge(message.data) ?: kotlin.run {
+                    connection.disconnectFromEndpoint(endpointId)
+                    return
+                }
                 // Respond to server challenge
                 sendPayload(
                     NearbyMessage(
                         NearbyStage.HANDSHAKE,
-                        respondToChallenge(message.data)
+                        response
                     ).toPayload()
                 )
             }

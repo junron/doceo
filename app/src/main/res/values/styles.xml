@@ -3,11 +3,15 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <item name="filterBackground">#303030</item>
+        <item name="filterTextColor">#42ffffff</item>
     </style>
 
     <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <item name="filterBackground">#ffffff</item>
+        <item name="filterTextColor">#862C2828</item>
     </style>
 
     <style name="WindowAnimationTransition">
