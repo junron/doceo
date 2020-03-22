@@ -1,18 +1,29 @@
 package com.example.attendance.util.android.nearby
 
 import android.content.Context
+import com.example.attendance.util.android.nearby.protocols.Handshake
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.nearby.connection.ConnectionsStatusCodes.*
 import com.google.firebase.auth.FirebaseAuth
 
 
+val state = mutableMapOf<String, MessageHandler>()
+
 object AndroidNearby {
     private lateinit var context: Context
     private val connectionCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
             when (result.status.statusCode) {
-                STATUS_OK -> println("Connection succeeded!")
+                STATUS_OK -> {
+                    println("Connection succeeded!")
+                    val handler = state[endpointId] ?: return
+                    handler.sendPayload(
+                        NearbyMessage(
+                            NearbyStage.HANDSHAKE, Handshake.clientCertificateString
+                        ).toPayload()
+                    )
+                }
                 STATUS_CONNECTION_REJECTED -> println("Connection refused!")
                 STATUS_ERROR -> println("Connection broke!")
             }
@@ -24,8 +35,12 @@ object AndroidNearby {
 
         override fun onConnectionInitiated(endpointId: String, info: ConnectionInfo) {
             println(info.endpointName)
+            val handler = MessageHandler(Nearby.getConnectionsClient(context), endpointId)
             Nearby.getConnectionsClient(context)
-                .acceptConnection(endpointId, MessageHandler)
+                .acceptConnection(
+                    endpointId,
+                    handler
+                )
         }
 
     }
