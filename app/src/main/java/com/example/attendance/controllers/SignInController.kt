@@ -23,7 +23,7 @@ object SignInController : FragmentController() {
                 val id = claims["unique_name"]?.asString() ?: return@signInUser
                 val csr = Crypto().generateCSR(context.context!!, name, id, token)
                 SignIn.getSignedCertificate(csr) {
-                    UserLoader.setUserCredentials(it)
+                    UserLoader.setUserCredentials(it, token)
                     UserLoader.loadFirebaseUser { error ->
                         println("FirebaseAuthError: $error")
                     }

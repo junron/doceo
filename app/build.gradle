@@ -66,4 +66,5 @@ dependencies {
     implementation "com.willowtreeapps:fuzzywuzzy-kotlin:0.9.0"
     implementation "com.google.android.gms:play-services-nearby:17.0.0"
     implementation 'com.karumi:dexter:6.0.2'
+    implementation 'com.google.firebase:firebase-messaging:20.1.3'
 }

@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 object UserLoader {
     lateinit var context: Context
 
-    fun setUserCredentials(signedData: SignedCertificateWithToken) {
+    fun setUserCredentials(signedData: SignedCertificateWithToken, microsoftToken: String) {
         val (certificate, token) = signedData
         if (!Crypto.verifyCertificate(certificate)) throw IllegalStateException("Certificate signature invalid")
         with(context) {
@@ -23,6 +23,10 @@ object UserLoader {
             with(filesDir.resolve("user/token")) {
                 createNewFile()
                 writeText(token)
+            }
+            with(filesDir.resolve("user/mstoken")) {
+                createNewFile()
+                writeText(microsoftToken)
             }
         }
     }
@@ -41,6 +45,8 @@ object UserLoader {
         SignedCertificate.serializer(),
         context.filesDir.resolve("user/certificate").readText()
     )
+
+    fun getMsToken() = context.filesDir.resolve("user/mstoken").readText()
 
     fun getUser() = with(getCertificate()) {
         User(certificate.name, certificate.id, certificate.metadata)

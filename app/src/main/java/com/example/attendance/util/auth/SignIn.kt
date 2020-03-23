@@ -9,6 +9,10 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.attendance.util.auth.models.CSR
 import com.example.attendance.util.auth.models.SignedCertificateWithToken
+import com.example.attendance.util.postJson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
@@ -70,18 +74,15 @@ object SignIn {
         csr: CSR,
         callback: (certificate: SignedCertificateWithToken) -> Unit
     ) {
-        queue.add(object : StringRequest(
-            Method.POST,
-            "https://pyrostore.nushhwboard.ml/certificates/new",
-            {
-                callback(Json.parse(SignedCertificateWithToken.serializer(), it))
-            }, {
-                println("Signing error: $it")
+        GlobalScope.launch {
+            val response = queue.postJson(
+                "https://pyrostore.nushhwboard.ml/certificates/new",
+                csr,
+                CSR.serializer()
+            )
+            GlobalScope.launch(Dispatchers.Main) {
+                callback(Json.parse(SignedCertificateWithToken.serializer(), response))
             }
-        ) {
-            override fun getBody() = (Json.stringify(CSR.serializer(), csr)).toByteArray()
-
-            override fun getBodyContentType() = "application/json"
-        })
+        }
     }
 }

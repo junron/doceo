@@ -15,6 +15,7 @@ import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.nearby.protocols.Handshake
+import com.example.attendance.util.android.notifications.ServerConnection
 import com.example.attendance.util.auth.SignIn
 import com.example.attendance.util.auth.UserLoader
 import com.google.firebase.FirebaseApp
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         initNavigationHandlers()
         setThemeIcon()
         Handshake.init(this)
+        ServerConnection.init(this)
     }
 
     fun toggleDarkMode(dark: Boolean) {

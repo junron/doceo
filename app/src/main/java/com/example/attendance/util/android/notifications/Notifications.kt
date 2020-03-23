@@ -1,4 +1,4 @@
-package com.example.attendance.util.android
+package com.example.attendance.util.android.notifications
 
 
 import android.app.*
@@ -30,10 +30,13 @@ object Notifications {
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-        this.id = id
+        Notifications.id = id
     }
 
-    fun getBuilder(context: Context) = NotificationCompat.Builder(context, id)
+    fun getBuilder(context: Context) = NotificationCompat.Builder(
+        context,
+        id
+    )
 
     fun notify(
         context: Context,
