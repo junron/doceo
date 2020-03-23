@@ -3,6 +3,7 @@ package com.example.attendance.util.android
 import android.app.Activity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 
 
 fun hideKeyboard(activity: Activity) {
@@ -15,4 +16,8 @@ fun hideKeyboard(activity: Activity) {
         view = View(activity)
     }
     imm.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+operator fun TextView.plusAssign(s: String) {
+    this.text = this.text.toString() + s
 }

@@ -1,6 +1,7 @@
 package com.example.attendance.util.android.nearby.protocols
 
 import android.content.Context
+import com.example.attendance.controllers.NearbyController
 import com.example.attendance.util.android.nearby.NearbyMessage
 import com.example.attendance.util.android.nearby.NearbyStage
 import com.example.attendance.util.auth.Crypto
@@ -106,7 +107,7 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
                     connection.disconnectFromEndpoint(endpointId)
                     return
                 }
-                println("Connected to ${serverCertificate.certificate.name}")
+                NearbyController.handshakeEventReceived("Connected to ${serverCertificate.certificate.name}")
             }
         }
         state++

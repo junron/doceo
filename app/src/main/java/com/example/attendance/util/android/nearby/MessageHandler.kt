@@ -1,5 +1,6 @@
 package com.example.attendance.util.android.nearby
 
+import com.example.attendance.controllers.NearbyController
 import com.example.attendance.util.android.nearby.protocols.Handshake
 import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.Payload
@@ -9,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
-enum class NearbyStage { HANDSHAKE }
+enum class NearbyStage { HANDSHAKE, GENERIC_DATA }
 
 @Serializable
 data class NearbyMessage(val stage: NearbyStage, val data: String) {
@@ -28,6 +29,7 @@ class MessageHandler(connection: ConnectionsClient, endpointId: String) :
                 val message = Json.parse(NearbyMessage.serializer(), String(payload.asBytes()!!))
                 when (message.stage) {
                     NearbyStage.HANDSHAKE -> handshake.next(message)
+                    NearbyStage.GENERIC_DATA -> NearbyController.dataMessageReceived(message.data)
                 }
             } catch (e: SerializationException) {
 
@@ -36,6 +38,5 @@ class MessageHandler(connection: ConnectionsClient, endpointId: String) :
     }
 
     override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
-        println("Payload Update: $endpointId $update")
     }
 }

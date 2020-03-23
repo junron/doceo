@@ -36,6 +36,7 @@ object AndroidNearby {
         override fun onConnectionInitiated(endpointId: String, info: ConnectionInfo) {
             println(info.endpointName)
             val handler = MessageHandler(Nearby.getConnectionsClient(context), endpointId)
+            state[endpointId] = handler
             Nearby.getConnectionsClient(context)
                 .acceptConnection(
                     endpointId,
