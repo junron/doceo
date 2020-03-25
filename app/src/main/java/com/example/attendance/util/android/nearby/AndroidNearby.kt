@@ -1,11 +1,12 @@
 package com.example.attendance.util.android.nearby
 
 import android.content.Context
+import com.example.attendance.controllers.NearbyController
 import com.example.attendance.util.android.nearby.protocols.Handshake
+import com.example.attendance.util.auth.UserLoader.getUserOrNull
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.nearby.connection.ConnectionsStatusCodes.*
-import com.google.firebase.auth.FirebaseAuth
 
 
 val state = mutableMapOf<String, MessageHandler>()
@@ -23,6 +24,7 @@ object AndroidNearby {
                             NearbyStage.HANDSHAKE, Handshake.clientCertificateString
                         ).toPayload()
                     )
+                    NearbyController.onConnected()
                 }
                 STATUS_CONNECTION_REJECTED -> println("Connection refused!")
                 STATUS_ERROR -> println("Connection broke!")
@@ -31,10 +33,10 @@ object AndroidNearby {
 
         override fun onDisconnected(endpointId: String) {
             println("$endpointId died.")
+            NearbyController.onDisconnected()
         }
 
         override fun onConnectionInitiated(endpointId: String, info: ConnectionInfo) {
-            println(info.endpointName)
             val handler = MessageHandler(Nearby.getConnectionsClient(context), endpointId)
             state[endpointId] = handler
             Nearby.getConnectionsClient(context)
@@ -69,12 +71,13 @@ object AndroidNearby {
     }
 
     fun startAdvertising() {
-        val auth = FirebaseAuth.getInstance()
+        val user = getUserOrNull() ?: return
+        if (!user.isMentorRep) return
         val advertisingOptions: AdvertisingOptions =
-            AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
+            AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
         Nearby.getConnectionsClient(context)
             .startAdvertising(
-                auth.currentUser?.uid.toString(),
+                user.email,
                 "com.example.attendance",
                 connectionCallback,
                 advertisingOptions
@@ -89,7 +92,7 @@ object AndroidNearby {
 
     fun startDiscovery() {
         val discoveryOptions =
-            DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
+            DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
         Nearby.getConnectionsClient(context)
             .startDiscovery("com.example.attendance", discoveryCallback, discoveryOptions)
             .addOnSuccessListener { println("Discovery started") }
@@ -105,6 +108,13 @@ object AndroidNearby {
                 stopDiscovery()
                 stopAdvertising()
                 stopAllEndpoints()
+            }
+    }
+
+    fun stopDiscovery() {
+        Nearby.getConnectionsClient(context)
+            .apply {
+                stopDiscovery()
             }
     }
 

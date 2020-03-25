@@ -33,6 +33,7 @@ object NotificationServer {
     }
 
     suspend fun addToken(token: String) {
+        if (!userExists()) return
         val request = AddTokenRequest(token, getMsToken())
         val response = queue.postJson(
             "https://pyrostore.nushhwboard.ml/notifications/addToken",

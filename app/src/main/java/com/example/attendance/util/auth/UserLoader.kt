@@ -52,6 +52,8 @@ object UserLoader {
         User(certificate.name, certificate.id, certificate.metadata)
     }
 
+    fun getUserOrNull() = if (userExists()) getUser() else null
+
     fun userExists() = context.filesDir.resolve("user/token").exists()
 
     fun destroyCredentials() {
@@ -62,4 +64,7 @@ object UserLoader {
 }
 
 
-data class User(val name: String, val email: String, val metadata: Map<String, String>)
+data class User(val name: String, val email: String, val metadata: Map<String, String>) {
+    val isMentorRep: Boolean
+        get() = metadata["mentorRep"] == "true"
+}
