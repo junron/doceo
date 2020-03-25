@@ -7,22 +7,12 @@ import com.example.attendance.util.android.Preferences
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 object SettingsController : FragmentController() {
-    private var darkMode = true
     private var fontScale = 1F
 
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
-            darkMode = Preferences.isDarkMode()
             fontScale = Preferences.getTextScale()
-            darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-                val prevValue =
-                    darkMode
-                darkMode = isChecked
-                if (prevValue != darkMode) (activity as MainActivity).toggleDarkMode(
-                    darkMode
-                )
-            }
 
             textScale.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 var progress: Int = 20
@@ -51,8 +41,6 @@ object SettingsController : FragmentController() {
 
     override fun restoreState() {
         with(context) {
-            darkModeSwitch.isChecked =
-                darkMode
             textScale.progress = ((fontScale * 100) - 80).toInt()
             textScaleOutput.text = "Text scaling: (${(fontScale * 100).toInt()}%)"
         }

@@ -15,7 +15,8 @@ import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.nearby.protocols.Handshake
-import com.example.attendance.util.android.notifications.ServerConnection
+import com.example.attendance.util.android.notifications.NotificationServer
+import com.example.attendance.util.android.notifications.Notifications.createNotificationChannel
 import com.example.attendance.util.auth.SignIn
 import com.example.attendance.util.auth.UserLoader
 import com.google.firebase.FirebaseApp
@@ -51,13 +52,15 @@ class MainActivity : AppCompatActivity() {
         )
         drawerLayout = drawer_layout
         loadStudents(this)
+        createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         SignIn.init(this)
         AndroidNearby.init(this)
         UserLoader.context = this
         initNavigationHandlers()
         setThemeIcon()
+        if (!UserLoader.userExists()) return
         Handshake.init(this)
-        ServerConnection.init(this)
+        NotificationServer.init(this)
     }
 
     fun toggleDarkMode(dark: Boolean) {

@@ -1,6 +1,7 @@
 name: Kotlin Android CI
 
-on: [push]
+# Disable Actions for now
+on: [pull_request]
 
 jobs:
   build:
