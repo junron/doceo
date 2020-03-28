@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/permissions_edit"
+        android:icon="@drawable/ic_baseline_edit_24"
+        android:title="Edit" />
+    <item
+        android:id="@+id/permissions_view"
+        android:icon="@drawable/ic_eye_24"
+        android:title="View" />
+    <item
+        android:id="@+id/permissions_none"
+        android:icon="@drawable/ic_baseline_close_24"
+        android:title="No access" />
+</menu>

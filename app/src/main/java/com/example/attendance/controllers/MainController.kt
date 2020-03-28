@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistAdapter.Companion.createAdapter
-import com.example.attendance.models.students
+import com.example.attendance.models.Students
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
@@ -28,7 +28,7 @@ object MainController : FragmentController() {
                     MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
                 }
             }
-            val classListAdapter = createAdapter(students)
+            val classListAdapter = createAdapter(Students.students)
             classListAdapter.filterStudents(constraints)
             classListView.adapter = classListAdapter
             if (!UserLoader.userExists()) {

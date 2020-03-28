@@ -1,5 +1,6 @@
 package com.example.attendance.util.android
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.Gravity
@@ -12,6 +13,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -97,4 +100,9 @@ fun Context.requestInputDialog(
         .setTitle(title)
         .setView(view)
         .show()
+}
+
+@SuppressLint("RestrictedApi")
+fun PopupMenu.showIcons() {
+    (menu as MenuBuilder).setOptionalIconsVisible(true)
 }

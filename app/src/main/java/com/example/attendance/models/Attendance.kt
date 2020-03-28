@@ -17,6 +17,17 @@ data class Attendance(
     val modified: Timestamp = Timestamp.now(),
     val deleted: Boolean = false
 ) {
+    @ExperimentalStdlibApi
+    val permissions = buildList {
+        add(Permission(owner, AccessLevel.OWNER, id))
+        addAll(editors.map {
+            Permission(it, AccessLevel.EDITOR, id)
+        })
+        addAll(viewers.map {
+            Permission(it, AccessLevel.VIEWER, id)
+        })
+    }
+
     fun getAccessLevel(uid: String) = when (uid) {
         owner -> AccessLevel.OWNER
         in editors -> AccessLevel.EDITOR
@@ -44,6 +55,28 @@ data class Attendance(
             .document(id)
             .update("name", name, "modified", Timestamp.now())
     }
+
+    fun changePermissions(uid: String, accessLevel: AccessLevel) {
+        val updateFields = mutableMapOf<String, Any>("modified" to Timestamp.now())
+        val currentAcl = getAccessLevel(uid)
+        if (accessLevel == currentAcl) return
+        when (currentAcl) {
+            AccessLevel.EDITOR -> updateFields["editors"] = editors - uid
+            AccessLevel.VIEWER -> updateFields["viewers"] = viewers - uid
+            AccessLevel.OWNER -> return
+            AccessLevel.NONE -> return
+        }
+        when (accessLevel) {
+            // Cannot change to owner
+            AccessLevel.OWNER -> return
+            AccessLevel.EDITOR -> updateFields["editors"] = editors + uid
+            AccessLevel.VIEWER -> updateFields["viewers"] = viewers + uid
+            AccessLevel.NONE -> Unit
+        }
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .update(updateFields)
+    }
 }
 
 object AttendanceLoader {
@@ -56,6 +89,12 @@ object AttendanceLoader {
         listeners += callback
     }
 
+    fun removeListener(callback: (List<Attendance>) -> Unit) {
+        listeners.removeAll {
+            it == callback
+        }
+    }
+
     private val processQuery = { documents: List<DocumentSnapshot> ->
         documents.mapNotNull {
             it.toObject(Attendance::class.java)?.copy(id = it.id)
@@ -64,7 +103,6 @@ object AttendanceLoader {
 
 
     fun setup() {
-        println("Attendance setup")
         val user =
             FirebaseAuth.getInstance().currentUser ?: return run {
                 FirebaseAuth.getInstance().addAuthStateListener { auth ->
@@ -79,9 +117,9 @@ object AttendanceLoader {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
                     val changedData = processQuery(snapshot.documents)
-                    attendance = changedData
+                    attendance = attendance.filter { user.uid != it.owner } + changedData
                     listeners.forEach {
-                        it(changedData)
+                        it(attendance)
                     }
                 }
                 get().addOnSuccessListener {
@@ -96,9 +134,9 @@ object AttendanceLoader {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
                     val changedData = processQuery(snapshot.documents)
-                    attendance = changedData
+                    attendance = attendance.filter { user.uid !in it.editors } + changedData
                     listeners.forEach {
-                        it(changedData)
+                        it(attendance)
                     }
                 }
                 get().addOnSuccessListener {
@@ -113,9 +151,9 @@ object AttendanceLoader {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
                     val changedData = processQuery(snapshot.documents)
-                    attendance = changedData
+                    attendance = attendance.filter { user.uid !in it.viewers } + changedData
                     listeners.forEach {
-                        it(changedData)
+                        it(attendance)
                     }
                 }
                 get().addOnSuccessListener {

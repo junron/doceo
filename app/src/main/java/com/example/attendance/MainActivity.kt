@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.models.AttendanceLoader
-import com.example.attendance.models.loadStudents
+import com.example.attendance.models.Students
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.nearby.AndroidNearby
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             ), navController, bottomAppBarNav
         )
         drawerLayout = drawer_layout
-        loadStudents(this)
+        Students.loadStudents(this)
         createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         SignIn.init(this)
         AndroidNearby.init(this)

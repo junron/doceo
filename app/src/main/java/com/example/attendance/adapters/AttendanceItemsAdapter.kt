@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
+import com.example.attendance.controllers.AttendanceListController
 import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.Attendance
 import com.example.attendance.util.android.requestInputDialog
@@ -18,6 +19,9 @@ import kotlinx.android.synthetic.main.document_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_attendance.*
 
 class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>) : BaseAdapter() {
+    private val user = UserLoader.getUser().email
+
+    @ExperimentalStdlibApi
     override fun getView(p0: Int, p1: View?, parent: ViewGroup): View {
         val item = getItem(p0)
         val inflater = LayoutInflater.from(parent.context)
@@ -33,12 +37,16 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                 itemTitle.text = item.name
                                 itemDetails.setOnClickListener {
                                     hide()
-                                    fragment.itemDetailsTitle.text = item.name
-                                    fragment.detailsCreatedTime.text = item.getCreatedTime()
-                                    fragment.detailsModifiedTime.text = item.getModifiedTime()
+                                    AttendanceListController.detailAttendance = item
+                                    AttendanceListController.updateDetails(item)
+                                    fragment.detailsClose.setOnClickListener {
+                                        fragment.drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                                    }
+                                    val adapter = PermissionsListAdapter(item, user)
+                                    fragment.permissionsListView.adapter = adapter
                                     fragment.drawer_layout_end.openDrawer(Gravity.RIGHT)
                                 }
-                                if (item.getAccessLevel(UserLoader.getUser().email) != AccessLevel.OWNER) {
+                                if (item.getAccessLevel(user) != AccessLevel.OWNER) {
                                     itemRename.visibility = View.GONE
                                     itemRemove.visibility = View.GONE
                                     return@apply
@@ -84,5 +92,4 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
     override fun getItemId(p0: Int) = 0L
 
     override fun getCount() = data.size
-
 }
