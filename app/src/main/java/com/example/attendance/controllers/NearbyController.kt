@@ -47,11 +47,13 @@ object NearbyController : FragmentController() {
             }
             send.setOnClickListener {
                 val text = messageBox.text.toString()
-                state.values.first().sendPayload(
-                    NearbyMessage(
-                        NearbyStage.GENERIC_DATA, text
-                    ).toPayload()
-                )
+                state.values.forEach {
+                    it.sendPayload(
+                        NearbyMessage(
+                            NearbyStage.GENERIC_DATA, text
+                        ).toPayload()
+                    )
+                }
             }
         }
     }

@@ -29,4 +29,8 @@
         android:name="com.example.attendance.fragments.NearbyFragment"
         android:label="fragment_nearby"
         tools:layout="@layout/fragment_nearby" />
+    <fragment
+        android:id="@+id/attendanceFragment"
+        android:name="com.example.attendance.fragments.AttendanceFragment"
+        android:label="AttendanceFragment" />
 </navigation>

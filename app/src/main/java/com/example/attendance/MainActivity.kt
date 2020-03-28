@@ -10,6 +10,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
+import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.loadStudents
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
@@ -47,7 +48,8 @@ class MainActivity : AppCompatActivity() {
         Navigation.init(
             mapOf(
                 R.id.nav_main to R.id.mainContent,
-                R.id.nav_events to R.id.nearbyFragment
+                R.id.nav_broadcast to R.id.nearbyFragment,
+                R.id.nav_attendance to R.id.attendanceFragment
             ), navController, bottomAppBarNav
         )
         drawerLayout = drawer_layout
@@ -61,12 +63,7 @@ class MainActivity : AppCompatActivity() {
         if (!UserLoader.userExists()) return
         Handshake.init(this)
         NotificationServer.init(this)
-    }
-
-    fun toggleDarkMode(dark: Boolean) {
-        println("Dark theme? $dark")
-        Preferences.setDarkMode(dark)
-        this.recreate()
+        AttendanceLoader.setup()
     }
 
     private fun updateTextScale() {
