@@ -8,8 +8,10 @@ import android.widget.BaseAdapter
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
 import com.example.attendance.controllers.AttendanceListController
+import com.example.attendance.controllers.StudentSelectController
 import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.Attendance
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.requestInputDialog
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -49,6 +51,7 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                 if (item.getAccessLevel(user) != AccessLevel.OWNER) {
                                     itemRename.visibility = View.GONE
                                     itemRemove.visibility = View.GONE
+                                    itemShare.visibility = View.GONE
                                     return@apply
                                 }
                                 itemRename.setOnClickListener {
@@ -77,6 +80,22 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                             Snackbar.LENGTH_SHORT
                                         ).show()
                                     }.show()
+                                }
+                                itemShare.setOnClickListener {
+                                    hide()
+                                    Navigation.navigate(R.id.studentSelectFragment)
+                                    StudentSelectController.initializeSharing(
+                                        exclude = listOf(item.owner) + item.editors + item.viewers,
+                                        back = R.id.attendanceFragment
+                                    )
+                                    { selected, editing ->
+                                        item.share(selected, editing)
+                                        Snackbar.make(
+                                            parent,
+                                            "Shared with ${selected.size} students.",
+                                            Snackbar.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             })
                     }

@@ -28,5 +28,6 @@ object Students {
         students = Json.parse(Student.serializer().list, fileData)
     }
 
-    fun getStudentById(id: String) = students.find { it.id == id.substringBefore("@") }
+    fun getStudentById(id: String) = students.find { it.id == id }
+    fun getStudentByName(name: String) = students.find { it.name == name }
 }

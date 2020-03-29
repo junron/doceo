@@ -13,6 +13,7 @@ import com.example.attendance.util.postJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
@@ -80,7 +81,7 @@ object SignIn {
                 csr,
                 CSR.serializer()
             )
-            GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 callback(Json.parse(SignedCertificateWithToken.serializer(), response))
             }
         }

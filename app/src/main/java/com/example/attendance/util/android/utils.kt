@@ -3,21 +3,19 @@ package com.example.attendance.util.android
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.button.MaterialButton
+import com.example.attendance.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_layout.view.*
 
 
 fun hideKeyboard(activity: Activity) {
@@ -52,50 +50,24 @@ fun Context.requestInputDialog(
     confirm: String = "Confirm",
     callback: (String?) -> Unit
 ) {
-    val editText = EditText(this).apply {
-        layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-        setText(placeholder)
-    }
-    val confirmBtn =
-        MaterialButton(this)
-            .apply {
-                setMargin(10, 8, 10, 8)
-                text = confirm
-                setOnClickListener {
-                    callback(editText.text.toString())
-                    dialog?.hide()
-                }
+    val view = LayoutInflater.from(this).inflate(R.layout.dialog_layout, null)
+        .apply {
+            dialogEditText.setText(placeholder)
+            dialogEditText.onTextChange {
+                dialogConfirm.isEnabled = !it.isBlank()
             }
-    editText.onTextChange {
-        if (it.isBlank()) {
-            confirmBtn.isEnabled = false
+            dialogConfirm.text = confirm
+            dialogConfirm.setOnClickListener {
+                callback(dialogEditText.text.toString())
+                dialog?.hide()
+                dialog = null
+            }
+            dialogCancel.setOnClickListener {
+                callback(null)
+                dialog?.hide()
+                dialog = null
+            }
         }
-    }
-
-    val view = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL
-        layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        addView(LinearLayout(context).apply {
-            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            orientation = LinearLayout.VERTICAL
-            setMargin(16, 16, 16, 16)
-            addView(editText)
-            addView(LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.END
-                addView(
-                    MaterialButton(context).apply {
-                        setMargin(10, 8, 10, 8)
-                        text = "Cancel"
-                        setOnClickListener {
-                            callback(null)
-                            dialog?.hide()
-                        }
-                    })
-                addView(confirmBtn)
-            })
-        })
-    }
     dialog = MaterialAlertDialogBuilder(this)
         .setTitle(title)
         .setView(view)

@@ -77,6 +77,13 @@ data class Attendance(
             .document(id)
             .update(updateFields)
     }
+
+    fun share(students: List<Student>, edit: Boolean) {
+        val new = (if (edit) editors else viewers) + students.map { it.id }
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
+    }
 }
 
 object AttendanceLoader {

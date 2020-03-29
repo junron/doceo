@@ -33,4 +33,9 @@
         android:id="@+id/attendanceFragment"
         android:name="com.example.attendance.fragments.AttendanceFragment"
         android:label="AttendanceFragment" />
+    <fragment
+        android:id="@+id/studentSelectFragment"
+        android:name="com.example.attendance.fragments.StudentSelectFragment"
+        android:label="fragment_student_select"
+        tools:layout="@layout/fragment_student_select" />
 </navigation>

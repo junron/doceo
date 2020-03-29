@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/filterBackground"
+    tools:context=".fragments.FilterFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp">
+
+
+        <com.pchmn.materialchips.ChipsInput
+            android:id="@+id/studentFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/transparent"
+            android:textSize="18sp"
+            app:chip_backgroundColor="?android:attr/colorBackground"
+            app:chip_hasAvatarIcon="true"
+            app:chip_labelColor="?android:attr/textColorPrimaryNoDisable"
+            app:filterable_list_backgroundColor="?android:attr/colorBackground"
+            app:filterable_list_textColor="?android:attr/textColorPrimaryNoDisable"
+            app:hint="Search students"
+            app:maxRows="3"
+            app:showChipDetailed="false" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/selectEditToggle"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_baseline_edit_24" />
+
+    </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/studentSelectDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_baseline_done_24"
+        android:tint="#FFFFFF"
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
