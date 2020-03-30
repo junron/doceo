@@ -14,7 +14,6 @@ import kotlinx.serialization.UnstableDefault
 @UnstableDefault
 object MainController : FragmentController() {
     private var constraints = listOf<String>()
-    private var signedIn = false
 
     override fun init(context: Fragment) {
         super.init(context)

@@ -3,13 +3,12 @@ package com.example.attendance.util.auth
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.auth0.android.jwt.JWT
 import com.example.attendance.AuthenticationActivity
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.util.Volley.queue
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.models.CSR
 import com.example.attendance.util.auth.models.SignedCertificateWithToken
@@ -27,11 +26,6 @@ object SignIn {
     const val tenantId = "d72a7172-d5f8-4889-9a85-d7424751592a"
     const val clientId = "0dd4d56f-45c1-47e1-8f8c-7c93ec9c71aa"
     const val redirectUrl = "com.example.attendance.auth://callback"
-    private lateinit var queue: RequestQueue
-
-    fun init(context: Context) {
-        queue = Volley.newRequestQueue(context)
-    }
 
     fun startSignIn(activity: AppCompatActivity, context: Context) {
         signInUser(activity as MainActivity, context) { token ->
@@ -63,7 +57,7 @@ object SignIn {
         activity.startActivity(Intent(context, AuthenticationActivity::class.java))
     }
 
-    fun getAccessToken(code: String, callback: (token: String) -> Unit) {
+    private fun getAccessToken(code: String, callback: (token: String) -> Unit) {
         queue.add(
             object : StringRequest(
                 Method.POST,
@@ -88,7 +82,7 @@ object SignIn {
         )
     }
 
-    fun getSignedCertificate(
+    private fun getSignedCertificate(
         csr: CSR,
         callback: (certificate: SignedCertificateWithToken) -> Unit
     ) {

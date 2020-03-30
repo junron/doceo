@@ -33,7 +33,7 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
             itemMore.setOnClickListener {
                 BottomSheetDialog(context)
                     .apply {
-                        behavior.peekHeight = 800
+                        behavior.peekHeight = 1500
                         setContentView(inflater.inflate(R.layout.document_bottom_sheet, null)
                             .apply {
                                 itemTitle.text = item.name

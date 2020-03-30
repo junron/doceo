@@ -1,48 +1,49 @@
 package com.example.attendance.controllers
 
-import android.widget.SeekBar
+import android.content.Intent
+import android.graphics.Color
+import android.view.Gravity
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
-import com.example.attendance.util.android.Preferences
+import com.example.attendance.R
+import com.example.attendance.util.Volley
+import com.example.attendance.util.downloadFile
 import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 object SettingsController : FragmentController() {
-    private var fontScale = 1F
 
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
-            fontScale = Preferences.getTextScale()
-
-            textScale.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                var progress: Int = 20
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    this.progress = progress
-                    textScaleOutput.text = "Text scaling: (${progress + 80}%)"
+            toolbarSettings.apply {
+                setNavigationIcon(R.drawable.ic_baseline_menu_24)
+                navigationIcon?.setTint(Color.WHITE)
+                setNavigationOnClickListener {
+                    MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
                 }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+            updateApp.setOnClickListener {
+                val downloadUrl =
+                    "https://junron-github-actions-public-artifacts.s3-ap-southeast-1.amazonaws.com/app-release.apk"
+                GlobalScope.launch {
+                    val file = Volley.queue.downloadFile(context.context!!.filesDir, downloadUrl)
+                    val uri = FileProvider.getUriForFile(
+                        context.context!!,
+                        context.context!!.applicationContext.packageName + ".provider",
+                        file
+                    )
+                    val install = Intent(Intent.ACTION_VIEW)
+                    install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+                    install.setDataAndType(uri, "application/vnd.android.package-archive")
+                    context.startActivity(install)
                 }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    val scale = (progress + 80) / 100F
-                    if (scale != fontScale) (activity as MainActivity).setFontScale(scale)
-                }
-
-            })
-
+            }
             toolbarSettings.title = "Settings"
-        }
-    }
-
-    override fun restoreState() {
-        with(context) {
-            textScale.progress = ((fontScale * 100) - 80).toInt()
-            textScaleOutput.text = "Text scaling: (${(fontScale * 100).toInt()}%)"
         }
     }
 }

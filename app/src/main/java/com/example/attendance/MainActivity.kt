@@ -1,24 +1,22 @@
 package com.example.attendance
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.Students
+import com.example.attendance.util.Volley
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.nearby.protocols.Handshake
 import com.example.attendance.util.android.notifications.NotificationServer
 import com.example.attendance.util.android.notifications.Notifications.createNotificationChannel
-import com.example.attendance.util.auth.SignIn
 import com.example.attendance.util.auth.UserLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -42,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        updateTextScale()
 
         val navController = nav_host_fragment.findNavController()
         drawerLayout = drawer_layout
@@ -53,42 +50,17 @@ class MainActivity : AppCompatActivity() {
         )
         Students.loadStudents(this)
         createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
-        SignIn.init(this)
+        Volley.init(this)
         AndroidNearby.init(this)
         UserLoader.context = this
         initNavigationHandlers()
         setThemeIcon()
         if (!UserLoader.userExists()) return
         Handshake.init(this)
-        NotificationServer.init(this)
+        NotificationServer.init()
         AttendanceLoader.setup()
     }
 
-    private fun updateTextScale() {
-        val metrics = resources.displayMetrics
-        val wm =
-            getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        wm.defaultDisplay.getMetrics(metrics)
-        metrics.scaledDensity =
-            applicationContext.resources.configuration.fontScale * metrics.density
-        baseContext.resources.updateConfiguration(
-            applicationContext.resources.configuration,
-            metrics
-        )
-    }
-
-    fun setFontScale(scale: Float) {
-        Preferences.setTextScale(scale)
-        this.recreate()
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        Preferences.init(newBase)
-        val config = newBase.resources.configuration
-        config.fontScale = Preferences.getTextScale()
-        val newContext = newBase.createConfigurationContext(config)
-        super.attachBaseContext(newContext)
-    }
 
     fun initNavigationHandlers() {
         if (UserLoader.userExists()) {
