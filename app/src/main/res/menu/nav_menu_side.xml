@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
         <item
-            android:id="@+id/nav_main_side"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Home" />
+            android:id="@+id/nav_attendance"
+            android:icon="@drawable/ic_attendance"
+            android:title="Attendance" />
 
         <item
             android:id="@+id/logout"

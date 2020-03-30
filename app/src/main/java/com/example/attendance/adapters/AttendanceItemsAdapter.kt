@@ -90,11 +90,6 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                     )
                                     { selected, editing ->
                                         item.share(selected, editing)
-                                        Snackbar.make(
-                                            parent,
-                                            "Shared with ${selected.size} students.",
-                                            Snackbar.LENGTH_SHORT
-                                        ).show()
                                     }
                                 }
                             })

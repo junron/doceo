@@ -1,18 +1,45 @@
 package com.example.attendance.controllers
 
+import android.graphics.Color
+import android.view.Gravity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.example.attendance.MainActivity
+import com.example.attendance.R
 import com.example.attendance.adapters.AttendanceItemsAdapter
 import com.example.attendance.models.Attendance
 import com.example.attendance.models.AttendanceLoader
+import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.auth.UserLoader
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_attendance.*
 
 object AttendanceListController : FragmentController() {
+    private var signedIn: Boolean = false
     var detailAttendance: Attendance? = null
 
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
+            toolbarMain.apply {
+                setNavigationIcon(R.drawable.ic_baseline_menu_24)
+                navigationIcon?.setTint(Color.WHITE)
+                setNavigationOnClickListener {
+                    MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
+                }
+            }
+            if (!UserLoader.userExists()) {
+                MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                Navigation.navigate(R.id.signInNow)
+                return@with
+            } else if (!signedIn) {
+                MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                val user = UserLoader.getUser()
+                signedIn = true
+                Snackbar.make(mainParent, "Welcome, ${user.name}!", Snackbar.LENGTH_LONG)
+                    .show()
+                (activity as MainActivity).initNavigationHandlers()
+            }
             drawer_layout_end.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             val adapter = AttendanceItemsAdapter(
                 context,

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainContent">
+    app:startDestination="@id/attendanceFragment">
     <fragment
         android:id="@+id/mainContent"
         android:name="com.example.attendance.fragments.MainContent"
@@ -14,11 +14,6 @@
         android:name="com.example.attendance.fragments.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
-    <fragment
-        android:id="@+id/signInFragment"
-        android:name="com.example.attendance.fragments.SignInFragment"
-        android:label="fragment_sign_in"
-        tools:layout="@layout/fragment_sign_in" />
     <fragment
         android:id="@+id/filterFragment"
         android:name="com.example.attendance.fragments.FilterFragment"
@@ -38,4 +33,9 @@
         android:name="com.example.attendance.fragments.StudentSelectFragment"
         android:label="fragment_student_select"
         tools:layout="@layout/fragment_student_select" />
+    <fragment
+        android:id="@+id/signInNow"
+        android:name="com.example.attendance.fragments.SignInNow"
+        android:label="fragment_sign_in_now"
+        tools:layout="@layout/fragment_sign_in_now" />
 </navigation>

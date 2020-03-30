@@ -1,7 +1,10 @@
 package com.example.attendance.util.android
 
+import android.view.Gravity
+import androidx.core.view.iterator
 import androidx.navigation.NavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.attendance.MainActivity
+import com.google.android.material.navigation.NavigationView
 
 object Navigation {
     private lateinit var navMap: Map<Int, Int>
@@ -10,14 +13,17 @@ object Navigation {
     fun init(
         navMap: Map<Int, Int>,
         navController: NavController,
-        bottomNavView: BottomNavigationView
+        navigationView: NavigationView
     ) {
         Navigation.navMap = navMap
         Navigation.navController = navController
-        bottomNavView.setOnNavigationItemSelectedListener {
-            val destination = navMap[it.itemId] ?: return@setOnNavigationItemSelectedListener false
-            navController.navigate(destination)
-            true
+        navigationView.menu.iterator().forEach { menuItem ->
+            menuItem.setOnMenuItemClickListener {
+                val destination = navMap[it.itemId] ?: return@setOnMenuItemClickListener false
+                navController.navigate(destination)
+                MainActivity.drawerLayout.closeDrawer(Gravity.LEFT)
+                true
+            }
         }
     }
 

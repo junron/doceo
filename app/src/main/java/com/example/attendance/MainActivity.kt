@@ -45,14 +45,12 @@ class MainActivity : AppCompatActivity() {
         updateTextScale()
 
         val navController = nav_host_fragment.findNavController()
+        drawerLayout = drawer_layout
         Navigation.init(
             mapOf(
-                R.id.nav_main to R.id.mainContent,
-                R.id.nav_broadcast to R.id.nearbyFragment,
                 R.id.nav_attendance to R.id.attendanceFragment
-            ), navController, bottomAppBarNav
+            ), navController, drawerLayout.sideNavView
         )
-        drawerLayout = drawer_layout
         Students.loadStudents(this)
         createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         SignIn.init(this)
@@ -109,22 +107,13 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
             }
-        } else {
-            with(drawerLayout.sideNavView.menu) {
-                val item = getItem(1)
-                item.title = "Sign in"
-                item.setOnMenuItemClickListener {
-                    Navigation.navigate(R.id.signInFragment)
-                    drawerLayout.closeDrawer(Gravity.LEFT)
-                    true
-                }
-            }
         }
         settingsButton.setOnClickListener {
             drawerLayout.closeDrawer(Gravity.LEFT)
             Navigation.navigate(R.id.settings)
         }
         darkModeToggle.setOnClickListener {
+            drawerLayout.closeDrawer(Gravity.LEFT)
             Preferences.setDarkMode(!Preferences.isDarkMode())
             this@MainActivity.recreate()
         }
