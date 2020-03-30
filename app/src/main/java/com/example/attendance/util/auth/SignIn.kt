@@ -50,7 +50,7 @@ object SignIn {
         }
     }
 
-    fun signInUser(
+    private fun signInUser(
         activity: MainActivity,
         context: Context,
         callback: (token: String) -> Unit
