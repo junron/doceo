@@ -20,10 +20,10 @@ data class Attendance(
     @ExperimentalStdlibApi
     val permissions = buildList {
         add(Permission(owner, AccessLevel.OWNER, id))
-        addAll(editors.map {
+        addAll(editors.sorted().map {
             Permission(it, AccessLevel.EDITOR, id)
         })
-        addAll(viewers.map {
+        addAll(viewers.sorted().map {
             Permission(it, AccessLevel.VIEWER, id)
         })
     }

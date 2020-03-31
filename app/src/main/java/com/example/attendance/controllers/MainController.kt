@@ -35,7 +35,4 @@ object MainController : FragmentController() {
     }
 
 
-    fun updateFilters(constraints: String) {
-        this.constraints = constraints.split(" ")
-    }
 }

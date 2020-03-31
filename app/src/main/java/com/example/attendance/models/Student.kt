@@ -30,4 +30,27 @@ object Students {
 
     fun getStudentById(id: String) = students.find { it.id == id }
     fun getStudentByName(name: String) = students.find { it.name == name }
+    fun filterStudents(
+        query: List<String>,
+        _students: List<Student> = Students.students
+    ): List<Student> {
+        var students = _students
+        query.forEach {
+            if (":" !in it) return@forEach
+            val (key, value) = it.split(":")
+            val filterParam = FilterParam.filterParams.firstOrNull { param ->
+                param.key == "$key: "
+            } ?: return@forEach
+            if (value !in filterParam.possibleValues) return@forEach
+            when (filterParam.key) {
+                "from: " -> students = students.filter { student ->
+                    student.mentorGroup.substringAfter("M20") == value
+                }
+                "takes: " -> students = students.filter { student ->
+                    value in student.combination
+                }
+            }
+        }
+        return students
+    }
 }

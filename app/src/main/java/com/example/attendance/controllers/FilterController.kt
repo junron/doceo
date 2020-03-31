@@ -3,45 +3,51 @@ package com.example.attendance.controllers
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.fragment.app.Fragment
-import com.example.attendance.R
+import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.models.FilterParam
-import com.example.attendance.util.android.Navigation
+import com.example.attendance.models.Students
 import com.example.attendance.util.android.hideKeyboard
 import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 object FilterController : FragmentController() {
-    private lateinit var constraints: String
+    lateinit var constraints: String
     private lateinit var adapter: FilterAdapter
+    var callback: ((String) -> Unit)? = null
 
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
             adapter = FilterAdapter(filterEditText)
             suggestions.adapter = adapter
-            adapter.updateFilters("")
+            adapter.updateFilters(if (::constraints.isInitialized) constraints else "")
             filterEditText.requestFocus()
+            val classListAdapter = ClasslistAdapter.createAdapter(Students.students)
+            classListView.adapter = classListAdapter
             filterEditText.onTextChange {
                 adapter.updateFilters(it)
-                constraints = it
+                if (callback == null) {
+                    constraints = it
+                }
                 if (isValidFilter(it)) {
-                    filterDone.visibility = VISIBLE
+                    suggestions.visibility = GONE
+                    classListView.visibility = VISIBLE
+                    if (Students
+                            .filterStudents(it.split(" "), Students.students)
+                            .isNotEmpty()
+                    ) filterDone.visibility = VISIBLE
+                    classListAdapter.filterStudents(it.split(" "))
                 } else {
+                    classListView.visibility = GONE
+                    suggestions.visibility = VISIBLE
                     filterDone.visibility = GONE
                 }
             }
-            back.setOnClickListener {
-                hideKeyboard(this.activity!!)
-                if (filterEditText.text.toString().isBlank()) {
-                    MainController.updateFilters("")
-                }
-                Navigation.navigate(R.id.mainContent)
-            }
             filterDone.setOnClickListener {
                 hideKeyboard(this.activity!!)
-                Navigation.navigate(R.id.mainContent)
-                MainController.updateFilters(filterEditText.text.toString())
+                callback?.invoke(filterEditText.text.toString())
+                callback = null
             }
         }
     }

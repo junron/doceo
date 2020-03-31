@@ -58,6 +58,10 @@ object AttendanceListController : FragmentController() {
                     updateDetails(item)
                 }
             }
+
+            newAttendance.setOnClickListener {
+                Navigation.navigate(R.id.newAttendance2)
+            }
         }
     }
 

@@ -38,4 +38,9 @@
         android:name="com.example.attendance.fragments.SignInNow"
         android:label="fragment_sign_in_now"
         tools:layout="@layout/fragment_sign_in_now" />
+    <fragment
+        android:id="@+id/newAttendance2"
+        android:name="com.example.attendance.fragments.NewAttendance"
+        android:label="fragment_new_attendance"
+        tools:layout="@layout/fragment_new_attendance" />
 </navigation>

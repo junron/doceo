@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import com.example.attendance.models.FilterParam
 import com.example.attendance.models.StatefulStudent
 import com.example.attendance.models.Student
+import com.example.attendance.models.Students
 
 class ClasslistAdapter(private val originalStudents: List<StatefulStudent>) : BaseAdapter() {
     companion object {
@@ -40,22 +40,8 @@ class ClasslistAdapter(private val originalStudents: List<StatefulStudent>) : Ba
     }
 
     fun filterStudents(query: List<String>) {
-        students = originalStudents
-        query.forEach {
-            if (":" !in it) return@forEach
-            val (key, value) = it.split(":")
-            val filterParam = FilterParam.filterParams.firstOrNull { param ->
-                param.key == "$key: "
-            } ?: return@forEach
-            if (value !in filterParam.possibleValues) return@forEach
-            when (filterParam.key) {
-                "from: " -> students = students.filter { student ->
-                    student.student.mentorGroup.substringAfter("M20") == value
-                }
-                "takes: " -> students = students.filter { student ->
-                    value in student.student.combination
-                }
-            }
+        students = Students.filterStudents(query, originalStudents.map { it.student }).map {
+            StatefulStudent(it, 0)
         }
         notifyDataSetChanged()
     }
