@@ -34,6 +34,7 @@ object UserLoader {
     fun loadFirebaseUser(failure: (String) -> Unit) {
         with(context) {
             val token = filesDir.resolve("user/token").readText()
+            println(token)
             FirebaseAuth.getInstance().signInWithCustomToken(token)
                 .addOnFailureListener {
                     failure(it.message.toString())

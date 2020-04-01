@@ -28,6 +28,7 @@ import kotlinx.serialization.UnstableDefault
 class MainActivity : AppCompatActivity() {
     companion object {
         lateinit var drawerLayout: DrawerLayout
+        lateinit var activity: MainActivity
     }
 
     @UnstableDefault
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         UserLoader.context = this
         initNavigationHandlers()
         setThemeIcon()
+        activity = this
         if (!UserLoader.userExists()) return
         Handshake.init(this)
         NotificationServer.init()

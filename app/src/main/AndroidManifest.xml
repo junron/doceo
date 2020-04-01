@@ -19,9 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:launchMode="standard"
             android:name="com.example.attendance.MainActivity"
-            android:windowSoftInputMode="adjustResize">
+            android:launchMode="standard"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

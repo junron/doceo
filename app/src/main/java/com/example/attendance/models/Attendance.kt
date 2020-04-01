@@ -1,5 +1,6 @@
 package com.example.attendance.models
 
+import com.example.attendance.util.uuid
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -15,8 +16,30 @@ data class Attendance(
     val viewers: List<String> = emptyList(),
     val created: Timestamp = Timestamp.now(),
     val modified: Timestamp = Timestamp.now(),
+    val constraints: String = "",
+    val tags: Map<String, Int> = emptyMap(),
     val deleted: Boolean = false
 ) {
+    companion object {
+        fun newAttendance(name: String, tags: List<Tag>, constraints: String) {
+            Firebase.firestore.collection("attendance")
+                .document(uuid())
+                .set(
+                    mapOf(
+                        "name" to name,
+                        "owner" to FirebaseAuth.getInstance().uid,
+                        "editors" to emptyList<String>(),
+                        "viewers" to emptyList<String>(),
+                        "tags" to tags.map { it.name to it.color }.toMap(),
+                        "constraints" to constraints,
+                        "created" to Timestamp.now(),
+                        "modified" to Timestamp.now(),
+                        "deleted" to false
+                    )
+                )
+        }
+    }
+
     @ExperimentalStdlibApi
     val permissions = buildList {
         add(Permission(owner, AccessLevel.OWNER, id))
