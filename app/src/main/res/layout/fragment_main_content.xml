@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parentView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.MainContent">
@@ -10,38 +9,23 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbarMain"
+            android:id="@+id/toolbarClasslistToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_collapseMode="pin"
-            app:title="Attendance"
-            app:titleTextColor="@color/white">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/filter"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                app:icon="@drawable/ic_baseline_filter_list_24"
-                app:iconGravity="end"
-                app:iconTint="@color/white" />
-        </androidx.appcompat.widget.Toolbar>
-
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
 
     <GridView
         android:id="@+id/classListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:numColumns="2" />
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

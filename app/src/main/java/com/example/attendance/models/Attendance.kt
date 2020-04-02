@@ -1,12 +1,17 @@
 package com.example.attendance.models
 
+import com.example.attendance.util.AppendOnlyStorage
+import com.example.attendance.util.toDate
+import com.example.attendance.util.toStringValue
 import com.example.attendance.util.uuid
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.serialization.Serializable
 import org.ocpsoft.prettytime.PrettyTime
+import java.util.*
 
 data class Attendance(
     val id: String = "",
@@ -107,9 +112,23 @@ data class Attendance(
             .document(id)
             .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
     }
+
+    fun opened() {
+        AttendanceLoader.history += AttendanceHistory(id, Date().toStringValue())
+    }
+
+    fun lastOpenedDate(): String {
+        val latest = AttendanceLoader.history.filter { it.id == id }
+            .maxBy { it.time.toDate().time } ?: return "Never opened"
+        return "Opened ${PrettyTime().format(latest.time.toDate())}"
+    }
 }
 
+@Serializable
+data class AttendanceHistory(val id: String, val time: String)
+
 object AttendanceLoader {
+    val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())
     var attendance = emptyList<Attendance>()
         private set
 

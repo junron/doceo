@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.Students
+import com.example.attendance.util.AppendOnlyStorage
 import com.example.attendance.util.Volley
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         UserLoader.context = this
         initNavigationHandlers()
         setThemeIcon()
+        AppendOnlyStorage.init(this)
         activity = this
         if (!UserLoader.userExists()) return
         Handshake.init(this)

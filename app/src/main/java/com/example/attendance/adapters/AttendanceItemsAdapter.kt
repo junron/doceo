@@ -8,6 +8,7 @@ import android.widget.BaseAdapter
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
 import com.example.attendance.controllers.AttendanceListController
+import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.controllers.StudentSelectController
 import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.Attendance
@@ -29,70 +30,80 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.attendance_item, null)
         with(view) {
+            setOnClickListener {
+                item.opened()
+                ClasslistController.setClasslist(item)
+                Navigation.navigate(R.id.mainContent)
+            }
             itemName.text = item.name
+            lastOpenTime.text = item.lastOpenedDate()
+            if (item.permissions.size > 1) {
+                itemShared.visibility = View.VISIBLE
+            }
             itemMore.setOnClickListener {
                 BottomSheetDialog(context)
                     .apply {
                         behavior.peekHeight = 1500
-                        setContentView(inflater.inflate(R.layout.document_bottom_sheet, null)
-                            .apply {
-                                itemTitle.text = item.name
-                                itemDetails.setOnClickListener {
-                                    hide()
-                                    AttendanceListController.detailAttendance = item
-                                    AttendanceListController.updateDetails(item)
-                                    fragment.detailsClose.setOnClickListener {
-                                        fragment.drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                        setContentView(
+                            inflater.inflate(R.layout.document_bottom_sheet, null)
+                                .apply {
+                                    itemTitle.text = item.name
+                                    itemDetails.setOnClickListener {
+                                        hide()
+                                        AttendanceListController.detailAttendance = item
+                                        AttendanceListController.updateDetails(item)
+                                        fragment.detailsClose.setOnClickListener {
+                                            fragment.drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                                        }
+                                        val adapter = PermissionsListAdapter(item, user)
+                                        fragment.permissionsListView.adapter = adapter
+                                        fragment.drawer_layout_end.openDrawer(Gravity.RIGHT)
                                     }
-                                    val adapter = PermissionsListAdapter(item, user)
-                                    fragment.permissionsListView.adapter = adapter
-                                    fragment.drawer_layout_end.openDrawer(Gravity.RIGHT)
-                                }
-                                if (item.getAccessLevel(user) != AccessLevel.OWNER) {
-                                    itemRename.visibility = View.GONE
-                                    itemRemove.visibility = View.GONE
-                                    itemShare.visibility = View.GONE
-                                    return@apply
-                                }
-                                itemRename.setOnClickListener {
-                                    hide()
-                                    context.requestInputDialog(
-                                        "Rename item",
-                                        item.name,
-                                        "Rename"
-                                    ) {
-                                        it ?: return@requestInputDialog
-                                        item.rename(it)
+                                    if (item.getAccessLevel(user) != AccessLevel.OWNER) {
+                                        itemRename.visibility = View.GONE
+                                        itemRemove.visibility = View.GONE
+                                        itemShare.visibility = View.GONE
+                                        return@apply
                                     }
-                                }
-                                itemRemove.setOnClickListener {
-                                    hide()
-                                    item.delete()
-                                    Snackbar.make(
-                                        fragment.drawer_layout_end,
-                                        "Item removed",
-                                        Snackbar.LENGTH_LONG
-                                    ).setAction("Undo") {
-                                        item.restore()
+                                    itemRename.setOnClickListener {
+                                        hide()
+                                        context.requestInputDialog(
+                                            "Rename item",
+                                            item.name,
+                                            "Rename"
+                                        ) {
+                                            it ?: return@requestInputDialog
+                                            item.rename(it)
+                                        }
+                                    }
+                                    itemRemove.setOnClickListener {
+                                        hide()
+                                        item.delete()
                                         Snackbar.make(
                                             fragment.drawer_layout_end,
-                                            "Item restored",
-                                            Snackbar.LENGTH_SHORT
-                                        ).show()
-                                    }.show()
-                                }
-                                itemShare.setOnClickListener {
-                                    hide()
-                                    Navigation.navigate(R.id.studentSelectFragment)
-                                    StudentSelectController.initializeSharing(
-                                        exclude = listOf(item.owner) + item.editors + item.viewers,
-                                        back = R.id.attendanceFragment
-                                    )
-                                    { selected, editing ->
-                                        item.share(selected, editing)
+                                            "Item removed",
+                                            Snackbar.LENGTH_LONG
+                                        ).setAction("Undo") {
+                                            item.restore()
+                                            Snackbar.make(
+                                                fragment.drawer_layout_end,
+                                                "Item restored",
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+                                        }.show()
                                     }
-                                }
-                            })
+                                    itemShare.setOnClickListener {
+                                        hide()
+                                        Navigation.navigate(R.id.studentSelectFragment)
+                                        StudentSelectController.initializeSharing(
+                                            exclude = listOf(item.owner) + item.editors + item.viewers,
+                                            back = R.id.attendanceFragment
+                                        )
+                                        { selected, editing ->
+                                            item.share(selected, editing)
+                                        }
+                                    }
+                                })
                     }
                     .show()
 
