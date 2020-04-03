@@ -14,6 +14,7 @@ object Preferences {
     fun setDarkMode(darkMode: Boolean) =
         preferences.edit().putBoolean("darkMode?", darkMode).commit()
 
-    fun getTextScale() = preferences.getFloat("textScale", 1F)
-    fun setTextScale(scale: Float) = preferences.edit().putFloat("textScale", scale).commit()
+    fun getDeveloper() = preferences.getBoolean("developer", false)
+    fun setDeveloper(developer: Boolean) =
+        preferences.edit().putBoolean("developer", developer).commit()
 }

@@ -44,5 +44,6 @@ fun String.toDp(numDp: Int) =
 fun Date.toStringValue(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this)
 fun String.toDate() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(this) as Date
 fun String.formatDate(): String = SimpleDateFormat("dd MMM yyyy").format(toDate())
+infix fun Int.suffix(suffix: String) = if (this == 1) "1 $suffix" else "$this $suffix" + "s"
 
 fun uuid() = UUID.randomUUID().toString()

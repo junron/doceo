@@ -13,11 +13,11 @@
 
 
         <androidx.appcompat.widget.Toolbar
-            app:titleTextColor="@color/white"
             android:id="@+id/toolbarSettings"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_collapseMode="pin" />
+            app:layout_collapseMode="pin"
+            app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -28,15 +28,43 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_margin="@dimen/text_margin"
+            android:orientation="vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/updateApp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="Update app" />
+
+            <LinearLayout
+                android:id="@+id/developerMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Developer mode"
+                    android:textSize="24sp" />
+
+                <EditText
+                    android:id="@+id/sudoKeys"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Type certificate and private key here" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sudo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="sudo" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

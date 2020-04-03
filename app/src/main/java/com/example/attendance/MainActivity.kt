@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
                     FirebaseAuth.getInstance().signOut()
                     drawerLayout.closeDrawer(Gravity.LEFT)
                     this@MainActivity.recreate()
+                    Navigation.navigate(R.id.signInNow)
                     true
                 }
             }
