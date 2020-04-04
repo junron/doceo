@@ -1,5 +1,6 @@
 package com.example.attendance.util
 
+import android.text.format.DateUtils
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,6 +43,8 @@ fun String.toDp(numDp: Int) =
 
 
 fun Date.toStringValue(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this)
+fun Date.isToday() = DateUtils.isToday(this.time)
+fun Date.isYesterday() = DateUtils.isToday(this.time + DateUtils.DAY_IN_MILLIS)
 fun String.toDate() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(this) as Date
 fun String.formatDate(): String = SimpleDateFormat("dd MMM yyyy").format(toDate())
 infix fun Int.suffix(suffix: String) = if (this == 1) "1 $suffix" else "$this $suffix" + "s"

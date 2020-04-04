@@ -25,10 +25,14 @@ data class Attendance(
     val tags: Map<String, Int> = emptyMap(),
     val deleted: Boolean = false
 ) {
+    lateinit var classlists: List<ClasslistInstance>
+    private val listeners = mutableListOf<(List<ClasslistInstance>) -> Unit>()
+
     companion object {
         fun newAttendance(name: String, tags: List<Tag>, constraints: String) {
+            val id = uuid()
             Firebase.firestore.collection("attendance")
-                .document(uuid())
+                .document(id)
                 .set(
                     mapOf(
                         "name" to name,
@@ -42,7 +46,52 @@ data class Attendance(
                         "deleted" to false
                     )
                 )
+            Firebase.firestore.collection("attendance")
+                .document(id)
+                .collection("lists")
+                .document(uuid())
+                .set(mapOf("events" to emptyList<String>()))
         }
+    }
+
+    init {
+        if (id != "") {
+            Firebase.firestore.collection("attendance")
+                .document(id)
+                .collection("lists")
+                .get()
+                .addOnSuccessListener {
+                    this.classlists = it.documents.mapNotNull { snapshot ->
+                        try {
+                            snapshot.toObject(ClasslistInstance::class.java)
+                                ?.copy(parent = this, id = snapshot.id)
+                        } catch (e: Exception) {
+                            println(e)
+                            null
+                        }
+                    }
+                }
+            Firebase.firestore.collection("attendance")
+                .document(id)
+                .collection("lists")
+                .addSnapshotListener { snapshotList, _ ->
+                    snapshotList ?: return@addSnapshotListener
+                    this.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                        try {
+                            snapshot.toObject(ClasslistInstance::class.java)
+                                ?.copy(parent = this, id = snapshot.id)
+                        } catch (e: Exception) {
+                            println(e)
+                            null
+                        }
+                    }
+                    listeners.forEach { it(this.classlists) }
+                }
+        }
+    }
+
+    fun addListener(callback: (List<ClasslistInstance>) -> Unit) {
+        listeners += callback
     }
 
     @ExperimentalStdlibApi

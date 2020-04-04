@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <GridView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/classListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

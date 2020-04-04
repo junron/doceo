@@ -3,10 +3,8 @@ package com.example.attendance.controllers
 import android.graphics.Color
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
-import com.example.attendance.adapters.ClasslistAdapter
+import com.example.attendance.adapters.ClasslistPagerAdapter
 import com.example.attendance.models.Attendance
-import com.example.attendance.models.StatefulStudent
-import com.example.attendance.models.Students
 import com.example.attendance.util.android.Navigation
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
@@ -37,13 +35,12 @@ object ClasslistController : FragmentController() {
             this.attendance = attendance
             with(context) {
                 toolbarClasslistToolbar.title = attendance.name
-                println(attendance.name)
-                val adapter =
-                    ClasslistAdapter(Students.filterStudents(attendance.constraints.split(" "))
-                        .map {
-                            StatefulStudent(it, 0)
-                        })
-                classListView.adapter = adapter
+//                classListView.adapter = ClasslistAdapter(
+//                    Students.filterStudents(attendance.constraints.split(" "))
+//                        .map {
+//                            StatefulStudent(it, 0)
+//                        }, true)
+                classlistViewPager.adapter = ClasslistPagerAdapter(attendance, this)
             }
         }
         if (contextInitialized() && context.view != null) run()

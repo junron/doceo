@@ -3,6 +3,7 @@ package com.example.attendance.controllers
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.models.FilterParam
@@ -25,6 +26,7 @@ object FilterController : FragmentController() {
             filterEditText.requestFocus()
             val classListAdapter = ClasslistAdapter.createAdapter(Students.students)
             classListView.adapter = classListAdapter
+            classListView.layoutManager = GridLayoutManager(context.context!!, 2)
             filterEditText.onTextChange {
                 adapter.updateFilters(it)
                 if (callback == null) {
