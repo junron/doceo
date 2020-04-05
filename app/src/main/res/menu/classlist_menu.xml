@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/classlist_tap"
+        android:icon="@drawable/ic_baseline_touch_app_24"
+        android:title="Tap" />
+    <item
+        android:id="@+id/classlist_ocr"
+        android:icon="@drawable/ic_ocr"
+        android:title="OCR" />
+    <item
+        android:id="@+id/classlist_advertise"
+        android:icon="@drawable/ic_cell_tower"
+        android:title="Wireless" />
+    <item
+        android:id="@+id/classlist_analyze"
+        android:icon="@drawable/ic_baseline_show_chart_24"
+        android:title="Analyze" />
+</menu>

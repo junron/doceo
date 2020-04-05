@@ -1,13 +1,17 @@
 package com.example.attendance
 
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
+import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.Students
 import com.example.attendance.util.AppendOnlyStorage
@@ -25,8 +29,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
 import kotlinx.serialization.UnstableDefault
+import org.opencv.android.OpenCVLoader
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     companion object {
         lateinit var drawerLayout: DrawerLayout
         lateinit var activity: MainActivity
@@ -63,6 +68,9 @@ class MainActivity : AppCompatActivity() {
         Handshake.init(this)
         NotificationServer.init()
         AttendanceLoader.setup()
+        if (OpenCVLoader.initDebug()) {
+            println("Loaded")
+        }
     }
 
 
@@ -103,4 +111,22 @@ class MainActivity : AppCompatActivity() {
             darkModeToggle.setImageResource(R.drawable.ic_light_mode)
         }
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        println(PackageManager.PERMISSION_GRANTED)
+        println("Permissions: $requestCode ${permissions.toList()} ${grantResults.toList()}")
+        when (requestCode) {
+            0 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ClasslistController.initCamera()
+                }
+            }
+        }
+    }
+
+    override fun getCameraXConfig() = Camera2Config.defaultConfig()
 }
