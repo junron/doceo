@@ -35,11 +35,6 @@ object ClasslistController : FragmentController() {
             this.attendance = attendance
             with(context) {
                 toolbarClasslistToolbar.title = attendance.name
-//                classListView.adapter = ClasslistAdapter(
-//                    Students.filterStudents(attendance.constraints.split(" "))
-//                        .map {
-//                            StatefulStudent(it, 0)
-//                        }, true)
                 classlistViewPager.adapter = ClasslistPagerAdapter(attendance, this)
             }
         }

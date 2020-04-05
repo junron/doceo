@@ -1,64 +1,68 @@
 package com.example.attendance.adapters
 
-import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.attendance.models.ClasslistEvent
+import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.models.StatefulStudent
-import com.example.attendance.models.Student
 import com.example.attendance.models.Students
 
 class ClasslistAdapter(
-    private val originalStudents: List<StatefulStudent>,
-    private val editable: Boolean
+    private var classlist: ClasslistInstance
 ) : RecyclerView.Adapter<ClasslistAdapter.StudentViewHolder>() {
-
-    companion object {
-        fun createAdapter(students: List<Student>, editable: Boolean = false) =
-            ClasslistAdapter(students.map {
-                StatefulStudent(it, 0)
-            }, editable)
-    }
-
-    private var students = originalStudents
-
     class StudentViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+
+    private var attendance = classlist.parent!!
+    lateinit var students: List<StatefulStudent>
+
+    init {
+        dataChanged(classlist)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         StudentViewHolder(TextView(parent.context))
 
     override fun onBindViewHolder(holder: StudentViewHolder, position: Int) {
-        val statefulStudent = getItem(position)
-        val (student, state) = statefulStudent
+        val (student, tag) = getItem(position)
         holder.textView.apply {
             text = student.shortName
-            setTextColor(
-                if (state == 1) Color.GREEN else Color.RED
-            )
+            setTextColor(tag.color)
             setPadding(36, 24, 10, 36)
-            if (editable)
-                setOnClickListener {
-                    statefulStudent.state++
-                    statefulStudent.state %= 2
-                    notifyDataSetChanged()
-                }
+            setOnClickListener {
+                classlist.addEvent(
+                    ClasslistEvent.StateChanged(
+                        student.id,
+                        (if (tag == attendance.getParsedTags()
+                                .first()
+                        ) attendance.getParsedTags()[1]
+                        else attendance.getParsedTags()[0]).id
+                    )
+                )
+            }
             gravity = Gravity.CENTER
             textSize = 18f
         }
     }
 
-
-    fun filterStudents(query: List<String>) {
-        students = Students.filterStudents(query, originalStudents.map { it.student }).map {
-            StatefulStudent(it, 0)
+    fun dataChanged(classlist: ClasslistInstance) {
+        this.classlist = classlist
+        this.attendance = classlist.parent!!
+        val defaultTag = attendance.getParsedTags().first()
+        val tags = attendance.getParsedTags().map { it.id to it }.toMap()
+        val stateMap = mutableMapOf<String, String>()
+        classlist.getParsedEvents().forEach {
+            if (it is ClasslistEvent.StateChanged) {
+                stateMap[it.targetId] = it.state
+            }
         }
+        students = Students.filterStudents(attendance.constraints.split(" "))
+            .map { StatefulStudent(it, tags[stateMap[it.id]] ?: defaultTag) }
         notifyDataSetChanged()
     }
 
-    private fun getItem(position: Int): StatefulStudent {
-        return students[position]
-    }
+    private fun getItem(position: Int) = students[position]
 
     override fun getItemCount() = students.size
 }

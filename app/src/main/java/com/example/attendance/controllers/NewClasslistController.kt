@@ -1,5 +1,6 @@
 package com.example.attendance.controllers
 
+import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
@@ -19,6 +20,13 @@ object NewClasslistController : FragmentController() {
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
+            newClasslistToolbar.apply {
+                setNavigationIcon(R.drawable.ic_baseline_close_24)
+                navigationIcon?.setTint(Color.WHITE)
+                setNavigationOnClickListener {
+                    Navigation.navigate(R.id.attendanceFragment)
+                }
+            }
             selectStudents.setOnClickListener {
                 name = classlistName.editText?.text.toString()
                 tags = adapter.tags

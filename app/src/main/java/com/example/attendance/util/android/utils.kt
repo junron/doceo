@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.example.attendance.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_layout.view.*
@@ -36,7 +35,7 @@ operator fun TextView.plusAssign(s: String) {
 
 fun View.setMargin(left: Int, top: Int, right: Int, bottom: Int) {
     if (layoutParams == null) layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-    this.layoutParams = CoordinatorLayout.LayoutParams(layoutParams)
+    (this.layoutParams as ViewGroup.MarginLayoutParams)
         .apply {
             this.setMargins(left, top, right, bottom)
         }

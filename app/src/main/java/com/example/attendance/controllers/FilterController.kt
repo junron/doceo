@@ -4,8 +4,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.adapters.FilterAdapter
+import com.example.attendance.adapters.ImmutableClasslistAdapter
 import com.example.attendance.models.FilterParam
 import com.example.attendance.models.Students
 import com.example.attendance.util.android.hideKeyboard
@@ -24,7 +24,7 @@ object FilterController : FragmentController() {
             suggestions.adapter = adapter
             adapter.updateFilters(if (::constraints.isInitialized) constraints else "")
             filterEditText.requestFocus()
-            val classListAdapter = ClasslistAdapter.createAdapter(Students.students)
+            val classListAdapter = ImmutableClasslistAdapter(Students.students)
             classListView.adapter = classListAdapter
             classListView.layoutManager = GridLayoutManager(context.context!!, 2)
             filterEditText.onTextChange {

@@ -9,8 +9,10 @@ import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.controllers.NewClasslistController
 import com.example.attendance.models.Tag
+import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.onTextChange
+import com.example.attendance.util.uuid
 import kotlinx.android.synthetic.main.tag_item.view.*
 import petrov.kristiyan.colorpicker.ColorPicker
 
@@ -19,7 +21,7 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
     BaseAdapter() {
     init {
         if (editable) {
-            tags.plusAssign(Tag("Tag name", -1))
+            tags.plusAssign(Tag(uuid(), "Tag name", -1))
         }
     }
 
@@ -66,6 +68,7 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
                     tags.remove(item)
                     notifyDataSetChanged()
                 }
+                if (item.id in Tags.defaultTags.map { it.id }) tagDelete.visibility = View.GONE
             } else {
                 tagName.isFocusable = false
                 tagName.isFocusableInTouchMode = false
@@ -81,8 +84,8 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
     override fun getCount() = tags.size
 
     override fun notifyDataSetChanged() {
-        if (editable && Tag("Tag name", -1) !in tags) {
-            tags.plusAssign(Tag("Tag name", -1))
+        if (editable && tags.find { it.color == -1 } == null) {
+            tags.plusAssign(Tag(uuid(), "Tag name", -1))
         }
         NewClasslistController.checkValidState()
         super.notifyDataSetChanged()

@@ -2,7 +2,11 @@ package com.example.attendance.models
 
 import com.example.attendance.util.toStringValue
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.util.*
 
@@ -14,21 +18,36 @@ data class ClasslistInstance(
     val modified: Timestamp = Timestamp.now()
 ) {
     fun addEvent(event: ClasslistEvent) {
-        events += Json.stringify(ClasslistEvent.serializer(), event)
+        val eventString = Json.stringify(ClasslistEvent.serializer(), event)
+        events += eventString
+        Firebase.firestore.collection("attendance")
+            .document(parent!!.id)
+            .collection("lists")
+            .document(id)
+            .update("events", FieldValue.arrayUnion(eventString), "modified", Timestamp.now())
+    }
+
+    fun getParsedEvents() = events.mapNotNull {
+        try {
+            Json.parse(ClasslistEvent.serializer(), it)
+        } catch (e: SerializationException) {
+            null
+        }
     }
 }
 
 @Serializable
 sealed class ClasslistEvent {
     @Serializable
-    data class Opened(val uid: String)
+    data class Opened(val uid: String) : ClasslistEvent()
 
     @Serializable
-    data class Closed(val uid: String)
+    data class Closed(val uid: String) : ClasslistEvent()
 
     @Serializable
-    data class SetState(val targetId: String, val state: Tag, val timestamp: String) {
-        constructor(targetId: String, state: Tag) : this(
+    data class StateChanged(val targetId: String, val state: String, val timestamp: String) :
+        ClasslistEvent() {
+        constructor(targetId: String, state: String) : this(
             targetId, state, Date().toStringValue()
         )
     }

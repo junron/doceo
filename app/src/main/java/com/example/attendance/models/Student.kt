@@ -16,7 +16,7 @@ data class Student(
 )
 
 @Serializable
-data class StatefulStudent(val student: Student, var state: Int)
+data class StatefulStudent(val student: Student, var tag: Tag)
 
 object Students {
     var students: List<Student> = emptyList()

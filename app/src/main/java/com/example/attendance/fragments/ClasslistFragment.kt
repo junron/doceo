@@ -10,15 +10,15 @@ import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.models.Attendance
 import com.example.attendance.models.ClasslistInstance
-import com.example.attendance.models.StatefulStudent
-import com.example.attendance.models.Students
 import com.example.attendance.util.isToday
 import com.example.attendance.util.isYesterday
 import kotlinx.android.synthetic.main.fragment_classlist.*
+import kotlinx.android.synthetic.main.fragment_main_content.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ClasslistFragment(val attendance: Attendance, val classlist: ClasslistInstance) : Fragment() {
+class ClasslistFragment(val attendance: Attendance, private var classlist: ClasslistInstance) :
+    Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,15 +30,15 @@ class ClasslistFragment(val attendance: Attendance, val classlist: ClasslistInst
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ClasslistAdapter(
-            Students.filterStudents(attendance.constraints.split(" "))
-                .map {
-                    StatefulStudent(it, 0)
-                }, true
-        )
+        val adapter = ClasslistAdapter(classlist)
+        attendance.addListener {
+            this.classlist =
+                attendance.classlists.find { it.id == classlist.id } ?: return@addListener
+            adapter.dataChanged(classlist)
+        }
         classListView.adapter = adapter
         classListView.layoutManager = GridLayoutManager(context, 2)
-        timestamp.text = formatDate(classlist.created.toDate())
+        parentFragment?.toolbarClasslistToolbar?.subtitle = formatDate(classlist.created.toDate())
     }
 
 

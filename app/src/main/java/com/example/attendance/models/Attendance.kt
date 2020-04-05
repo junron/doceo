@@ -10,6 +10,8 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
 
@@ -22,7 +24,7 @@ data class Attendance(
     val created: Timestamp = Timestamp.now(),
     val modified: Timestamp = Timestamp.now(),
     val constraints: String = "",
-    val tags: Map<String, Int> = emptyMap(),
+    val tags: List<String> = emptyList(),
     val deleted: Boolean = false
 ) {
     lateinit var classlists: List<ClasslistInstance>
@@ -39,7 +41,7 @@ data class Attendance(
                         "owner" to FirebaseAuth.getInstance().uid,
                         "editors" to emptyList<String>(),
                         "viewers" to emptyList<String>(),
-                        "tags" to tags.map { it.name to it.color }.toMap(),
+                        "tags" to tags.map { Json.stringify(Tag.serializer(), it) },
                         "constraints" to constraints,
                         "created" to Timestamp.now(),
                         "modified" to Timestamp.now(),
@@ -50,7 +52,13 @@ data class Attendance(
                 .document(id)
                 .collection("lists")
                 .document(uuid())
-                .set(mapOf("events" to emptyList<String>()))
+                .set(
+                    mapOf(
+                        "events" to emptyList<String>(),
+                        "created" to Timestamp.now(),
+                        "modified" to Timestamp.now()
+                    )
+                )
         }
     }
 
@@ -171,6 +179,14 @@ data class Attendance(
             .maxBy { it.time.toDate().time } ?: return "Never opened"
         return "Opened ${PrettyTime().format(latest.time.toDate())}"
     }
+
+    fun getParsedTags() = tags.mapNotNull {
+        try {
+            Json.parse(Tag.serializer(), it)
+        } catch (e: SerializationException) {
+            null
+        }
+    }
 }
 
 @Serializable
@@ -195,7 +211,11 @@ object AttendanceLoader {
 
     private val processQuery = { documents: List<DocumentSnapshot> ->
         documents.mapNotNull {
-            it.toObject(Attendance::class.java)?.copy(id = it.id)
+            try {
+                it.toObject(Attendance::class.java)?.copy(id = it.id)
+            } catch (e: RuntimeException) {
+                null
+            }
         }
     }
 
