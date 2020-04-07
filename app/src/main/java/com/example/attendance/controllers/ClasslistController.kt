@@ -10,6 +10,7 @@ import android.util.Size
 import android.view.View
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,13 +18,11 @@ import androidx.lifecycle.LifecycleOwner
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistPagerAdapter
 import com.example.attendance.models.Attendance
-import com.example.attendance.models.ClasslistEvent
 import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
 import com.example.attendance.util.android.ocr.TextAnalyzer
-import com.example.attendance.util.toDate
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 
@@ -40,6 +39,7 @@ object ClasslistController : FragmentController() {
                 setNavigationIcon(R.drawable.ic_baseline_close_24)
                 navigationIcon?.setTint(Color.WHITE)
                 setNavigationOnClickListener {
+                    closeCamera()
                     Navigation.navigate(R.id.attendanceFragment)
                 }
             }
@@ -47,14 +47,14 @@ object ClasslistController : FragmentController() {
                 when (it.itemId) {
                     R.id.classlist_tap -> {
                         closeCamera()
-                        outputImageView.visibility = View.GONE
+                        preview_view.visibility = View.GONE
                     }
                     R.id.classlist_ocr -> {
                         Permissions.requestPermissions(
                             context.activity!!,
                             Manifest.permission.CAMERA
                         )
-                        outputImageView.visibility = View.VISIBLE
+                        preview_view.visibility = View.VISIBLE
                     }
                 }
                 true
@@ -81,12 +81,18 @@ object ClasslistController : FragmentController() {
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
 
+        val preview = Preview.Builder()
+            .setTargetName("Preview")
+            .build()
+
+
         val students = Students.filterStudents(attendance.constraints.split(" "))
         val vibrator = context.context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         with(context) {
+            preview.setSurfaceProvider(preview_view.previewSurfaceProvider)
             imageAnalyzer.setAnalyzer(
                 ContextCompat.getMainExecutor(context),
-                TextAnalyzer({
+                TextAnalyzer {
                     students.filter { student ->
                         val idName =
                             if (student.shortName.length > 4) student.shortName.toLowerCase()
@@ -97,17 +103,11 @@ object ClasslistController : FragmentController() {
                         ).toLowerCase() in it.toLowerCase()
                     }.forEach { student ->
                         val classlist = attendance.classlists.last()
-                        val currentState = classlist.getParsedEvents()
-                            .filter { it is ClasslistEvent.StateChanged && it.targetId == student.id }
-                            .map { it as ClasslistEvent.StateChanged }
-                            .maxBy { it.timestamp.toDate() }?.state
+                        val currentState = classlist.studentState[student.id]
+                        println(Tags.present)
+                        println(Tags.defaultTags.last())
                         if (currentState != Tags.present) {
-                            classlist.addEvent(
-                                ClasslistEvent.StateChanged(
-                                    student.id,
-                                    Tags.present
-                                )
-                            )
+                            classlist.setStudentState(student, Tags.defaultTags.last())
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vibrator.vibrate(
                                     VibrationEffect.createOneShot(
@@ -121,13 +121,14 @@ object ClasslistController : FragmentController() {
                             }
                         }
                     }
-                }, outputImageView)
+                }
             )
         }
         cameraProvider.bindToLifecycle(
             context.activity as LifecycleOwner,
             selector,
-            imageAnalyzer
+            imageAnalyzer,
+            preview
         )
     }
 

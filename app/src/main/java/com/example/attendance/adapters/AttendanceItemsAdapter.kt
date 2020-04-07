@@ -31,7 +31,7 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
         val view = inflater.inflate(R.layout.attendance_item, null)
         with(view) {
             setOnClickListener {
-                item.opened()
+                item.opened(user)
                 ClasslistController.setClasslist(item)
                 Navigation.navigate(R.id.mainContent)
             }
@@ -48,6 +48,10 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                             inflater.inflate(R.layout.document_bottom_sheet, null)
                                 .apply {
                                     itemTitle.text = item.name
+                                    itemA2hs.setOnClickListener {
+                                        hide()
+                                        item.addToHomeScreen()
+                                    }
                                     itemDetails.setOnClickListener {
                                         hide()
                                         AttendanceListController.detailAttendance = item

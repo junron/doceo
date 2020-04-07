@@ -1,5 +1,12 @@
 package com.example.attendance.models
 
+import android.content.Intent
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
+import android.os.Build
+import com.example.attendance.MainActivity
+import com.example.attendance.R
 import com.example.attendance.util.AppendOnlyStorage
 import com.example.attendance.util.toDate
 import com.example.attendance.util.toStringValue
@@ -21,6 +28,7 @@ data class Attendance(
     val owner: String = "",
     val editors: List<String> = emptyList(),
     val viewers: List<String> = emptyList(),
+    val onlineUsers: List<String> = emptyList(),
     val created: Timestamp = Timestamp.now(),
     val modified: Timestamp = Timestamp.now(),
     val constraints: String = "",
@@ -45,7 +53,8 @@ data class Attendance(
                         "constraints" to constraints,
                         "created" to Timestamp.now(),
                         "modified" to Timestamp.now(),
-                        "deleted" to false
+                        "deleted" to false,
+                        "onlineUsers" to emptyList<String>()
                     )
                 )
             Firebase.firestore.collection("attendance")
@@ -54,7 +63,7 @@ data class Attendance(
                 .document(uuid())
                 .set(
                     mapOf(
-                        "events" to emptyList<String>(),
+                        "studentState" to emptyMap<String, String>(),
                         "created" to Timestamp.now(),
                         "modified" to Timestamp.now()
                     )
@@ -170,9 +179,19 @@ data class Attendance(
             .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
     }
 
-    fun opened() {
+    fun opened(uid: String) {
         AttendanceLoader.history += AttendanceHistory(id, Date().toStringValue())
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .update("onlineUsers", onlineUsers + uid)
     }
+
+    fun closed(uid: String) {
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .update("onlineUsers", onlineUsers - uid)
+    }
+
 
     fun lastOpenedDate(): String {
         val latest = AttendanceLoader.history.filter { it.id == id }
@@ -185,6 +204,46 @@ data class Attendance(
             Json.parse(Tag.serializer(), it)
         } catch (e: SerializationException) {
             null
+        }
+    }
+
+    fun addToHomeScreen() {
+        val shortcutIntent =
+            Intent(MainActivity.activity.applicationContext, MainActivity::class.java).apply {
+                putExtra("attendance_id", id)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            }
+        Intent()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val shortcut = ShortcutInfo.Builder(MainActivity.activity, id)
+                .setShortLabel(name)
+                .setLongLabel("Open $name")
+                .setIcon(
+                    Icon.createWithResource(
+                        MainActivity.activity,
+                        R.drawable.ic_baseline_group_24
+                    )
+                )
+                .setIntent(shortcutIntent)
+                .build()
+            val shortcutManager =
+                MainActivity.activity.getSystemService(ShortcutManager::class.java)
+            shortcutManager.requestPinShortcut(shortcut, null)
+        } else {
+            val addIntent = Intent()
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent)
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name)
+            addIntent.putExtra(
+                Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                Intent.ShortcutIconResource.fromContext(
+                    MainActivity.activity,
+                    R.drawable.ic_baseline_group_24
+                )
+            )
+            addIntent.action = "com.android.launcher.action.INSTALL_SHORTCUT";
+            addIntent.putExtra("duplicate", false)
+            MainActivity.activity.sendBroadcast(addIntent)
         }
     }
 }

@@ -30,10 +30,12 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/outputImageView"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
             android:visibility="gone" />
     </LinearLayout>
 

@@ -34,6 +34,7 @@ class ClasslistFragment(val attendance: Attendance, private var classlist: Class
         attendance.addListener {
             this.classlist =
                 attendance.classlists.find { it.id == classlist.id } ?: return@addListener
+            println(classlist)
             adapter.dataChanged(classlist)
         }
         classListView.adapter = adapter
