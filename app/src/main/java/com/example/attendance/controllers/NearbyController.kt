@@ -1,77 +1,48 @@
 package com.example.attendance.controllers
 
-import android.Manifest
-import android.view.View.GONE
+import android.graphics.Color
+import android.view.Gravity
 import androidx.fragment.app.Fragment
+import com.example.attendance.MainActivity
+import com.example.attendance.R
 import com.example.attendance.util.android.nearby.AndroidNearby
-import com.example.attendance.util.android.nearby.NearbyMessage
-import com.example.attendance.util.android.nearby.NearbyStage
-import com.example.attendance.util.android.nearby.state
-import com.example.attendance.util.android.plusAssign
-import com.example.attendance.util.auth.UserLoader.getUserOrNull
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.single.BasePermissionListener
+import com.example.attendance.util.auth.User
 import kotlinx.android.synthetic.main.fragment_nearby.*
 
 object NearbyController : FragmentController() {
+    private var advertising = false
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
-            val user = getUserOrNull() ?: return@with
-            if (user.isMentorRep) {
-                advertise.setOnClickListener {
+            toolbarMain.apply {
+                setNavigationIcon(R.drawable.ic_baseline_menu_24)
+                navigationIcon?.setTint(Color.WHITE)
+                setNavigationOnClickListener {
+                    MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
+                }
+            }
+            toggleAdvertise.setOnClickListener {
+                advertising = if (!advertising) {
                     AndroidNearby.startAdvertising()
-                    advertise.isEnabled = false
-                }
-                discover.visibility = GONE
-            } else {
-                discover.setOnClickListener {
-                    Dexter.withActivity(context.activity)
-                        .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        .withListener(object : BasePermissionListener() {
-                            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                                AndroidNearby.startDiscovery()
-                            }
-                        })
-                        .check()
-                    discover.isEnabled = false
-                }
-                advertise.visibility = GONE
-            }
-
-            stop.setOnClickListener {
-                AndroidNearby.stop()
-                discover.isEnabled = true
-                advertise.isEnabled = true
-            }
-            send.setOnClickListener {
-                val text = messageBox.text.toString()
-                state.values.forEach {
-                    it.sendPayload(
-                        NearbyMessage(
-                            NearbyStage.GENERIC_DATA, text
-                        ).toPayload()
-                    )
+                    toggleAdvertise.text = "Stop"
+                    true
+                } else {
+                    AndroidNearby.stopAdvertising()
+                    toggleAdvertise.text = "Start"
+                    false
                 }
             }
         }
     }
 
-    fun dataMessageReceived(data: String) {
-        context.nearbyOutput += "$data\n"
+    fun onConnected(user: User) {
+        println("Connected to $user")
     }
 
-    fun handshakeEventReceived(data: String) {
-        context.nearbyOutput += "Handshake: $data\n"
-    }
-
-    fun onConnected() {
-        AndroidNearby.stopDiscovery()
-        context.send.isEnabled = true
+    fun onHandshakeComplete() {
+        println("handshake complete")
     }
 
     fun onDisconnected() {
-        context.send.isEnabled = false
     }
 }

@@ -2,10 +2,10 @@ package com.example.attendance.util.android.nearby.protocols
 
 import android.content.Context
 import com.example.attendance.controllers.NearbyController
-import com.example.attendance.util.android.nearby.NearbyMessage
-import com.example.attendance.util.android.nearby.NearbyStage
+import com.example.attendance.util.android.nearby.toPayload
 import com.example.attendance.util.auth.Crypto
 import com.example.attendance.util.auth.Crypto.Companion.loadKeyBytes
+import com.example.attendance.util.auth.User
 import com.example.attendance.util.auth.UserLoader.getCertificate
 import com.example.attendance.util.auth.models.SignedCertificate
 import com.google.android.gms.nearby.connection.ConnectionsClient
@@ -14,15 +14,20 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
 @UnstableDefault
-class Handshake(connection: ConnectionsClient, endpointId: String) :
+class Handshake(
+    connection: ConnectionsClient,
+    endpointId: String,
+    private val advertising: Boolean
+) :
     Protocol(connection, endpointId) {
     /*
     Steps:
-    0: Certificate exchange
-    1: Receive and respond to challenge
-    2: Receive and verify server response
+    0: Server: sends certificate to client; Client: Verify certificate and send challenge to server
+    1: Server: Receive challenge, generate response; Client: verify server response, send certificates
+    2: Server: Verify certificates and send challenge; Client: Generate response to challenge
+    3: Server: Verify response, sends OK; Client: Receives OK, closes connection
      */
-    lateinit var serverCertificate: SignedCertificate
+    private lateinit var serverCertificate: SignedCertificate
     private lateinit var serverChallenge: String
 
     companion object {
@@ -34,7 +39,7 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
         }
     }
 
-    private fun setServerCertificate(certificate: String): Boolean {
+    private fun setRemoteCertificate(certificate: String): Boolean {
         return try {
             serverCertificate = Json.parse(SignedCertificate.serializer(), certificate)
             true
@@ -44,7 +49,7 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
         }
     }
 
-    private fun generateServerChallenge(): String {
+    private fun generateChallenge(): String {
         // Generate random string to prove server has private key
         serverChallenge = Crypto.randomString()
         return serverChallenge
@@ -61,7 +66,7 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
         }
     }
 
-    private fun verifyServerResponse(signature: String) = try {
+    private fun verifyRemoteResponse(signature: String) = try {
         Crypto.verify(
             serverChallenge,
             signature,
@@ -72,42 +77,75 @@ class Handshake(connection: ConnectionsClient, endpointId: String) :
         false
     }
 
-    override fun next(message: NearbyMessage) {
+    override fun next(message: String) {
         when (state) {
             0 -> {
-                val result = setServerCertificate(message.data)
-                if (!result) {
-                    connection.disconnectFromEndpoint(endpointId)
-                    return
+                if (advertising) sendPayload(clientCertificateString.toPayload())
+                else {
+                    val result = setRemoteCertificate(message)
+                    if (!result) {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    //  Send challenge to remote
+                    sendPayload(generateChallenge().toPayload())
                 }
-                //  Send challenge to server
-                sendPayload(
-                    NearbyMessage(
-                        NearbyStage.HANDSHAKE,
-                        generateServerChallenge()
-                    ).toPayload()
-                )
             }
             1 -> {
-                val response = respondToChallenge(message.data) ?: kotlin.run {
-                    connection.disconnectFromEndpoint(endpointId)
-                    return
+                if (advertising) {
+                    val response = respondToChallenge(message) ?: kotlin.run {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    sendPayload(response.toPayload())
+                } else {
+                    if (!verifyRemoteResponse(message)) {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    val cert = serverCertificate.certificate
+                    val remoteUser = User(cert.name, cert.id, cert.metadata)
+                    if (!remoteUser.isMentorRep) {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    // Connected to Mentor Rep
+                    println("Connected to ${serverCertificate.certificate.name}")
+                    NearbyController.onConnected(remoteUser)
+                    sendPayload(clientCertificateString.toPayload())
                 }
-                // Respond to server challenge
-                sendPayload(
-                    NearbyMessage(
-                        NearbyStage.HANDSHAKE,
-                        response
-                    ).toPayload()
-                )
             }
             2 -> {
-                //  Verify server response
-                if (!verifyServerResponse(message.data)) {
-                    connection.disconnectFromEndpoint(endpointId)
-                    return
+                if (advertising) {
+                    val result = setRemoteCertificate(message)
+                    if (!result) {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    //  Send challenge to peer
+                    sendPayload(generateChallenge().toPayload())
+                } else {
+                    val response = respondToChallenge(message) ?: kotlin.run {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    sendPayload(response.toPayload())
                 }
-                NearbyController.handshakeEventReceived("Connected to ${serverCertificate.certificate.name}")
+            }
+            3 -> {
+                if (advertising) {
+                    if (!verifyRemoteResponse(message)) {
+                        connection.disconnectFromEndpoint(endpointId)
+                        return
+                    }
+                    println("Connected to ${serverCertificate.certificate.name}")
+                    sendPayload("CONN_OK".toPayload())
+                } else {
+                    if (message == "CONN_OK") {
+                        println("Connection established!")
+                        NearbyController.onHandshakeComplete()
+                    }
+                }
             }
         }
         state++

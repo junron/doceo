@@ -12,13 +12,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.opencv.core.Mat
-import org.opencv.imgproc.Imgproc
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.pow
 
 
 val detector = FirebaseVision.getInstance()
@@ -66,11 +63,4 @@ private fun executeOcr(bitmap: Bitmap, cont: Continuation<String>) {
             println("Exception: $e")
             cont.resumeWithException(e)
         }
-}
-
-private fun computeDistanceToCenter(mat: Mat, imgX: Double, imgY: Double): Double {
-    val p = Imgproc.moments(mat)
-    val x = p._m10 / p._m00
-    val y = p._m01 / p._m00
-    return (x - imgX).pow(2) + (y - imgY).pow(2)
 }

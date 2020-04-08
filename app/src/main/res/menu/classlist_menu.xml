@@ -11,7 +11,7 @@
     <item
         android:id="@+id/classlist_advertise"
         android:icon="@drawable/ic_cell_tower"
-        android:title="Wireless" />
+        android:title="Nearby" />
     <item
         android:id="@+id/classlist_analyze"
         android:icon="@drawable/ic_baseline_show_chart_24"

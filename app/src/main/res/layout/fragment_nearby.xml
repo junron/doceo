@@ -1,53 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".fragments.NearbyFragment">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/advertise"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarMain"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_collapseMode="pin"
+            app:title="Nearby"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
         android:layout_height="wrap_content"
-        android:text="Advertise" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/discover"
+        android:layout_marginTop="56dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Discover" />
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/stop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Stop" />
-
-    <EditText
-        android:id="@+id/messageBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.google.android.material.button.MaterialButton
-        android:enabled="false"
-        android:id="@+id/send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Send" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/nearbyOutput"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin" />
+            android:layout_margin="@dimen/text_margin"
+            android:gravity="center"
+            android:text="Allows nearby mentor reps to take your attendance.\n Your identity will only be shared with verified mentor reps."
+            android:textSize="16sp" />
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/nearbyStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:gravity="center"
+            android:text="Status: Not connected"
+            android:textSize="16sp" />
 
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggleAdvertise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Start" />
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

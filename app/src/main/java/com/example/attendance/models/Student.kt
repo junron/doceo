@@ -22,6 +22,21 @@ object Students {
     var students: List<Student> = emptyList()
         private set
 
+    val mentorReps = listOf(
+        "h1610044@nushigh.edu.sg",
+        "h1710004@nushigh.edu.sg",
+        "h1710011@nushigh.edu.sg",
+        "h1710021@nushigh.edu.sg",
+        "h1710088@nushigh.edu.sg",
+        "h1710076@nushigh.edu.sg",
+        "h1710092@nushigh.edu.sg",
+        "h1710078@nushigh.edu.sg",
+        "h1710072@nushigh.edu.sg",
+        "h1710074@nushigh.edu.sg",
+        "h1710159@nushigh.edu.sg",
+        "h1930009@nushigh.edu.sg"
+    )
+
     @UnstableDefault
     fun loadStudents(context: Context) {
         val fileData = String(context.assets.open("y4.json").readBytes())

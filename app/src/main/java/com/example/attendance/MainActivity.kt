@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
 import kotlinx.serialization.UnstableDefault
-import org.opencv.android.OpenCVLoader
 
 class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     companion object {
@@ -52,7 +51,8 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         drawerLayout = drawer_layout
         Navigation.init(
             mapOf(
-                R.id.nav_attendance to R.id.attendanceFragment
+                R.id.nav_attendance to R.id.attendanceFragment,
+                R.id.nav_nearby to R.id.nearbyFragment
             ), navController, drawerLayout.sideNavView
         )
         Students.loadStudents(this)
@@ -68,9 +68,6 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         Handshake.init(this)
         NotificationServer.init()
         AttendanceLoader.setup()
-        if (OpenCVLoader.initDebug()) {
-            println("Loaded")
-        }
     }
 
 
@@ -79,7 +76,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
             drawerLayout.sideNavView.getHeaderView(0).username.text =
                 UserLoader.getUser().name
             with(drawerLayout.sideNavView.menu) {
-                val item = getItem(1)
+                val item = getItem(this.size() - 1)
                 item.title = SpannableString("Logout").apply {
                     setSpan(ForegroundColorSpan(Color.RED), 0, 6, 0)
                 }

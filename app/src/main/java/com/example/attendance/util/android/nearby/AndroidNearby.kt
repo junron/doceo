@@ -2,7 +2,7 @@ package com.example.attendance.util.android.nearby
 
 import android.content.Context
 import com.example.attendance.controllers.NearbyController
-import com.example.attendance.util.android.nearby.protocols.Handshake
+import com.example.attendance.models.Students
 import com.example.attendance.util.auth.UserLoader.getUserOrNull
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
@@ -12,20 +12,12 @@ import com.google.android.gms.nearby.connection.ConnectionsStatusCodes.*
 val state = mutableMapOf<String, MessageHandler>()
 
 object AndroidNearby {
+    private var advertising = true
     private lateinit var context: Context
     private val connectionCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
             when (result.status.statusCode) {
-                STATUS_OK -> {
-                    println("Connection succeeded!")
-                    val handler = state[endpointId] ?: return
-                    handler.sendPayload(
-                        NearbyMessage(
-                            NearbyStage.HANDSHAKE, Handshake.clientCertificateString
-                        ).toPayload()
-                    )
-                    NearbyController.onConnected()
-                }
+                STATUS_OK -> println("Connection succeeded!")
                 STATUS_CONNECTION_REJECTED -> println("Connection refused!")
                 STATUS_ERROR -> println("Connection broke!")
             }
@@ -37,7 +29,10 @@ object AndroidNearby {
         }
 
         override fun onConnectionInitiated(endpointId: String, info: ConnectionInfo) {
-            val handler = MessageHandler(Nearby.getConnectionsClient(context), endpointId)
+            val handler = MessageHandler(
+                Nearby.getConnectionsClient(context), endpointId,
+                advertising
+            )
             state[endpointId] = handler
             Nearby.getConnectionsClient(context)
                 .acceptConnection(
@@ -50,8 +45,14 @@ object AndroidNearby {
 
     private val discoveryCallback = object : EndpointDiscoveryCallback() {
         override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
+            if (info.endpointName !in Students.mentorReps) {
+                // Only connect to advertised mentor reps
+                println("Rejected connection from ${info.endpointName}")
+                Nearby.getConnectionsClient(context).rejectConnection(endpointId)
+                return
+            }
             Nearby.getConnectionsClient(context)
-                .requestConnection("hello, world", endpointId, connectionCallback)
+                .requestConnection("Hello, world!", endpointId, connectionCallback)
                 .addOnSuccessListener {
                     println("Connection Succeeded!")
                 }
@@ -83,6 +84,7 @@ object AndroidNearby {
                 advertisingOptions
             )
             .addOnSuccessListener {
+                advertising = true
                 println("Started advertising")
             }
             .addOnFailureListener {
@@ -95,27 +97,23 @@ object AndroidNearby {
             DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
         Nearby.getConnectionsClient(context)
             .startDiscovery("com.example.attendance", discoveryCallback, discoveryOptions)
-            .addOnSuccessListener { println("Discovery started") }
+            .addOnSuccessListener {
+                advertising = false
+                println("Discovery started")
+            }
             .addOnFailureListener {
                 println("Discovery Failed: $it")
             }
     }
 
-    fun stop() {
-        println("Stopping everything")
+    fun stopAdvertising() {
         Nearby.getConnectionsClient(context)
-            .apply {
-                stopDiscovery()
-                stopAdvertising()
-                stopAllEndpoints()
-            }
+            .stopAdvertising()
     }
 
     fun stopDiscovery() {
         Nearby.getConnectionsClient(context)
-            .apply {
-                stopDiscovery()
-            }
+            .stopDiscovery()
     }
 
 }

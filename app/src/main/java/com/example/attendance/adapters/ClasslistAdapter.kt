@@ -36,9 +36,7 @@ class ClasslistAdapter(
             setOnClickListener {
                 classlist.setStudentState(
                     student,
-                    if (tag == attendance.getParsedTags()
-                            .first()
-                    ) attendance.getParsedTags()[1]
+                    if (tag == attendance.getParsedTags().first()) attendance.getParsedTags()[1]
                     else attendance.getParsedTags()[0]
                 )
             }
@@ -52,7 +50,6 @@ class ClasslistAdapter(
                                 }
                         }
                         setOnMenuItemClickListener { item ->
-                            println(item.title)
                             val selectedTag =
                                 attendance.getParsedTags().find { tag -> tag.name == item.title }
                                     ?: return@setOnMenuItemClickListener false

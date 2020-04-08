@@ -24,7 +24,14 @@ import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
 import com.example.attendance.util.android.Preferences
+import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.ocr.TextAnalyzer
+import com.example.attendance.util.auth.User
+import com.example.attendance.util.auth.UserLoader
+import com.google.android.material.snackbar.Snackbar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.single.BasePermissionListener
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 
@@ -46,6 +53,8 @@ object ClasslistController : FragmentController() {
                     Navigation.navigate(R.id.attendanceFragment)
                 }
             }
+            if (!UserLoader.getUser().isMentorRep) classlistNavigation.menu.getItem(2).isEnabled =
+                false
             classlistNavigation.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.classlist_tap -> {
@@ -58,6 +67,24 @@ object ClasslistController : FragmentController() {
                             Manifest.permission.CAMERA
                         )
                         preview_view.visibility = View.VISIBLE
+                    }
+                    R.id.classlist_advertise -> {
+                        Dexter.withActivity(context.activity)
+                            .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                            .withListener(object : BasePermissionListener() {
+                                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                                    AndroidNearby.startDiscovery()
+                                    Snackbar.make(
+                                        classlistParent,
+                                        "Discovering students...",
+                                        Snackbar.LENGTH_INDEFINITE
+                                    )
+                                        .setAction("Stop") {
+                                            AndroidNearby.stopDiscovery()
+                                        }
+                                }
+                            })
+                            .check()
                     }
                 }
                 true
@@ -184,5 +211,9 @@ object ClasslistController : FragmentController() {
 
     fun addRenderListener(callback: (Boolean) -> Unit) {
         this.renderListeners += callback
+    }
+
+    fun onNearbyCompleted(user: User) {
+
     }
 }

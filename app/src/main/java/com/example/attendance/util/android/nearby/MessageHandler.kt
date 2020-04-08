@@ -1,40 +1,23 @@
 package com.example.attendance.util.android.nearby
 
-import com.example.attendance.controllers.NearbyController
 import com.example.attendance.util.android.nearby.protocols.Handshake
 import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.Payload
 import com.google.android.gms.nearby.connection.PayloadCallback
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 
-enum class NearbyStage { HANDSHAKE, GENERIC_DATA }
 
-@Serializable
-data class NearbyMessage(val stage: NearbyStage, val data: String) {
-    fun toPayload() = Payload.fromBytes(
-        Json.stringify(serializer(), this).toByteArray()
-    )
-}
-
-class MessageHandler(connection: ConnectionsClient, endpointId: String) :
+class MessageHandler(connection: ConnectionsClient, endpointId: String, advertising: Boolean) :
     PayloadCallback() {
-    private val handshake = Handshake(connection, endpointId)
-    val sendPayload = connection.connection(endpointId)
-    override fun onPayloadReceived(endpointId: String, payload: Payload) {
-        when (payload.type) {
-            Payload.Type.BYTES -> try {
-                val message = Json.parse(NearbyMessage.serializer(), String(payload.asBytes()!!))
-                when (message.stage) {
-                    NearbyStage.HANDSHAKE -> handshake.next(message)
-                    NearbyStage.GENERIC_DATA -> NearbyController.dataMessageReceived(message.data)
-                }
-            } catch (e: SerializationException) {
+    private val handshake = Handshake(connection, endpointId, advertising)
 
-            }
-        }
+    init {
+        if (advertising)
+            handshake.next("")
+    }
+
+    override fun onPayloadReceived(endpointId: String, payload: Payload) {
+        if (payload.type == Payload.Type.BYTES) handshake.next(String(payload.asBytes()!!))
     }
 
     override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
