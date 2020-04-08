@@ -117,8 +117,6 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        println(PackageManager.PERMISSION_GRANTED)
-        println("Permissions: $requestCode ${permissions.toList()} ${grantResults.toList()}")
         when (requestCode) {
             0 -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -129,4 +127,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     }
 
     override fun getCameraXConfig() = Camera2Config.defaultConfig()
+
+    override fun onBackPressed() {
+    }
 }

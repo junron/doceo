@@ -47,7 +47,7 @@ object AttendanceListController : FragmentController() {
             attendanceItems.adapter = adapter
             AttendanceLoader.addListener {
                 val data = it.filter { attendance -> !attendance.deleted }
-                println("Updated data: $data")
+                ClasslistController.attendanceUpdated(data)
                 adapter.data = data
                 adapter.notifyDataSetChanged()
                 if (detailAttendance != null) {

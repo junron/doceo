@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistAdapter
+import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.models.Attendance
 import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.util.isToday
@@ -17,7 +18,11 @@ import kotlinx.android.synthetic.main.fragment_main_content.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ClasslistFragment(val attendance: Attendance, private var classlist: ClasslistInstance) :
+class ClasslistFragment(
+    val attendance: Attendance,
+    private var classlist: ClasslistInstance,
+    private var fullName: Boolean
+) :
     Fragment() {
 
     override fun onCreateView(
@@ -30,12 +35,16 @@ class ClasslistFragment(val attendance: Attendance, private var classlist: Class
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ClasslistAdapter(classlist)
+        val adapter = ClasslistAdapter(classlist, fullName)
         attendance.addListener {
             this.classlist =
                 attendance.classlists.find { it.id == classlist.id } ?: return@addListener
-            println(classlist)
             adapter.dataChanged(classlist)
+        }
+        ClasslistController.addRenderListener {
+            this.fullName = it
+            adapter.fullName = it
+            adapter.notifyDataSetChanged()
         }
         classListView.adapter = adapter
         classListView.layoutManager = GridLayoutManager(context, 2)

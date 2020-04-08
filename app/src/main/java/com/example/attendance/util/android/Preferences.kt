@@ -17,4 +17,8 @@ object Preferences {
     fun getDeveloper() = preferences.getBoolean("developer", false)
     fun setDeveloper(developer: Boolean) =
         preferences.edit().putBoolean("developer", developer).commit()
+
+    fun getShowFullName(id: String) = preferences.getBoolean(id + "_fullname", false)
+    fun setFullName(id: String, state: Boolean) =
+        preferences.edit().putBoolean(id + "_fullname", state).commit()
 }

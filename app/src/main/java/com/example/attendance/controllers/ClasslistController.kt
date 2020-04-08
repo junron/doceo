@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Size
+import android.view.Gravity
 import android.view.View
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -22,6 +23,7 @@ import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
+import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.android.ocr.TextAnalyzer
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
@@ -31,6 +33,7 @@ object ClasslistController : FragmentController() {
     private lateinit var cameraProvider: ProcessCameraProvider
     lateinit var attendance: Attendance
     private lateinit var callback: () -> Unit
+    private val renderListeners = mutableListOf<(Boolean) -> Unit>()
 
     override fun init(context: Fragment) {
         super.init(context)
@@ -58,6 +61,9 @@ object ClasslistController : FragmentController() {
                     }
                 }
                 true
+            }
+            classlistMore.setOnClickListener {
+                drawer_layout_end.openDrawer(Gravity.RIGHT)
             }
         }
         if (::callback.isInitialized)
@@ -104,8 +110,6 @@ object ClasslistController : FragmentController() {
                     }.forEach { student ->
                         val classlist = attendance.classlists.last()
                         val currentState = classlist.studentState[student.id]
-                        println(Tags.present)
-                        println(Tags.defaultTags.last())
                         if (currentState != Tags.present) {
                             classlist.setStudentState(student, Tags.defaultTags.last())
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -132,7 +136,7 @@ object ClasslistController : FragmentController() {
         )
     }
 
-    fun closeCamera() {
+    private fun closeCamera() {
         if (::cameraProvider.isInitialized)
             cameraProvider.unbindAll()
     }
@@ -142,11 +146,43 @@ object ClasslistController : FragmentController() {
         val run = {
             this.attendance = attendance
             with(context) {
-                toolbarClasslistToolbar.title = attendance.name
-                classlistViewPager.adapter = ClasslistPagerAdapter(attendance, this)
+                initializeFields(attendance)
+                classlistViewPager.adapter = ClasslistPagerAdapter(
+                    attendance,
+                    this,
+                    Preferences.getShowFullName(attendance.id)
+                )
             }
         }
         if (contextInitialized() && context.view != null) run()
         else callback = run
+    }
+
+    private fun initializeFields(attendance: Attendance) {
+        this.attendance = attendance
+        with(context) {
+            toolbarClasslistToolbar.title = attendance.name
+            attendanceName.text = attendance.name
+            showFullNames.isChecked = Preferences.getShowFullName(attendance.id)
+            showFullNames.setOnCheckedChangeListener { _, isChecked ->
+                println(isChecked)
+                drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                Preferences.setFullName(attendance.id, isChecked)
+                renderListeners.forEach { it(isChecked) }
+            }
+        }
+    }
+
+    fun attendanceUpdated(attendances: List<Attendance>) {
+        if (::attendance.isInitialized)
+            attendances.forEach { attendance ->
+                if (attendance.id != this.attendance.id) return
+                if (attendance.isInitialized())
+                    initializeFields(attendance)
+            }
+    }
+
+    fun addRenderListener(callback: (Boolean) -> Unit) {
+        this.renderListeners += callback
     }
 }

@@ -5,12 +5,16 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.attendance.fragments.ClasslistFragment
 import com.example.attendance.models.Attendance
 
-class ClasslistPagerAdapter(val attendance: Attendance, parent: Fragment) :
+class ClasslistPagerAdapter(
+    val attendance: Attendance,
+    parent: Fragment,
+    private val fullName: Boolean
+) :
     FragmentStateAdapter(parent) {
     override fun getItemCount() = attendance.classlists.size
 
     override fun createFragment(position: Int): Fragment {
         val item = attendance.classlists[position]
-        return ClasslistFragment(attendance, item)
+        return ClasslistFragment(attendance, item, fullName)
     }
 }

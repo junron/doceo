@@ -28,7 +28,6 @@ data class Attendance(
     val owner: String = "",
     val editors: List<String> = emptyList(),
     val viewers: List<String> = emptyList(),
-    val onlineUsers: List<String> = emptyList(),
     val created: Timestamp = Timestamp.now(),
     val modified: Timestamp = Timestamp.now(),
     val constraints: String = "",
@@ -53,8 +52,7 @@ data class Attendance(
                         "constraints" to constraints,
                         "created" to Timestamp.now(),
                         "modified" to Timestamp.now(),
-                        "deleted" to false,
-                        "onlineUsers" to emptyList<String>()
+                        "deleted" to false
                     )
                 )
             Firebase.firestore.collection("attendance")
@@ -179,17 +177,8 @@ data class Attendance(
             .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
     }
 
-    fun opened(uid: String) {
+    fun opened() {
         AttendanceLoader.history += AttendanceHistory(id, Date().toStringValue())
-        Firebase.firestore.collection("attendance")
-            .document(id)
-            .update("onlineUsers", onlineUsers + uid)
-    }
-
-    fun closed(uid: String) {
-        Firebase.firestore.collection("attendance")
-            .document(id)
-            .update("onlineUsers", onlineUsers - uid)
     }
 
 
@@ -206,6 +195,8 @@ data class Attendance(
             null
         }
     }
+
+    fun isInitialized() = ::classlists.isInitialized
 
     fun addToHomeScreen() {
         val shortcutIntent =
