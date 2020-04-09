@@ -1,7 +1,9 @@
 package com.example.attendance.util.android.nearby.protocols
 
 import android.content.Context
+import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.controllers.NearbyController
+import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.nearby.toPayload
 import com.example.attendance.util.auth.Crypto
 import com.example.attendance.util.auth.Crypto.Companion.loadKeyBytes
@@ -138,12 +140,23 @@ class Handshake(
                         connection.disconnectFromEndpoint(endpointId)
                         return
                     }
+                    val cert = serverCertificate.certificate
+                    val remoteUser = User(cert.name, cert.id, cert.metadata)
                     println("Connected to ${serverCertificate.certificate.name}")
-                    sendPayload("CONN_OK".toPayload())
+                    val result = ClasslistController.onNearbyCompleted(remoteUser)
+                    if (result) {
+                        sendPayload("RECORD_OK".toPayload())
+                    } else {
+                        sendPayload("CONN_OK".toPayload())
+                    }
                 } else {
-                    if (message == "CONN_OK") {
+                    connection.disconnectFromEndpoint(endpointId)
+                    if (message == "RECORD_OK") {
                         println("Connection established!")
                         NearbyController.onHandshakeComplete()
+                        AndroidNearby.stopDiscovery()
+                    } else if (message == "CONN_OK") {
+                        println("Connection succeeded, but attendance not recorded")
                     }
                 }
             }

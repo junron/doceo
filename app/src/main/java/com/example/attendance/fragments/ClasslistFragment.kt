@@ -11,12 +11,7 @@ import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.models.Attendance
 import com.example.attendance.models.ClasslistInstance
-import com.example.attendance.util.isToday
-import com.example.attendance.util.isYesterday
 import kotlinx.android.synthetic.main.fragment_classlist.*
-import kotlinx.android.synthetic.main.fragment_main_content.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class ClasslistFragment(
     val attendance: Attendance,
@@ -48,18 +43,5 @@ class ClasslistFragment(
         }
         classListView.adapter = adapter
         classListView.layoutManager = GridLayoutManager(context, 2)
-        parentFragment?.toolbarClasslistToolbar?.subtitle = formatDate(classlist.created.toDate())
-    }
-
-
-    private fun formatDate(date: Date): String {
-        val sdf = SimpleDateFormat("dd MMM")
-        val sdf2 = SimpleDateFormat("hh:mm a")
-        val day: String = when {
-            date.isToday() -> "Today"
-            date.isYesterday() -> "Yesterday"
-            else -> sdf.format(date)
-        }
-        return "$day at ${sdf2.format(date)}"
     }
 }

@@ -31,6 +31,10 @@ object UserLoader {
         }
     }
 
+    fun printFirebaseToken() {
+        println(context.filesDir.resolve("user/token").readText())
+    }
+
     fun loadFirebaseUser(failure: (String) -> Unit) {
         with(context) {
             val token = filesDir.resolve("user/token").readText()

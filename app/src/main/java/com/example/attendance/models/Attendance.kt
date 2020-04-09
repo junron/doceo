@@ -75,8 +75,8 @@ data class Attendance(
                 .document(id)
                 .collection("lists")
                 .get()
-                .addOnSuccessListener {
-                    this.classlists = it.documents.mapNotNull { snapshot ->
+                .addOnSuccessListener { snapshotList ->
+                    this.classlists = snapshotList.documents.mapNotNull { snapshot ->
                         try {
                             snapshot.toObject(ClasslistInstance::class.java)
                                 ?.copy(parent = this, id = snapshot.id)
@@ -84,7 +84,7 @@ data class Attendance(
                             println(e)
                             null
                         }
-                    }
+                    }.sortedBy { it.created }
                 }
             Firebase.firestore.collection("attendance")
                 .document(id)
@@ -99,7 +99,7 @@ data class Attendance(
                             println(e)
                             null
                         }
-                    }
+                    }.sortedBy { it.created }
                     listeners.forEach { it(this.classlists) }
                 }
         }
@@ -196,6 +196,22 @@ data class Attendance(
         }
     }
 
+    fun newClasslist(): String {
+        val classlistId = uuid()
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .collection("lists")
+            .document(classlistId)
+            .set(
+                mapOf(
+                    "studentState" to emptyMap<String, String>(),
+                    "created" to Timestamp.now(),
+                    "modified" to Timestamp.now()
+                )
+            )
+        return classlistId
+    }
+
     fun isInitialized() = ::classlists.isInitialized
 
     fun addToHomeScreen() {
@@ -232,7 +248,7 @@ data class Attendance(
                     R.drawable.ic_baseline_group_24
                 )
             )
-            addIntent.action = "com.android.launcher.action.INSTALL_SHORTCUT";
+            addIntent.action = "com.android.launcher.action.INSTALL_SHORTCUT"
             addIntent.putExtra("duplicate", false)
             MainActivity.activity.sendBroadcast(addIntent)
         }
@@ -251,12 +267,6 @@ object AttendanceLoader {
 
     fun addListener(callback: (List<Attendance>) -> Unit) {
         listeners += callback
-    }
-
-    fun removeListener(callback: (List<Attendance>) -> Unit) {
-        listeners.removeAll {
-            it == callback
-        }
     }
 
     private val processQuery = { documents: List<DocumentSnapshot> ->

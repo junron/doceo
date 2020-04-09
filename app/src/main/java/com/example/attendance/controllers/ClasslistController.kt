@@ -16,9 +16,11 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.viewpager2.widget.ViewPager2
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistPagerAdapter
 import com.example.attendance.models.Attendance
+import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
@@ -28,12 +30,16 @@ import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.ocr.TextAnalyzer
 import com.example.attendance.util.auth.User
 import com.example.attendance.util.auth.UserLoader
+import com.example.attendance.util.isToday
+import com.example.attendance.util.isYesterday
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.BasePermissionListener
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
+import java.text.SimpleDateFormat
+import java.util.*
 
 @UnstableDefault
 object ClasslistController : FragmentController() {
@@ -41,6 +47,8 @@ object ClasslistController : FragmentController() {
     lateinit var attendance: Attendance
     private lateinit var callback: () -> Unit
     private val renderListeners = mutableListOf<(Boolean) -> Unit>()
+    private var classlist: ClasslistInstance? = null
+    private var navigateClasslistId: String? = null
 
     override fun init(context: Fragment) {
         super.init(context)
@@ -74,14 +82,17 @@ object ClasslistController : FragmentController() {
                             .withListener(object : BasePermissionListener() {
                                 override fun onPermissionGranted(response: PermissionGrantedResponse?) {
                                     AndroidNearby.startDiscovery()
+                                    println("Discovering")
                                     Snackbar.make(
-                                        classlistParent,
+                                        classlistViewPager,
                                         "Discovering students...",
                                         Snackbar.LENGTH_INDEFINITE
                                     )
+                                        .setAnchorView(classlistNavigation)
                                         .setAction("Stop") {
                                             AndroidNearby.stopDiscovery()
                                         }
+                                        .show()
                                 }
                             })
                             .check()
@@ -92,6 +103,25 @@ object ClasslistController : FragmentController() {
             classlistMore.setOnClickListener {
                 drawer_layout_end.openDrawer(Gravity.RIGHT)
             }
+            classlistAdd.setOnClickListener {
+                navigateClasslistId = attendance.newClasslist()
+
+            }
+            classlistViewPager.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    val prevClasslist = this@ClasslistController.classlist
+                    classlist = this@ClasslistController.attendance.classlists[position]
+                    val classlist = this@ClasslistController.classlist ?: return
+                    var displayDate = formatDate(classlist.created.toDate())
+                    if (displayDate == prevClasslist?.let { formatDate(prevClasslist.created.toDate()) })
+                        displayDate = formatDate(classlist.created.toDate(), true)
+                    toolbarClasslistToolbar?.subtitle =
+                        displayDate + if (position == attendance.classlists.lastIndex) " (Latest)"
+                        else ""
+                }
+            })
         }
         if (::callback.isInitialized)
             callback()
@@ -135,7 +165,7 @@ object ClasslistController : FragmentController() {
                             "@"
                         ).toLowerCase() in it.toLowerCase()
                     }.forEach { student ->
-                        val classlist = attendance.classlists.last()
+                        val classlist = attendance.classlists[classlistViewPager.currentItem]
                         val currentState = classlist.studentState[student.id]
                         if (currentState != Tags.present) {
                             classlist.setStudentState(student, Tags.defaultTags.last())
@@ -179,6 +209,18 @@ object ClasslistController : FragmentController() {
                     this,
                     Preferences.getShowFullName(attendance.id)
                 )
+                classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
+            }
+            attendance.addListener {
+                val classlistIndex =
+                    it.indexOfFirst { classlistInstance -> classlistInstance.id == navigateClasslistId }
+                println(classlistIndex)
+                println(navigateClasslistId)
+                println(it)
+                if (classlistIndex != -1) {
+                    context.classlistViewPager.setCurrentItem(classlistIndex, false)
+                    navigateClasslistId = null
+                }
             }
         }
         if (contextInitialized() && context.view != null) run()
@@ -192,7 +234,6 @@ object ClasslistController : FragmentController() {
             attendanceName.text = attendance.name
             showFullNames.isChecked = Preferences.getShowFullName(attendance.id)
             showFullNames.setOnCheckedChangeListener { _, isChecked ->
-                println(isChecked)
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
                 Preferences.setFullName(attendance.id, isChecked)
                 renderListeners.forEach { it(isChecked) }
@@ -213,7 +254,41 @@ object ClasslistController : FragmentController() {
         this.renderListeners += callback
     }
 
-    fun onNearbyCompleted(user: User) {
+    fun onNearbyCompleted(user: User): Boolean {
+        with(context) {
+            val vibrator = context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            val student = Students.getStudentById(user.email) ?: return false
+            val students = Students.filterStudents(attendance.constraints.split(" "))
+            val classlist = attendance.classlists[classlistViewPager.currentItem]
+            if (student !in students) return false
+            val state = classlist.studentState[student.id] ?: return false
+            if (state != Tags.present) {
+                classlist.setStudentState(student, Tags.defaultTags.last())
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(
+                        VibrationEffect.createOneShot(
+                            250,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
+                    )
+                } else {
+                    //deprecated in API 26
+                    vibrator.vibrate(250)
+                }
+            }
+        }
+        return true
+    }
 
+
+    private fun formatDate(date: Date, seconds: Boolean = false): String {
+        val sdf = SimpleDateFormat("dd MMM")
+        val sdf2 = SimpleDateFormat("hh:mm${if (seconds) ":ss" else ""} a")
+        val day: String = when {
+            date.isToday() -> "Today"
+            date.isYesterday() -> "Yesterday"
+            else -> sdf.format(date)
+        }
+        return "$day at ${sdf2.format(date)}"
     }
 }
