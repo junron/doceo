@@ -32,6 +32,11 @@ import com.example.attendance.util.auth.User
 import com.example.attendance.util.auth.UserLoader
 import com.example.attendance.util.isToday
 import com.example.attendance.util.isYesterday
+import com.example.attendance.util.suffix
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
@@ -67,14 +72,18 @@ object ClasslistController : FragmentController() {
                 when (it.itemId) {
                     R.id.classlist_tap -> {
                         closeCamera()
+                        classlistViewPager.visibility = View.VISIBLE
                         preview_view.visibility = View.GONE
+                        pieChartContainer.visibility = View.GONE
                     }
                     R.id.classlist_ocr -> {
                         Permissions.requestPermissions(
                             context.activity!!,
                             Manifest.permission.CAMERA
                         )
+                        classlistViewPager.visibility = View.VISIBLE
                         preview_view.visibility = View.VISIBLE
+                        pieChartContainer.visibility = View.GONE
                     }
                     R.id.classlist_advertise -> {
                         Dexter.withActivity(context.activity)
@@ -97,6 +106,31 @@ object ClasslistController : FragmentController() {
                             })
                             .check()
                     }
+                    R.id.classlist_analyze -> {
+                        preview_view.visibility = View.GONE
+                        classlistViewPager.visibility = View.GONE
+                        val (entries, colors) = getPieChartData()
+                            ?: return@setOnNavigationItemSelectedListener false
+                        val pieData = PieData(
+                            PieDataSet(
+                                entries,
+                                attendance.name
+                            ).apply {
+                                this.colors = colors
+                            }
+                        )
+                        pieData.setValueTextSize(13f)
+                        pieData.setValueFormatter(object : ValueFormatter() {
+                            override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
+                                return value.toInt().suffix("student")
+                            }
+                        })
+                        pieChart.isDrawHoleEnabled = false
+                        pieChart.data = pieData
+                        pieChart.legend.isEnabled = false
+                        pieChart.description.text = ""
+                        pieChartContainer.visibility = View.VISIBLE
+                    }
                 }
                 true
             }
@@ -105,7 +139,6 @@ object ClasslistController : FragmentController() {
             }
             classlistAdd.setOnClickListener {
                 navigateClasslistId = attendance.newClasslist()
-
             }
             classlistViewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
@@ -127,6 +160,26 @@ object ClasslistController : FragmentController() {
         }
         if (::callback.isInitialized)
             callback()
+    }
+
+    private fun getPieChartData(): Pair<List<PieEntry>, List<Int>>? {
+        val classlist = classlist ?: return null
+        val data = classlist
+            .studentState.entries.groupBy { state -> state.value }
+            .map { (k, v) -> k to v.size }.toMap().toMutableMap()
+        val students = Students.filterStudents(
+            attendance.constraints.split(" ")
+        )
+        data[Tags.absent] =
+            students.size - data.map { (k, v) -> if (k == Tags.absent) 0 else v }
+                .sum()
+        val colors = mutableListOf<Int>()
+        val entries = data.map { (k, v) ->
+            val tag = attendance.getParsedTags().find { tag -> tag.id == k }!!
+            colors += tag.color
+            PieEntry(v.toFloat(), tag.name)
+        }
+        return (entries to colors.toList())
     }
 
     fun initCamera() {
@@ -167,7 +220,7 @@ object ClasslistController : FragmentController() {
                             "@"
                         ).toLowerCase() in it.toLowerCase()
                     }.forEach { student ->
-                        val classlist = attendance.classlists[classlistViewPager.currentItem]
+                        val classlist = classlist ?: return@TextAnalyzer
                         val currentState = classlist.studentState[student.id]
                         if (currentState != Tags.present) {
                             classlist.setStudentState(student, Tags.defaultTags.last())
@@ -187,6 +240,7 @@ object ClasslistController : FragmentController() {
                 }
             )
         }
+        cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
             context.activity as LifecycleOwner,
             selector,
@@ -218,8 +272,21 @@ object ClasslistController : FragmentController() {
                 val classlistIndex =
                     it.indexOfFirst { classlistInstance -> classlistInstance.id == navigateClasslistId }
                 if (classlistIndex != -1) {
-                    context.classlistViewPager.setCurrentItem(classlistIndex, false)
+                    context.classlistViewPager.setCurrentItem(classlistIndex, true)
                     navigateClasslistId = null
+                }
+                try {
+                    with(context) {
+                        if (pieChart.data == null) return@with
+                        val dataset = pieChart.data.dataSet
+                        dataset.clear()
+                        val (entries, colors) = getPieChartData() ?: return@with
+                        (dataset as PieDataSet).colors = colors
+                        entries.forEach { entry -> dataset.addEntry(entry) }
+                        pieChart.notifyDataSetChanged()
+                        pieChart.invalidate()
+                    }
+                } catch (e: NullPointerException) {
                 }
             }
         }
@@ -238,16 +305,20 @@ object ClasslistController : FragmentController() {
                 Preferences.setFullName(attendance.id, isChecked)
                 renderListeners.forEach { it(isChecked) }
             }
+            detailsClose.setOnClickListener {
+                drawer_layout_end.closeDrawer(Gravity.RIGHT)
+            }
         }
     }
 
     fun attendanceUpdated(attendances: List<Attendance>) {
-        if (::attendance.isInitialized)
+        if (::attendance.isInitialized) {
             attendances.forEach { attendance ->
                 if (attendance.id != this.attendance.id) return
                 if (attendance.isInitialized())
                     initializeFields(attendance)
             }
+        }
     }
 
     fun addRenderListener(callback: (Boolean) -> Unit) {

@@ -22,7 +22,9 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:subtitleTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
+                app:subtitleTextAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                app:subtitleTextColor="@color/white"
+                app:titleTextColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -59,6 +61,26 @@
             android:orientation="vertical"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
+            <LinearLayout
+                android:id="@+id/pieChartContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/text_margin"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Summary"
+                    android:textSize="20sp" />
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/pieChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp" />
+            </LinearLayout>
+
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/classlistViewPager"
                 android:layout_width="match_parent"
@@ -72,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_marginRight="@dimen/text_margin"
-                android:layout_marginBottom="50dp"
+                android:layout_marginBottom="70dp"
                 android:visibility="gone" />
         </LinearLayout>
 

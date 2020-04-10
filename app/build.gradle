@@ -93,6 +93,7 @@ dependencies {
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
     implementation 'androidx.browser:browser:1.2.0'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
 

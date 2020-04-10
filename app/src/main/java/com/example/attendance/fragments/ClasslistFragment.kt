@@ -14,9 +14,9 @@ import com.example.attendance.models.ClasslistInstance
 import kotlinx.android.synthetic.main.fragment_classlist.*
 
 class ClasslistFragment(
-    val attendance: Attendance,
-    private var classlist: ClasslistInstance,
-    private var fullName: Boolean
+    val attendance: Attendance? = null,
+    private var classlist: ClasslistInstance? = null,
+    private var fullName: Boolean = false
 ) :
     Fragment() {
 
@@ -30,10 +30,13 @@ class ClasslistFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val classlist = classlist ?: return
+        val attendance = attendance ?: return
         val adapter = ClasslistAdapter(classlist, fullName)
         attendance.addListener {
             this.classlist =
                 attendance.classlists.find { it.id == classlist.id } ?: return@addListener
+            println("Updated: $classlist")
             adapter.dataChanged(classlist)
         }
         ClasslistController.addRenderListener {
