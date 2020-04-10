@@ -6,10 +6,12 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
+import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.models.StatefulStudent
 import com.example.attendance.models.Students
 import com.example.attendance.util.android.showIcons
+import com.example.attendance.util.auth.UserLoader
 
 class ClasslistAdapter(
     private var classlist: ClasslistInstance,
@@ -19,6 +21,7 @@ class ClasslistAdapter(
 
     private var attendance = classlist.parent!!
     lateinit var students: List<StatefulStudent>
+    private val user = UserLoader.getUser()
 
     init {
         dataChanged(classlist)
@@ -33,6 +36,9 @@ class ClasslistAdapter(
             text = if (fullName) student.name else student.shortName
             setTextColor(tag.color)
             setPadding(36, 24, 10, 36)
+            gravity = Gravity.CENTER
+            textSize = 18f
+            if (attendance.getAccessLevel(user.email) == AccessLevel.VIEWER) return@apply
             setOnClickListener {
                 classlist.setStudentState(
                     student,
@@ -66,8 +72,6 @@ class ClasslistAdapter(
                 }
                 true
             }
-            gravity = Gravity.CENTER
-            textSize = 18f
         }
     }
 

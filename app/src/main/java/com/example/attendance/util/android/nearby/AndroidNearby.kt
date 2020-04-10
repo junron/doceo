@@ -85,6 +85,7 @@ object AndroidNearby {
             )
             .addOnSuccessListener {
                 advertising = true
+                NearbyController.startedAdvertising()
                 println("Started advertising")
             }
             .addOnFailureListener {

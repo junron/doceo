@@ -22,33 +22,66 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center"
+        android:layout_marginTop="56dp"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="center"
-            android:text="Allows nearby mentor reps to take your attendance.\n Your identity will only be shared with verified mentor reps."
-            android:textSize="16sp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/nearbyStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="center"
-            android:text="Status: Not connected"
-            android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/cellTowerView"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:src="@drawable/ic_cell_tower2"
+                android:tint="?android:attr/textColorPrimaryNoDisable" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/toggleAdvertise"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/nearbyStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
+                android:text="Not connected"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Start" />
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Allows nearby mentor reps to take your attendance."
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:drawableLeft="@drawable/ic_baseline_lock_24"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:text="Your identity will only be shared with verified mentor reps."
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/toggleAdvertise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="Start" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

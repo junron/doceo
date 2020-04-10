@@ -19,10 +19,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistPagerAdapter
-import com.example.attendance.models.Attendance
-import com.example.attendance.models.ClasslistInstance
-import com.example.attendance.models.Students
-import com.example.attendance.models.Tags
+import com.example.attendance.models.*
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
 import com.example.attendance.util.android.Preferences
@@ -307,6 +304,26 @@ object ClasslistController : FragmentController() {
             }
             detailsClose.setOnClickListener {
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
+            }
+            val user = UserLoader.getUser()
+            val accessLevel = attendance.getAccessLevel(user.email)
+            if (accessLevel == AccessLevel.VIEWER) {
+                classlistAdd.visibility = View.GONE
+                // Disable OCR and Nearby
+                classlistNavigation.menu.getItem(1).isEnabled = false
+                classlistNavigation.menu.getItem(2).isEnabled = false
+                classlistNavigation.menu.getItem(0).apply {
+                    title = "View"
+                    setIcon(R.drawable.ic_eye_24)
+                }
+            } else {
+                classlistAdd.visibility = View.VISIBLE
+                classlistNavigation.menu.getItem(0).apply {
+                    title = "Tap"
+                    setIcon(R.drawable.ic_baseline_touch_app_24)
+                }
+                classlistNavigation.menu.getItem(1).isEnabled = true
+                classlistNavigation.menu.getItem(2).isEnabled = user.isMentorRep
             }
         }
     }
