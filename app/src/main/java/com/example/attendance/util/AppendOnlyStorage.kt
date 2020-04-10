@@ -1,9 +1,6 @@
 package com.example.attendance.util
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
@@ -36,9 +33,7 @@ class AppendOnlyStorage<T>(
     }
 
     private fun write() {
-        GlobalScope.launch(Dispatchers.IO) {
-            storageFile.writeText(Json.stringify(serializer.list, items))
-        }
+        storageFile.writeText(Json.stringify(serializer.list, items))
     }
 
 

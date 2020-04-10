@@ -37,4 +37,13 @@ object NotificationServer {
             AddTokenRequest.serializer()
         )
     }
+
+    suspend fun sendNotification(sendNotificationRequest: SendNotificationRequest) {
+        if (!userExists()) return
+        queue.postJson(
+            "https://pyrostore.nushhwboard.ml/notifications/sendNotification",
+            sendNotificationRequest.copy(auth = getMsToken()),
+            SendNotificationRequest.serializer()
+        )
+    }
 }

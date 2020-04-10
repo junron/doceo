@@ -1,17 +1,20 @@
 package com.example.attendance
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.controllers.ClasslistController
+import com.example.attendance.controllers.SettingsController
 import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.Students
 import com.example.attendance.util.AppendOnlyStorage
@@ -68,6 +71,33 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         Handshake.init(this)
         NotificationServer.init()
         AttendanceLoader.setup()
+        if (intent != null) handleIntents(intent)
+    }
+
+    private fun handleIntents(intent: Intent) {
+        if (intent.getBooleanExtra("updateApp", false)) {
+            println("Update app!!!" + intent.getBooleanExtra("updateApp", false))
+            SettingsController.updateApp(this)
+            return
+        }
+        val id = intent.getStringExtra("attendance_id") ?: return
+        if (AttendanceLoader.attendance.find { attendance -> attendance.id == id } != null) {
+            val attendance =
+                AttendanceLoader.attendance.find { attendance -> attendance.id == id }!!
+            attendance.opened()
+            ClasslistController.setClasslist(attendance)
+            Navigation.navigate(R.id.mainContent)
+            return
+        }
+        AttendanceLoader.addListener {
+            val attendance =
+                it.find { attendance -> attendance.id == id } ?: return@addListener run {
+                    Toast.makeText(this, "Classlist could not be found.", Toast.LENGTH_LONG).show()
+                }
+            attendance.opened()
+            ClasslistController.setClasslist(attendance)
+            Navigation.navigate(R.id.mainContent)
+        }
     }
 
 
@@ -99,6 +129,12 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
             Preferences.setDarkMode(!Preferences.isDarkMode())
             this@MainActivity.recreate()
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent ?: return
+        handleIntents(intent)
     }
 
     private fun setThemeIcon() {

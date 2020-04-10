@@ -7,7 +7,7 @@ data class AddTokenRequest(val token: String, val auth: String)
 
 @Serializable
 data class SendNotificationRequest(
-    val targetId: String,
+    val targetIds: List<String>,
     val data: Map<String, String>,
     val auth: String
 )

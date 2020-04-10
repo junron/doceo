@@ -1,5 +1,6 @@
 package com.example.attendance.controllers
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.view.Gravity
@@ -72,24 +73,28 @@ object SettingsController : FragmentController() {
                 }
             }
             updateApp.setOnClickListener {
-                val downloadUrl =
-                    "https://junron-github-actions-public-artifacts.s3-ap-southeast-1.amazonaws.com/app-release.apk"
-                GlobalScope.launch {
-                    val file = Volley.queue.downloadFile(context.context!!.filesDir, downloadUrl)
-                    val uri = FileProvider.getUriForFile(
-                        context.context!!,
-                        context.context!!.applicationContext.packageName + ".provider",
-                        file
-                    )
-                    val install = Intent(Intent.ACTION_VIEW)
-                    install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
-                    install.setDataAndType(uri, "application/vnd.android.package-archive")
-                    context.startActivity(install)
-                }
+                updateApp()
             }
             toolbarSettings.title = "Settings"
+        }
+    }
+
+    fun updateApp(context: Context = this.context.context!!) {
+        val downloadUrl =
+            "https://junron-github-actions-public-artifacts.s3-ap-southeast-1.amazonaws.com/app-release.apk"
+        GlobalScope.launch {
+            val file = Volley.queue.downloadFile(context.filesDir, downloadUrl)
+            val uri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                file
+            )
+            val install = Intent(Intent.ACTION_VIEW)
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+            install.setDataAndType(uri, "application/vnd.android.package-archive")
+            context.startActivity(install)
         }
     }
 }

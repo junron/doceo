@@ -8,6 +8,8 @@ import android.os.Build
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.util.AppendOnlyStorage
+import com.example.attendance.util.android.notifications.NotificationServer
+import com.example.attendance.util.android.notifications.SendNotificationRequest
 import com.example.attendance.util.toDate
 import com.example.attendance.util.toStringValue
 import com.example.attendance.util.uuid
@@ -16,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -34,7 +38,8 @@ data class Attendance(
     val tags: List<String> = emptyList(),
     val deleted: Boolean = false
 ) {
-    lateinit var classlists: List<ClasslistInstance>
+    var classlists: List<ClasslistInstance> = listOf()
+        private set
     private val listeners = mutableListOf<(List<ClasslistInstance>) -> Unit>()
 
     companion object {
@@ -175,6 +180,22 @@ data class Attendance(
         Firebase.firestore.collection("attendance")
             .document(id)
             .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
+        GlobalScope.launch {
+            NotificationServer.run {
+                sendNotification(
+                    SendNotificationRequest(
+                        students.map { it.id },
+                        mapOf(
+                            "type" to "ITEM_SHARED",
+                            "attendanceId" to id,
+                            "attendanceName" to name,
+                            "owner" to Students.getStudentById(owner)!!.name
+                        ),
+                        ""
+                    )
+                )
+            }
+        }
     }
 
     fun opened() {
@@ -212,14 +233,14 @@ data class Attendance(
         return classlistId
     }
 
-    fun isInitialized() = ::classlists.isInitialized
+    fun isInitialized() = classlists.isNotEmpty()
 
     fun addToHomeScreen() {
         val shortcutIntent =
             Intent(MainActivity.activity.applicationContext, MainActivity::class.java).apply {
                 putExtra("attendance_id", id)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
         Intent()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

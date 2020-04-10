@@ -115,7 +115,9 @@ object ClasslistController : FragmentController() {
                     classlist = this@ClasslistController.attendance.classlists[position]
                     val classlist = this@ClasslistController.classlist ?: return
                     var displayDate = formatDate(classlist.created.toDate())
-                    if (displayDate == prevClasslist?.let { formatDate(prevClasslist.created.toDate()) })
+                    if (prevClasslist != null && prevClasslist.id != classlist.id &&
+                        displayDate == formatDate(prevClasslist.created.toDate())
+                    )
                         displayDate = formatDate(classlist.created.toDate(), true)
                     toolbarClasslistToolbar?.subtitle =
                         displayDate + if (position == attendance.classlists.lastIndex) " (Latest)"
@@ -204,6 +206,7 @@ object ClasslistController : FragmentController() {
             this.attendance = attendance
             with(context) {
                 initializeFields(attendance)
+                if (!attendance.isInitialized()) return@with
                 classlistViewPager.adapter = ClasslistPagerAdapter(
                     attendance,
                     this,
@@ -214,9 +217,6 @@ object ClasslistController : FragmentController() {
             attendance.addListener {
                 val classlistIndex =
                     it.indexOfFirst { classlistInstance -> classlistInstance.id == navigateClasslistId }
-                println(classlistIndex)
-                println(navigateClasslistId)
-                println(it)
                 if (classlistIndex != -1) {
                     context.classlistViewPager.setCurrentItem(classlistIndex, false)
                     navigateClasslistId = null
