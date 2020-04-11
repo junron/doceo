@@ -41,6 +41,7 @@ data class Attendance(
     var classlists: List<ClasslistInstance> = listOf()
         private set
     private val listeners = mutableListOf<(List<ClasslistInstance>) -> Unit>()
+    val students = Students.filterStudents(constraints.split(" "))
 
     companion object {
         fun newAttendance(name: String, tags: List<Tag>, constraints: String) {
@@ -76,38 +77,47 @@ data class Attendance(
 
     init {
         if (id != "") {
-            Firebase.firestore.collection("attendance")
-                .document(id)
-                .collection("lists")
-                .get()
-                .addOnSuccessListener { snapshotList ->
-                    this.classlists = snapshotList.documents.mapNotNull { snapshot ->
-                        try {
-                            snapshot.toObject(ClasslistInstance::class.java)
-                                ?.copy(parent = this, id = snapshot.id)
-                        } catch (e: Exception) {
-                            println(e)
-                            null
-                        }
-                    }.sortedBy { it.created }
+            Firebase.firestore.collection("attendance").document(id).get()
+                .addOnFailureListener {
+                    this.classlists = emptyList()
+                    loadClasslists()
                 }
-            Firebase.firestore.collection("attendance")
-                .document(id)
-                .collection("lists")
-                .addSnapshotListener { snapshotList, _ ->
-                    snapshotList ?: return@addSnapshotListener
-                    this.classlists = snapshotList.documents.mapNotNull { snapshot ->
-                        try {
-                            snapshot.toObject(ClasslistInstance::class.java)
-                                ?.copy(parent = this, id = snapshot.id)
-                        } catch (e: Exception) {
-                            println(e)
-                            null
-                        }
-                    }.sortedBy { it.created }
-                    listeners.forEach { it(this.classlists) }
-                }
+            loadClasslists()
         }
+    }
+
+    private fun loadClasslists() {
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .collection("lists")
+            .get()
+            .addOnSuccessListener { snapshotList ->
+                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                    try {
+                        snapshot.toObject(ClasslistInstance::class.java)
+                            ?.copy(parent = this, id = snapshot.id)
+                    } catch (e: Exception) {
+                        println(e)
+                        null
+                    }
+                }.sortedBy { it.created }
+            }
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .collection("lists")
+            .addSnapshotListener { snapshotList, _ ->
+                snapshotList ?: return@addSnapshotListener
+                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                    try {
+                        snapshot.toObject(ClasslistInstance::class.java)
+                            ?.copy(parent = this, id = snapshot.id)
+                    } catch (e: Exception) {
+                        println(e)
+                        null
+                    }
+                }.sortedBy { it.created }
+                listeners.forEach { it(this.classlists) }
+            }
     }
 
     fun addListener(callback: (List<ClasslistInstance>) -> Unit) {
@@ -241,8 +251,8 @@ data class Attendance(
                 putExtra("attendance_id", id)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                action = Intent.ACTION_CREATE_SHORTCUT
             }
-        Intent()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val shortcut = ShortcutInfo.Builder(MainActivity.activity, id)
                 .setShortLabel(name)
@@ -316,6 +326,7 @@ object AttendanceLoader {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
                     val changedData = processQuery(snapshot.documents)
+                    println("Datachanged: $changedData")
                     attendance = attendance.filter { user.uid != it.owner } + changedData
                     listeners.forEach {
                         it(attendance)

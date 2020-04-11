@@ -66,6 +66,7 @@ object AttendanceListController : FragmentController() {
     }
 
     fun updateDetails(item: Attendance) {
+        if (context.view == null) return
         context.itemDetailsTitle.text = item.name
         context.detailsCreatedTime.text = item.getCreatedTime()
         context.detailsModifiedTime.text = item.getModifiedTime()

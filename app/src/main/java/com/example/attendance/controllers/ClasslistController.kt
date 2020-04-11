@@ -164,11 +164,8 @@ object ClasslistController : FragmentController() {
         val data = classlist
             .studentState.entries.groupBy { state -> state.value }
             .map { (k, v) -> k to v.size }.toMap().toMutableMap()
-        val students = Students.filterStudents(
-            attendance.constraints.split(" ")
-        )
         data[Tags.absent] =
-            students.size - data.map { (k, v) -> if (k == Tags.absent) 0 else v }
+            attendance.students.size - data.map { (k, v) -> if (k == Tags.absent) 0 else v }
                 .sum()
         val colors = mutableListOf<Int>()
         val entries = data.map { (k, v) ->
@@ -201,14 +198,13 @@ object ClasslistController : FragmentController() {
             .build()
 
 
-        val students = Students.filterStudents(attendance.constraints.split(" "))
         val vibrator = context.context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         with(context) {
             preview.setSurfaceProvider(preview_view.previewSurfaceProvider)
             imageAnalyzer.setAnalyzer(
                 ContextCompat.getMainExecutor(context),
                 TextAnalyzer {
-                    students.filter { student ->
+                    attendance.students.filter { student ->
                         val idName =
                             if (student.shortName.length > 4) student.shortName.toLowerCase()
                             else student.name.toLowerCase()
@@ -217,6 +213,7 @@ object ClasslistController : FragmentController() {
                             "@"
                         ).toLowerCase() in it.toLowerCase()
                     }.forEach { student ->
+                        println("Detected $student")
                         val classlist = classlist ?: return@TextAnalyzer
                         val currentState = classlist.studentState[student.id]
                         if (currentState != Tags.present) {
@@ -257,7 +254,10 @@ object ClasslistController : FragmentController() {
             this.attendance = attendance
             with(context) {
                 initializeFields(attendance)
+                println("attendance initaialized:" + attendance.isInitialized())
                 if (!attendance.isInitialized()) return@with
+                this@ClasslistController.classlist = attendance.classlists.last()
+                println(attendance.classlists)
                 classlistViewPager.adapter = ClasslistPagerAdapter(
                     attendance,
                     this,
@@ -266,6 +266,8 @@ object ClasslistController : FragmentController() {
                 classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
             }
             attendance.addListener {
+                this.classlist =
+                    it.find { classlistInstance -> classlistInstance.id == classlist?.id }
                 val classlistIndex =
                     it.indexOfFirst { classlistInstance -> classlistInstance.id == navigateClasslistId }
                 if (classlistIndex != -1) {
@@ -293,6 +295,7 @@ object ClasslistController : FragmentController() {
 
     private fun initializeFields(attendance: Attendance) {
         this.attendance = attendance
+        if (context.view == null) return
         with(context) {
             toolbarClasslistToolbar.title = attendance.name
             attendanceName.text = attendance.name
@@ -346,9 +349,8 @@ object ClasslistController : FragmentController() {
         with(context) {
             val vibrator = context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             val student = Students.getStudentById(user.email) ?: return false
-            val students = Students.filterStudents(attendance.constraints.split(" "))
             val classlist = attendance.classlists[classlistViewPager.currentItem]
-            if (student !in students) return false
+            if (student !in attendance.students) return false
             val state = classlist.studentState[student.id] ?: return false
             if (state != Tags.present) {
                 classlist.setStudentState(student, Tags.defaultTags.last())

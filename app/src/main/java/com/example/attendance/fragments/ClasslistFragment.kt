@@ -30,13 +30,14 @@ class ClasslistFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val classlist = classlist ?: return
+        var classlist = classlist ?: return
         val attendance = attendance ?: return
         val adapter = ClasslistAdapter(classlist, fullName)
         attendance.addListener {
-            this.classlist =
-                attendance.classlists.find { it.id == classlist.id } ?: return@addListener
-            println("Updated: $classlist")
+            classlist = it.find { classlistInstance -> classlistInstance.id == classlist.id }
+                ?: return@addListener
+            this.classlist = classlist
+//            println("Updated: $classlist")
             adapter.dataChanged(classlist)
         }
         ClasslistController.addRenderListener {

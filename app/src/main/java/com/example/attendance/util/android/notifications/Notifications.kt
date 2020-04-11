@@ -36,7 +36,9 @@ object Notifications {
     fun getBuilder(context: Context) = NotificationCompat.Builder(
         context,
         id
-    )
+    ).apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) setChannelId(id)
+    }
 
     fun notify(
         context: Context,

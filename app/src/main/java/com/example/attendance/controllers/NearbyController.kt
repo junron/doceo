@@ -64,7 +64,7 @@ object NearbyController : FragmentController() {
     }
 
     private fun stopAnimation() {
-        timerTask.cancel()
+        if (::timerTask.isInitialized) timerTask.cancel()
         seconds = 0
         context.cellTowerView.setImageResource(R.drawable.ic_cell_tower2)
     }

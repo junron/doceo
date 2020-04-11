@@ -9,7 +9,6 @@ import com.example.attendance.R
 import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.models.StatefulStudent
-import com.example.attendance.models.Students
 import com.example.attendance.util.android.showIcons
 import com.example.attendance.util.auth.UserLoader
 
@@ -80,10 +79,9 @@ class ClasslistAdapter(
         this.attendance = classlist.parent!!
         val defaultTag = attendance.getParsedTags().first()
         val tags = attendance.getParsedTags().map { it.id to it }.toMap()
-        students = Students.filterStudents(attendance.constraints.split(" "))
-            .map {
-                StatefulStudent(it, tags[classlist.studentState[it.id]] ?: defaultTag)
-            }
+        students = attendance.students.map {
+            StatefulStudent(it, tags[classlist.studentState[it.id]] ?: defaultTag)
+        }
         notifyDataSetChanged()
     }
 
