@@ -33,6 +33,34 @@
             android:layout_height="match_parent"
             android:layout_marginTop="70dp" />
 
+        <LinearLayout
+            android:id="@+id/noClasslists"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_baseline_accessibility_24"
+                android:tint="?android:attr/textColorPrimaryNoDisable" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/text_margin"
+                android:gravity="center"
+                android:text="No classlists found.\nTap the + button below to create a classlist"
+                android:textSize="18sp" />
+        </LinearLayout>
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/newAttendance"
             android:layout_width="wrap_content"

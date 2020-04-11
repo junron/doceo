@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import com.example.attendance.BuildConfig
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.util.Volley
@@ -27,6 +28,11 @@ object SettingsController : FragmentController() {
     override fun init(context: Fragment) {
         super.init(context)
         with(context) {
+            val versionName = with(BuildConfig.VERSION_NAME) {
+                if (endsWith("-p")) "Limited " + substringBefore("-p")
+                else this
+            }
+            appVersion.text = versionName
             toolbarSettings.setOnClickListener {
                 taps++
                 if (taps == 7) {

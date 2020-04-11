@@ -260,7 +260,7 @@ data class Attendance(
                 .setIcon(
                     Icon.createWithResource(
                         MainActivity.activity,
-                        R.drawable.ic_baseline_group_24
+                        R.drawable.app_icon
                     )
                 )
                 .setIntent(shortcutIntent)
@@ -276,7 +276,7 @@ data class Attendance(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(
                     MainActivity.activity,
-                    R.drawable.ic_baseline_group_24
+                    R.drawable.app_icon
                 )
             )
             addIntent.action = "com.android.launcher.action.INSTALL_SHORTCUT"

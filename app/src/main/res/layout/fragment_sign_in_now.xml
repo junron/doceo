@@ -8,6 +8,22 @@
     tools:context=".fragments.SignInNow">
 
     <TextView
+        style="@style/TextAppearance.MaterialComponents.Headline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/text_margin"
+        android:text="Welcome!" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_assignment_ind_24" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/text_margin"

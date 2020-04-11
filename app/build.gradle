@@ -21,7 +21,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 29
         versionCode 1001
-        versionName "alpha-02-p"
+        versionName "alpha-03-p"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

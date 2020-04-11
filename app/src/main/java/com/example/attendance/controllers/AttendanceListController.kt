@@ -2,6 +2,7 @@ package com.example.attendance.controllers
 
 import android.graphics.Color
 import android.view.Gravity
+import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
@@ -44,9 +45,11 @@ object AttendanceListController : FragmentController() {
             val adapter = AttendanceItemsAdapter(
                 context,
                 AttendanceLoader.attendance.filter { attendance -> !attendance.deleted })
+            checkIfEmpty(AttendanceLoader.attendance.filter { attendance -> !attendance.deleted })
             attendanceItems.adapter = adapter
             AttendanceLoader.addListener {
                 val data = it.filter { attendance -> !attendance.deleted }
+                checkIfEmpty(data)
                 ClasslistController.attendanceUpdated(data)
                 adapter.data = data
                 adapter.notifyDataSetChanged()
@@ -72,4 +75,14 @@ object AttendanceListController : FragmentController() {
         context.detailsModifiedTime.text = item.getModifiedTime()
     }
 
+    fun checkIfEmpty(attendance: List<Attendance>) {
+        if (context.view == null) return
+        if (attendance.isNotEmpty()) {
+            context.attendanceItems.visibility = View.VISIBLE
+            context.noClasslists.visibility = View.GONE
+        } else {
+            context.attendanceItems.visibility = View.GONE
+            context.noClasslists.visibility = View.VISIBLE
+        }
+    }
 }

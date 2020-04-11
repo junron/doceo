@@ -31,12 +31,40 @@
             android:layout_margin="@dimen/text_margin"
             android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/updateApp"
-                android:layout_width="wrap_content"
+            <TextView
+                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Update app" />
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:text="App version" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="?attr/dividerHorizontal" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/appVersion"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Limited alpha-02"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/updateApp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Update app" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/developerMode"
