@@ -28,6 +28,7 @@ import com.example.attendance.util.android.notifications.Notifications.createNot
 import com.example.attendance.util.auth.UserLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
                     UserLoader.destroyCredentials()
                     FirebaseAuth.getInstance().signOut()
                     drawerLayout.closeDrawer(Gravity.LEFT)
+                    FirebaseInstanceId.getInstance().deleteInstanceId()
                     this@MainActivity.recreate()
                     Navigation.navigate(R.id.signInNow)
                     true

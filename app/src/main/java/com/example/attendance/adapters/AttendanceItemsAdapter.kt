@@ -102,8 +102,8 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                         StudentSelectController.initializeSharing(
                                             exclude = listOf(item.owner) + item.editors + item.viewers,
                                             back = R.id.attendanceFragment
-                                        )
-                                        { selected, editing ->
+                                        ) { selected, editing ->
+                                            if (selected.isEmpty()) return@initializeSharing
                                             item.share(selected, editing)
                                         }
                                     }

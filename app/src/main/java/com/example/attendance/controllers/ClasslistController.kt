@@ -9,14 +9,17 @@ import android.os.Vibrator
 import android.util.Size
 import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
+import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistPagerAdapter
 import com.example.attendance.models.*
@@ -54,6 +57,7 @@ object ClasslistController : FragmentController() {
 
     override fun init(context: Fragment) {
         super.init(context)
+        MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         with(context) {
             toolbarClasslistToolbar.apply {
                 setNavigationIcon(R.drawable.ic_baseline_close_24)
@@ -168,7 +172,8 @@ object ClasslistController : FragmentController() {
             attendance.students.size - data.map { (k, v) -> if (k == Tags.absent) 0 else v }
                 .sum()
         val colors = mutableListOf<Int>()
-        val entries = data.map { (k, v) ->
+        val entries = data.mapNotNull { (k, v) ->
+            if (v == 0) return@mapNotNull null
             val tag = attendance.getParsedTags().find { tag -> tag.id == k }!!
             colors += tag.color
             PieEntry(v.toFloat(), tag.name)
@@ -249,7 +254,7 @@ object ClasslistController : FragmentController() {
     }
 
 
-    fun setClasslist(attendance: Attendance) {
+    fun setClasslist(attendance: Attendance, preserveIndex: Boolean = false) {
         val run = {
             this.attendance = attendance
             with(context) {
@@ -263,7 +268,11 @@ object ClasslistController : FragmentController() {
                     this,
                     Preferences.getShowFullName(attendance.id)
                 )
-                classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
+                if (preserveIndex) {
+                    var index = attendance.classlists.indexOfFirst { it.id == classlist?.id }
+                    if (index == -1) index = attendance.classlists.lastIndex
+                    classlistViewPager.setCurrentItem(index, false)
+                } else classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
             }
             attendance.addListener {
                 this.classlist =
@@ -333,10 +342,20 @@ object ClasslistController : FragmentController() {
 
     fun attendanceUpdated(attendances: List<Attendance>) {
         if (::attendance.isInitialized) {
-            attendances.forEach { attendance ->
-                if (attendance.id != this.attendance.id) return
-                if (attendance.isInitialized())
-                    initializeFields(attendance)
+            val newAttendance = attendances.find { it.id == attendance.id }
+            if (newAttendance == null) {
+                Toast.makeText(
+                    context.context!!,
+                    "You no longer have access to this classlist.",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+                Navigation.navigate(R.id.attendanceFragment)
+                return
+            }
+            if (newAttendance == attendance) return
+            newAttendance.forceLoadClasslists {
+                setClasslist(newAttendance, true)
             }
         }
     }

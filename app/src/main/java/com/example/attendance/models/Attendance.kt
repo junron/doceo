@@ -76,17 +76,36 @@ data class Attendance(
     }
 
     init {
-        if (id != "") {
-            Firebase.firestore.collection("attendance").document(id).get()
-                .addOnFailureListener {
-                    this.classlists = emptyList()
-                    loadClasslists()
-                }
-            loadClasslists()
-        }
+        if (id != "") loadClasslists()
+    }
+
+    fun forceLoadClasslists(callback: () -> Unit) {
+        Firebase.firestore.collection("attendance")
+            .document(id)
+            .collection("lists")
+            .get()
+            .addOnSuccessListener { snapshotList ->
+                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                    try {
+                        snapshot.toObject(ClasslistInstance::class.java)
+                            ?.copy(parent = this, id = snapshot.id)
+                    } catch (e: Exception) {
+                        println(e)
+                        null
+                    }
+                }.sortedBy { it.created }
+                callback()
+            }.addOnFailureListener {
+                forceLoadClasslists(callback)
+            }
     }
 
     private fun loadClasslists() {
+        Firebase.firestore.collection("attendance").document(id).get()
+            .addOnFailureListener {
+                this.classlists = emptyList()
+                loadClasslists()
+            }
         Firebase.firestore.collection("attendance")
             .document(id)
             .collection("lists")
@@ -214,9 +233,8 @@ data class Attendance(
 
 
     fun lastOpenedDate(): String {
-        val latest = AttendanceLoader.history.filter { it.id == id }
-            .maxBy { it.time.toDate().time } ?: return "Never opened"
-        return "Opened ${PrettyTime().format(latest.time.toDate())}"
+        val latest = getLastAccess() ?: return "Never opened"
+        return "Opened ${PrettyTime().format(latest)}"
     }
 
     fun getParsedTags() = tags.mapNotNull {
@@ -284,6 +302,9 @@ data class Attendance(
             MainActivity.activity.sendBroadcast(addIntent)
         }
     }
+
+    fun getLastAccess() = AttendanceLoader.history.filter { it.id == id }
+        .maxBy { it.time.toDate().time }?.time?.toDate()
 }
 
 @Serializable
@@ -325,11 +346,11 @@ object AttendanceLoader {
             .apply {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
-                    val changedData = processQuery(snapshot.documents)
-                    println("Datachanged: $changedData")
-                    attendance = attendance.filter { user.uid != it.owner } + changedData
-                    listeners.forEach {
-                        it(attendance)
+                    getAttendance {
+                        attendance = it
+                        listeners.forEach {
+                            it(attendance)
+                        }
                     }
                 }
                 get().addOnSuccessListener {
@@ -343,10 +364,11 @@ object AttendanceLoader {
             .apply {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
-                    val changedData = processQuery(snapshot.documents)
-                    attendance = attendance.filter { user.uid !in it.editors } + changedData
-                    listeners.forEach {
-                        it(attendance)
+                    getAttendance {
+                        attendance = it
+                        listeners.forEach {
+                            it(attendance)
+                        }
                     }
                 }
                 get().addOnSuccessListener {
@@ -360,10 +382,11 @@ object AttendanceLoader {
             .apply {
                 addSnapshotListener { snapshot, _ ->
                     snapshot ?: return@addSnapshotListener
-                    val changedData = processQuery(snapshot.documents)
-                    attendance = attendance.filter { user.uid !in it.viewers } + changedData
-                    listeners.forEach {
-                        it(attendance)
+                    getAttendance {
+                        attendance = it
+                        listeners.forEach {
+                            it(attendance)
+                        }
                     }
                 }
                 get().addOnSuccessListener {
@@ -371,6 +394,39 @@ object AttendanceLoader {
                     queries++
                     if (queries == 3) attendance = data
                 }
+            }
+    }
+
+    private fun getAttendance(callback: (List<Attendance>) -> Unit) {
+        val user =
+            FirebaseAuth.getInstance().currentUser ?: return run {
+                FirebaseAuth.getInstance().addAuthStateListener { auth ->
+                    if (auth.currentUser != null) setup()
+                }
+            }
+        var queries = 0
+        val data = mutableListOf<Attendance>()
+        Firebase.firestore.collection("attendance")
+            .whereEqualTo("owner", user.uid)
+            .get().addOnSuccessListener {
+                data += processQuery(it.documents)
+                queries++
+                if (queries == 3) callback(data)
+            }
+
+        Firebase.firestore.collection("attendance")
+            .whereArrayContains("editors", user.uid)
+            .get().addOnSuccessListener {
+                data += processQuery(it.documents)
+                queries++
+                if (queries == 3) callback(data)
+            }
+        Firebase.firestore.collection("attendance")
+            .whereArrayContains("viewers", user.uid)
+            .get().addOnSuccessListener {
+                data += processQuery(it.documents)
+                queries++
+                if (queries == 3) callback(data)
             }
     }
 }

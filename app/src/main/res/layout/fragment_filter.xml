@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/filterBackground"
     tools:context=".fragments.FilterFragment">
 
@@ -22,12 +23,22 @@
 
             <EditText
                 android:id="@+id/filterEditText"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/transparent"
                 android:hint="Filter students"
                 android:singleLine="true"
                 android:textSize="18dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filterCancel"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/ic_baseline_close_24"
+                app:iconGravity="end"
+                app:iconTint="@color/white" />
 
         </LinearLayout>
 

@@ -44,14 +44,15 @@ object AttendanceListController : FragmentController() {
             drawer_layout_end.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             val adapter = AttendanceItemsAdapter(
                 context,
-                AttendanceLoader.attendance.filter { attendance -> !attendance.deleted })
+                AttendanceLoader.attendance.filter { attendance -> !attendance.deleted }
+                    .sortedByDescending { attendance -> attendance.getLastAccess() })
             checkIfEmpty(AttendanceLoader.attendance.filter { attendance -> !attendance.deleted })
             attendanceItems.adapter = adapter
             AttendanceLoader.addListener {
                 val data = it.filter { attendance -> !attendance.deleted }
                 checkIfEmpty(data)
                 ClasslistController.attendanceUpdated(data)
-                adapter.data = data
+                adapter.data = data.sortedByDescending { attendance -> attendance.getLastAccess() }
                 adapter.notifyDataSetChanged()
                 if (detailAttendance != null) {
                     val item = data.find { item -> item.id == detailAttendance?.id }

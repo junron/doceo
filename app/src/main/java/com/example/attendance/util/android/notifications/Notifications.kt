@@ -33,11 +33,16 @@ object Notifications {
         Notifications.id = id
     }
 
-    fun getBuilder(context: Context) = NotificationCompat.Builder(
-        context,
-        id
-    ).apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) setChannelId(id)
+    fun getBuilder(context: Context): NotificationCompat.Builder {
+        if (!::id.isInitialized) createNotificationChannel(
+            context,
+            "NUSH Attendance",
+            "NUS High attendance"
+        )
+        return NotificationCompat.Builder(
+            context,
+            id
+        )
     }
 
     fun notify(

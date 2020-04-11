@@ -2,6 +2,7 @@ package com.example.attendance.controllers
 
 import android.graphics.Color
 import android.view.Gravity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
@@ -21,6 +22,7 @@ object NearbyController : FragmentController() {
 
     override fun init(context: Fragment) {
         super.init(context)
+        MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         with(context) {
             toolbarMain.apply {
                 setNavigationIcon(R.drawable.ic_baseline_menu_24)

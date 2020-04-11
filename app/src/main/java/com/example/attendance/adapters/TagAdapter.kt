@@ -34,7 +34,11 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
                 tagName.isFocusable = false
                 tagName.isFocusableInTouchMode = false
                 tagColor.setImageResource(R.drawable.ic_baseline_palette_24)
-                tagColor.setColorFilter(Color.WHITE)
+                tagColor.setColorFilter(
+                    if (Preferences.isDarkMode())
+                        Color.WHITE
+                    else Color.BLACK
+                )
                 tagDelete.visibility = View.GONE
             } else {
                 tagName.setText(item.name)
@@ -42,24 +46,10 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
             }
             if (editable) {
                 tagColor.setOnClickListener {
-                    val colorPicker = ColorPicker(MainActivity.activity)
-                    colorPicker.negativeButton.setTextColor(
-                        if (Preferences.isDarkMode())
-                            Color.WHITE
-                        else Color.BLACK
-                    )
-                    colorPicker.setOnChooseColorListener(object :
-                        ColorPicker.OnChooseColorListener {
-                        override fun onChooseColor(_p: Int, color: Int) {
-                            tags[position] = item.copy(color = color)
-                            notifyDataSetChanged()
-                        }
-
-                        override fun onCancel() {
-                        }
-
-                    })
-                    colorPicker.show()
+                    showColorPicker(position, item)
+                }
+                tagName.setOnClickListener {
+                    if (tagName.hint == "Add tag") showColorPicker(position, item)
                 }
                 tagName.onTextChange {
                     tags[position] = item.copy(name = it)
@@ -75,6 +65,27 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
                 tagDelete.visibility = View.GONE
             }
         }
+    }
+
+    fun showColorPicker(position: Int, item: Tag) {
+        val colorPicker = ColorPicker(MainActivity.activity)
+        colorPicker.negativeButton.setTextColor(
+            if (Preferences.isDarkMode())
+                Color.WHITE
+            else Color.BLACK
+        )
+        colorPicker.setOnChooseColorListener(object :
+            ColorPicker.OnChooseColorListener {
+            override fun onChooseColor(_p: Int, color: Int) {
+                tags[position] = item.copy(color = color)
+                notifyDataSetChanged()
+            }
+
+            override fun onCancel() {
+            }
+
+        })
+        colorPicker.show()
     }
 
     override fun getItem(position: Int) = tags[position]

@@ -2,8 +2,10 @@ package com.example.attendance.controllers
 
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.attendance.MainActivity
 import com.example.attendance.adapters.FilterAdapter
 import com.example.attendance.adapters.ImmutableClasslistAdapter
 import com.example.attendance.models.FilterParam
@@ -15,10 +17,11 @@ import kotlinx.android.synthetic.main.fragment_filter.*
 object FilterController : FragmentController() {
     lateinit var constraints: String
     private lateinit var adapter: FilterAdapter
-    var callback: ((String) -> Unit)? = null
+    var callback: ((String?) -> Unit)? = null
 
     override fun init(context: Fragment) {
         super.init(context)
+        MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         with(context) {
             adapter = FilterAdapter(filterEditText)
             suggestions.adapter = adapter
@@ -49,6 +52,11 @@ object FilterController : FragmentController() {
             filterDone.setOnClickListener {
                 hideKeyboard(this.activity!!)
                 callback?.invoke(filterEditText.text.toString())
+                callback = null
+            }
+            filterCancel.setOnClickListener {
+                hideKeyboard(this.activity!!)
+                callback?.invoke(null)
                 callback = null
             }
         }

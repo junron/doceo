@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.BuildConfig
 import com.example.attendance.MainActivity
@@ -27,6 +28,7 @@ object SettingsController : FragmentController() {
 
     override fun init(context: Fragment) {
         super.init(context)
+        MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         with(context) {
             val versionName = with(BuildConfig.VERSION_NAME) {
                 if (endsWith("-p")) "Limited " + substringBefore("-p")
