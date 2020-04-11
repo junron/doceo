@@ -37,7 +37,6 @@ class ClasslistFragment(
             classlist = it.find { classlistInstance -> classlistInstance.id == classlist.id }
                 ?: return@addListener
             this.classlist = classlist
-//            println("Updated: $classlist")
             adapter.dataChanged(classlist)
         }
         ClasslistController.addRenderListener {

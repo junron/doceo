@@ -29,12 +29,8 @@ object AttendanceListController : FragmentController() {
                     MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
                 }
             }
-            if (!UserLoader.userExists()) {
-                MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                Navigation.navigate(R.id.signInNow)
-                return@with
-            } else if (!signedIn) {
-                MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            if (!signedIn) {
                 val user = UserLoader.getUser()
                 signedIn = true
                 Snackbar.make(mainParent, "Welcome, ${user.name}!", Snackbar.LENGTH_LONG)
@@ -76,7 +72,7 @@ object AttendanceListController : FragmentController() {
         context.detailsModifiedTime.text = item.getModifiedTime()
     }
 
-    fun checkIfEmpty(attendance: List<Attendance>) {
+    private fun checkIfEmpty(attendance: List<Attendance>) {
         if (context.view == null) return
         if (attendance.isNotEmpty()) {
             context.attendanceItems.visibility = View.VISIBLE

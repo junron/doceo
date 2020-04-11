@@ -32,6 +32,8 @@ import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
 class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
@@ -59,25 +61,28 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
                 R.id.nav_nearby to R.id.nearbyFragment
             ), navController, drawerLayout.sideNavView
         )
-        Students.loadStudents(this)
-        createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
+        AppendOnlyStorage.init(this)
         Volley.init(this)
-        AndroidNearby.init(this)
         UserLoader.context = this
+        activity = this
+        if (!UserLoader.userExists()) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            Navigation.navigate(R.id.signInNow)
+            return
+        }
+        AttendanceLoader.setup()
+        Students.loadStudents(this)
+        AndroidNearby.init(this)
         initNavigationHandlers()
         setThemeIcon()
-        AppendOnlyStorage.init(this)
-        activity = this
-        if (!UserLoader.userExists()) return
         Handshake.init(this)
+        createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         NotificationServer.init()
-        AttendanceLoader.setup()
         if (intent != null) handleIntents(intent)
     }
 
     private fun handleIntents(intent: Intent) {
         if (intent.getBooleanExtra("updateApp", false)) {
-            println("Update app!!!" + intent.getBooleanExtra("updateApp", false))
             SettingsController.updateApp(this)
             return
         }
@@ -115,7 +120,9 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
                     UserLoader.destroyCredentials()
                     FirebaseAuth.getInstance().signOut()
                     drawerLayout.closeDrawer(Gravity.LEFT)
-                    FirebaseInstanceId.getInstance().deleteInstanceId()
+                    GlobalScope.launch {
+                        FirebaseInstanceId.getInstance().deleteInstanceId()
+                    }
                     this@MainActivity.recreate()
                     Navigation.navigate(R.id.signInNow)
                     true

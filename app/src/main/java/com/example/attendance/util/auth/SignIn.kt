@@ -1,11 +1,11 @@
 package com.example.attendance.util.auth
 
 import android.content.Context
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.android.volley.toolbox.StringRequest
 import com.auth0.android.jwt.JWT
-import com.example.attendance.AuthenticationActivity
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.util.Volley.queue
@@ -23,12 +23,30 @@ import kotlinx.serialization.json.Json
 
 @UnstableDefault
 object SignIn {
-    const val tenantId = "d72a7172-d5f8-4889-9a85-d7424751592a"
-    const val clientId = "0dd4d56f-45c1-47e1-8f8c-7c93ec9c71aa"
-    const val redirectUrl = "com.example.attendance.auth://callback"
+    private const val tenantId = "d72a7172-d5f8-4889-9a85-d7424751592a"
+    private const val clientId = "0dd4d56f-45c1-47e1-8f8c-7c93ec9c71aa"
+    private const val redirectUrl = "https://voting.nushhwboard.ml/callback"
 
-    fun startSignIn(activity: AppCompatActivity, context: Context) {
-        signInUser(activity as MainActivity, context) { token ->
+    private fun signInUser(webview: WebView, callback: (token: String) -> Unit) {
+        webview.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                if (request == null) return false
+                if (request.url.toString().startsWith("$redirectUrl?code=")) {
+                    val token = request.url.toString().substringAfter("code=").substringBefore("&")
+                    getAccessToken(token, callback)
+                }
+                return true
+            }
+        }
+        webview.settings.javaScriptEnabled = true
+        webview.loadUrl("https://login.microsoft.com/$tenantId/oauth2/authorize?client_id=$clientId&response_type=code&redirect_uri=$redirectUrl")
+    }
+
+    fun startSignIn(webview: WebView, context: Context) {
+        signInUser(webview) { token ->
             val claims = JWT(token).claims
             val name = claims["given_name"]?.asString() ?: return@signInUser
             val id = claims["unique_name"]?.asString() ?: return@signInUser
@@ -39,22 +57,9 @@ object SignIn {
                     println("FirebaseAuthError: $error")
                 }
                 Navigation.navigate(R.id.attendanceFragment)
-                activity.recreate()
+                MainActivity.activity.recreate()
             }
         }
-    }
-
-    private fun signInUser(
-        activity: MainActivity,
-        context: Context,
-        callback: (token: String) -> Unit
-    ) {
-        AuthenticationActivity.callback = {
-            if (it != null) {
-                getAccessToken(it, callback)
-            }
-        }
-        activity.startActivity(Intent(context, AuthenticationActivity::class.java))
     }
 
     private fun getAccessToken(code: String, callback: (token: String) -> Unit) {

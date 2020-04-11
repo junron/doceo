@@ -257,6 +257,7 @@ object ClasslistController : FragmentController() {
     fun setClasslist(attendance: Attendance, preserveIndex: Boolean = false) {
         val run = {
             this.attendance = attendance
+            attendance.loadClasslists()
             with(context) {
                 initializeFields(attendance)
                 println("attendance initaialized:" + attendance.isInitialized())
@@ -341,7 +342,7 @@ object ClasslistController : FragmentController() {
     }
 
     fun attendanceUpdated(attendances: List<Attendance>) {
-        if (::attendance.isInitialized) {
+        if (::attendance.isInitialized && context.view != null) {
             val newAttendance = attendances.find { it.id == attendance.id }
             if (newAttendance == null) {
                 Toast.makeText(
@@ -354,9 +355,7 @@ object ClasslistController : FragmentController() {
                 return
             }
             if (newAttendance == attendance) return
-            newAttendance.forceLoadClasslists {
-                setClasslist(newAttendance, true)
-            }
+            setClasslist(newAttendance, true)
         }
     }
 

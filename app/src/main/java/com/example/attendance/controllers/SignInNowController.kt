@@ -1,5 +1,6 @@
 package com.example.attendance.controllers
 
+import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
@@ -11,7 +12,9 @@ object SignInNowController : FragmentController() {
         super.init(context)
         MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         context.signInButton.setOnClickListener {
-            SignIn.startSignIn(context.activity as MainActivity, context.context!!)
+            context.signInInfo.visibility = View.GONE
+            context.signinWebview.visibility = View.VISIBLE
+            SignIn.startSignIn(context.signinWebview, context.context!!)
         }
     }
 }

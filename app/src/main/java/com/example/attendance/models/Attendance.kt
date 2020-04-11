@@ -79,63 +79,38 @@ data class Attendance(
         if (id != "") loadClasslists()
     }
 
-    fun forceLoadClasslists(callback: () -> Unit) {
+    fun loadClasslists() {
         Firebase.firestore.collection("attendance")
             .document(id)
             .collection("lists")
-            .get()
-            .addOnSuccessListener { snapshotList ->
-                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
-                    try {
-                        snapshot.toObject(ClasslistInstance::class.java)
-                            ?.copy(parent = this, id = snapshot.id)
-                    } catch (e: Exception) {
-                        println(e)
-                        null
+            .apply {
+                get().addOnSuccessListener { snapshotList ->
+                    this@Attendance.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                        try {
+                            snapshot.toObject(ClasslistInstance::class.java)
+                                ?.copy(parent = this@Attendance, id = snapshot.id)
+                        } catch (e: Exception) {
+                            println(e)
+                            null
+                        }
+                    }.sortedBy { it.created }
+                }
+                    .addOnFailureListener {
+                        loadClasslists()
                     }
-                }.sortedBy { it.created }
-                callback()
-            }.addOnFailureListener {
-                forceLoadClasslists(callback)
-            }
-    }
-
-    private fun loadClasslists() {
-        Firebase.firestore.collection("attendance").document(id).get()
-            .addOnFailureListener {
-                this.classlists = emptyList()
-                loadClasslists()
-            }
-        Firebase.firestore.collection("attendance")
-            .document(id)
-            .collection("lists")
-            .get()
-            .addOnSuccessListener { snapshotList ->
-                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
-                    try {
-                        snapshot.toObject(ClasslistInstance::class.java)
-                            ?.copy(parent = this, id = snapshot.id)
-                    } catch (e: Exception) {
-                        println(e)
-                        null
-                    }
-                }.sortedBy { it.created }
-            }
-        Firebase.firestore.collection("attendance")
-            .document(id)
-            .collection("lists")
-            .addSnapshotListener { snapshotList, _ ->
-                snapshotList ?: return@addSnapshotListener
-                this.classlists = snapshotList.documents.mapNotNull { snapshot ->
-                    try {
-                        snapshot.toObject(ClasslistInstance::class.java)
-                            ?.copy(parent = this, id = snapshot.id)
-                    } catch (e: Exception) {
-                        println(e)
-                        null
-                    }
-                }.sortedBy { it.created }
-                listeners.forEach { it(this.classlists) }
+                addSnapshotListener { snapshotList, _ ->
+                    snapshotList ?: return@addSnapshotListener
+                    this@Attendance.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                        try {
+                            snapshot.toObject(ClasslistInstance::class.java)
+                                ?.copy(parent = this@Attendance, id = snapshot.id)
+                        } catch (e: Exception) {
+                            println(e)
+                            null
+                        }
+                    }.sortedBy { it.created }
+                    listeners.forEach { it(this@Attendance.classlists) }
+                }
             }
     }
 
@@ -314,6 +289,7 @@ object AttendanceLoader {
     val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())
     var attendance = emptyList<Attendance>()
         private set
+    private var loadStatus = 0
 
     private val listeners = mutableListOf<(List<Attendance>) -> Unit>()
 
@@ -339,60 +315,69 @@ object AttendanceLoader {
                     if (auth.currentUser != null) setup()
                 }
             }
-        var queries = 0
-        val data = mutableListOf<Attendance>()
         Firebase.firestore.collection("attendance")
             .whereEqualTo("owner", user.uid)
-            .apply {
-                addSnapshotListener { snapshot, _ ->
-                    snapshot ?: return@addSnapshotListener
-                    getAttendance {
-                        attendance = it
+            .addSnapshotListener { snapshot, _ ->
+                snapshot ?: return@addSnapshotListener
+                if (loadStatus != 3) {
+                    attendance = attendance + processQuery(snapshot.documents)
+                    if (loadStatus == 2) {
                         listeners.forEach {
                             it(attendance)
                         }
                     }
+                    loadStatus++
+                    return@addSnapshotListener
                 }
-                get().addOnSuccessListener {
-                    data += processQuery(it.documents)
-                    queries++
-                    if (queries == 3) attendance = data
+                getAttendance {
+                    attendance = it
+                    listeners.forEach {
+                        it(attendance)
+                    }
                 }
             }
+
         Firebase.firestore.collection("attendance")
             .whereArrayContains("editors", user.uid)
-            .apply {
-                addSnapshotListener { snapshot, _ ->
-                    snapshot ?: return@addSnapshotListener
-                    getAttendance {
-                        attendance = it
+            .addSnapshotListener { snapshot, _ ->
+                snapshot ?: return@addSnapshotListener
+                if (loadStatus != 3) {
+                    attendance = attendance + processQuery(snapshot.documents)
+                    if (loadStatus == 2) {
                         listeners.forEach {
                             it(attendance)
                         }
                     }
+                    loadStatus++
+                    return@addSnapshotListener
                 }
-                get().addOnSuccessListener {
-                    data += processQuery(it.documents)
-                    queries++
-                    if (queries == 3) attendance = data
+                getAttendance {
+                    attendance = it
+                    listeners.forEach {
+                        it(attendance)
+                    }
                 }
             }
+
         Firebase.firestore.collection("attendance")
             .whereArrayContains("viewers", user.uid)
-            .apply {
-                addSnapshotListener { snapshot, _ ->
-                    snapshot ?: return@addSnapshotListener
-                    getAttendance {
-                        attendance = it
+            .addSnapshotListener { snapshot, _ ->
+                snapshot ?: return@addSnapshotListener
+                if (loadStatus != 3) {
+                    attendance = attendance + processQuery(snapshot.documents)
+                    if (loadStatus == 2) {
                         listeners.forEach {
                             it(attendance)
                         }
                     }
+                    loadStatus++
+                    return@addSnapshotListener
                 }
-                get().addOnSuccessListener {
-                    data += processQuery(it.documents)
-                    queries++
-                    if (queries == 3) attendance = data
+                getAttendance {
+                    attendance = it
+                    listeners.forEach {
+                        it(attendance)
+                    }
                 }
             }
     }
