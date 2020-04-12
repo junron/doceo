@@ -9,14 +9,11 @@ import com.google.android.gms.nearby.connection.PayloadTransferUpdate
 
 class MessageHandler(connection: ConnectionsClient, endpointId: String, advertising: Boolean) :
     PayloadCallback() {
-    private val handshake = Handshake(connection, endpointId, advertising)
+    val handshake = Handshake(connection, endpointId, advertising)
 
-    init {
-        if (advertising)
-            handshake.next("")
-    }
 
     override fun onPayloadReceived(endpointId: String, payload: Payload) {
+        println("Received payload ${String(payload.asBytes()!!)}")
         if (payload.type == Payload.Type.BYTES) handshake.next(String(payload.asBytes()!!))
     }
 

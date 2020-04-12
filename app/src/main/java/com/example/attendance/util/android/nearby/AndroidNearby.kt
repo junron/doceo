@@ -17,7 +17,14 @@ object AndroidNearby {
     private val connectionCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
             when (result.status.statusCode) {
-                STATUS_OK -> println("Connection succeeded!")
+                STATUS_OK -> {
+                    println("Connection succeeded!")
+                    if (advertising) {
+                        val handler = state[endpointId]
+                        println("Handler: $handler")
+                        handler?.handshake?.next("")
+                    }
+                }
                 STATUS_CONNECTION_REJECTED -> println("Connection refused!")
                 STATUS_ERROR -> println("Connection broke!")
             }
@@ -85,7 +92,6 @@ object AndroidNearby {
             )
             .addOnSuccessListener {
                 advertising = true
-                NearbyController.startedAdvertising()
                 println("Started advertising")
             }
             .addOnFailureListener {
@@ -101,6 +107,7 @@ object AndroidNearby {
             .addOnSuccessListener {
                 advertising = false
                 println("Discovery started")
+                NearbyController.startedDiscovery()
             }
             .addOnFailureListener {
                 println("Discovery Failed: $it")

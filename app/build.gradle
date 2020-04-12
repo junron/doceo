@@ -20,8 +20,8 @@ android {
         applicationId "com.example.attendance"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 1020
-        versionName "Beta 02"
+        versionCode 1100
+        versionName "Version 1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -95,6 +95,8 @@ dependencies {
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation 'com.github.wooplr:Spotlight:1.2.3'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3'
+    implementation 'com.github.wooplr:Spotlight:1.2.3'
 
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
 

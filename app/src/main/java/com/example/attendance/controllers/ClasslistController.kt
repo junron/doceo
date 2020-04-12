@@ -2,6 +2,7 @@ package com.example.attendance.controllers
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.VibrationEffect
@@ -21,26 +22,30 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.adapters.ClasslistPagerAdapter
+import com.example.attendance.fragments.ClasslistFragment
 import com.example.attendance.models.*
+import com.example.attendance.util.*
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
 import com.example.attendance.util.android.Preferences
+import com.example.attendance.util.android.Sharing
 import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.ocr.TextAnalyzer
 import com.example.attendance.util.auth.User
 import com.example.attendance.util.auth.UserLoader
-import com.example.attendance.util.isToday
-import com.example.attendance.util.isYesterday
-import com.example.attendance.util.suffix
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.single.BasePermissionListener
+import com.wooplr.spotlight.SpotlightConfig
+import com.wooplr.spotlight.SpotlightView
+import com.wooplr.spotlight.utils.SpotlightSequence
+import kotlinx.android.synthetic.main.fragment_classlist.*
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 import java.text.SimpleDateFormat
@@ -87,25 +92,17 @@ object ClasslistController : FragmentController() {
                         pieChartContainer.visibility = View.GONE
                     }
                     R.id.classlist_advertise -> {
-                        Dexter.withActivity(context.activity)
-                            .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                            .withListener(object : BasePermissionListener() {
-                                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                                    AndroidNearby.startDiscovery()
-                                    println("Discovering")
-                                    Snackbar.make(
-                                        classlistViewPager,
-                                        "Discovering students...",
-                                        Snackbar.LENGTH_INDEFINITE
-                                    )
-                                        .setAnchorView(classlistNavigation)
-                                        .setAction("Stop") {
-                                            AndroidNearby.stopDiscovery()
-                                        }
-                                        .show()
-                                }
-                            })
-                            .check()
+                        AndroidNearby.startAdvertising()
+                        Snackbar.make(
+                            classlistViewPager,
+                            "Discovering students...",
+                            Snackbar.LENGTH_INDEFINITE
+                        )
+                            .setAnchorView(classlistNavigation)
+                            .setAction("Stop") {
+                                AndroidNearby.stopAdvertising()
+                            }
+                            .show()
                     }
                     R.id.classlist_analyze -> {
                         preview_view.visibility = View.GONE
@@ -158,23 +155,163 @@ object ClasslistController : FragmentController() {
                         else ""
                 }
             })
+            classlistExport.setOnClickListener {
+                drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                val file = context.context!!.filesDir.resolve(
+                    "${attendance.name}_${attendance.created.toDate().toStringValue()}.csv"
+                )
+                val data =
+                    getStudentStates()?.entries?.sortedBy { (k, _) -> k.id }
+                        ?.map { (student, tag) ->
+                            listOf(student.name, tag.name)
+                        } ?: return@setOnClickListener
+                val rows =
+                    listOf(listOf("Name", "Status")) + data
+                csvWriter().open(file) {
+                    writeAll(rows)
+                }
+                MaterialAlertDialogBuilder(context.context!!)
+                    .setTitle("Export classlist")
+                    .setMessage("Classlist ${attendance.name} has been exported!")
+                    .setPositiveButton("Share") { _, _ ->
+                        startActivity(
+                            Intent.createChooser(
+                                Sharing.shareCSV(
+                                    context.context!!,
+                                    Intent.ACTION_SEND,
+                                    file
+                                ), "Share CSV"
+                            )
+                        )
+                    }
+                    .setNeutralButton("Open") { _, _ ->
+                        startActivity(
+                            Intent.createChooser(
+                                Sharing.shareCSV(
+                                    context.context!!,
+                                    Intent.ACTION_VIEW,
+                                    file
+                                ), "Open CSV"
+                            )
+                        )
+                    }.show()
+            }
+            classlistHelp.setOnClickListener {
+                drawer_layout_end.closeDrawer(Gravity.RIGHT)
+                showOnboarding()
+            }
         }
         if (::callback.isInitialized)
             callback()
     }
 
-    private fun getPieChartData(): Pair<List<PieEntry>, List<Int>>? {
+    private fun showOnboarding() {
+        val config = SpotlightConfig()
+            .apply {
+                isDismissOnTouch = true
+                lineAndArcColor = Color.parseColor("#eb273f")
+                introAnimationDuration = 200
+                fadingTextDuration = 200
+                lineAnimationDuration = 200
+                maskColor = Color.parseColor("#dc000000")
+                headingTvSize = 32
+                subHeadingTvSize = 16
+                isPerformClick = false
+            }
+        val config2 = SpotlightConfig()
+            .apply {
+                isDismissOnTouch = true
+                maskColor = Color.parseColor("#dc000000")
+                headingTvSize = 32
+                subHeadingTvSize = 16
+                isPerformClick = false
+                lineAndArcColor = Color.parseColor("#dc000000")
+                lineAnimationDuration = 0
+                introAnimationDuration = 200
+                fadingTextDuration = 200
+            }
+        with(context) {
+            val currentFragment =
+                (classlistViewPager.adapter as ClasslistPagerAdapter).state[classlistViewPager.currentItem] as? ClasslistFragment
+                    ?: return@with
+            val adapter = currentFragment.classListView.adapter as ClasslistAdapter
+            SpotlightView.Builder(MainActivity.activity)
+                .setConfiguration(config2)
+                .target(View(context!!))
+                .headingTvText("Welcome!")
+                .subHeadingTvText("This interactive tutorial will guide you through this app.\nTap anywhere to continue.")
+                .setListener {
+                    SpotlightSequence.getInstance(MainActivity.activity, config)
+                        .addSpotlight(
+                            adapter.state[2],
+                            "",
+                            "Tap on a student to toggle its state between Absent (default) and Present (green)\nTap and hold to select other states",
+                            uuid()
+                        )
+                        .addSpotlight(
+                            classlistNavigation.findViewById(R.id.classlist_ocr),
+                            "OCR Mode",
+                            "Tap to use OCR to detect student's names",
+                            uuid()
+                        ).apply {
+                            if (UserLoader.getUser().isMentorRep) {
+                                addSpotlight(
+                                    classlistNavigation.findViewById(R.id.classlist_advertise),
+                                    "Nearby Mode",
+                                    "Tap to detect nearby students using Bluetooth",
+                                    uuid()
+                                )
+                            }
+                        }
+                        .addSpotlight(
+                            classlistNavigation.findViewById(R.id.classlist_analyze),
+                            "Analysis",
+                            "Tap to have a quick overview of the class list",
+                            uuid()
+                        )
+                        .addSpotlight(
+                            classlistAdd,
+                            "History",
+                            "Tap to create a new instance of a class list.\nSwipe to view previous instances of this class list",
+                            uuid()
+                        )
+                        .addSpotlight(
+                            classlistMore,
+                            "",
+                            "Tap to view more options",
+                            uuid()
+                        )
+                        .startSequence()
+                }
+                .usageId(uuid())
+                .show()
+        }
+
+    }
+
+    private fun getStudentStates(): Map<Student, Tag>? {
         val classlist = classlist ?: return null
         val data = classlist
-            .studentState.entries.groupBy { state -> state.value }
-            .map { (k, v) -> k to v.size }.toMap().toMutableMap()
-        data[Tags.absent] =
-            attendance.students.size - data.map { (k, v) -> if (k == Tags.absent) 0 else v }
-                .sum()
+            .studentState.mapNotNull { (k, v) ->
+                val student = attendance.students.find { it.id == k } ?: return@mapNotNull null
+                val tag = attendance.getParsedTags()
+                    .find { it.id == v } ?: return@mapNotNull null
+                student to tag
+            }.toMap().toMutableMap()
+        val defaultTag = attendance.getParsedTags().find { it.id == Tags.absent }!!
+        attendance.students.forEach {
+            if (data[it] == null) data[it] = defaultTag
+        }
+        return data
+    }
+
+    private fun getPieChartData(): Pair<List<PieEntry>, List<Int>>? {
+        val studentData = getStudentStates() ?: return null
+        val data = studentData.entries.groupBy { it.value }
+            .map { (tag, students) -> tag to students.size }.toMap()
         val colors = mutableListOf<Int>()
-        val entries = data.mapNotNull { (k, v) ->
+        val entries = data.mapNotNull { (tag, v) ->
             if (v == 0) return@mapNotNull null
-            val tag = attendance.getParsedTags().find { tag -> tag.id == k }!!
             colors += tag.color
             PieEntry(v.toFloat(), tag.name)
         }
@@ -260,10 +397,8 @@ object ClasslistController : FragmentController() {
             attendance.loadClasslists()
             with(context) {
                 initializeFields(attendance)
-                println("attendance initaialized:" + attendance.isInitialized())
                 if (!attendance.isInitialized()) return@with
                 this@ClasslistController.classlist = attendance.classlists.last()
-                println(attendance.classlists)
                 classlistViewPager.adapter = ClasslistPagerAdapter(
                     attendance,
                     this,
@@ -274,6 +409,16 @@ object ClasslistController : FragmentController() {
                     if (index == -1) index = attendance.classlists.lastIndex
                     classlistViewPager.setCurrentItem(index, false)
                 } else classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
+                val user = UserLoader.getUser()
+                if (attendance.getAccessLevel(user.email) == AccessLevel.VIEWER) classlistHelp.visibility =
+                    View.GONE
+                if (attendance.getAccessLevel(user.email) == AccessLevel.OWNER && AttendanceLoader.attendance.size == 1) {
+                    Snackbar.make(classlistViewPager, "Need help?", Snackbar.LENGTH_LONG)
+                        .setAction("Start guide") {
+                            showOnboarding()
+                        }
+                        .show()
+                }
             }
             attendance.addListener {
                 this.classlist =

@@ -11,10 +11,13 @@ class ClasslistPagerAdapter(
     private val fullName: Boolean
 ) :
     FragmentStateAdapter(parent) {
+    val state = mutableMapOf<Int, Fragment>()
     override fun getItemCount() = attendance.classlists.size
 
     override fun createFragment(position: Int): Fragment {
         val item = attendance.classlists[position]
-        return ClasslistFragment(attendance, item, fullName)
+        val fragment = ClasslistFragment(attendance, item, fullName)
+        state[position] = fragment
+        return fragment
     }
 }

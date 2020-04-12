@@ -35,8 +35,9 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/classlistAdd"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="56dp"
+                        android:layout_width="28dp"
                         android:layout_height="match_parent"
+                        app:iconPadding="0dp"
                         app:icon="@drawable/ic_baseline_add_24"
                         app:iconGravity="end"
                         app:iconTint="@color/white" />
@@ -157,10 +158,30 @@
                 android:orientation="vertical">
 
                 <Switch
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:id="@+id/showFullNames"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Show full names" />
+
+                <TextView
+                    android:id="@+id/classlistExport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Export"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+                <TextView
+                    android:id="@+id/classlistHelp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Help"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>

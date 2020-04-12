@@ -58,8 +58,6 @@ class Handshake(
     }
 
     private fun respondToChallenge(randomString: String): String? {
-        // Improperly seeded CSPRNGs
-        if (randomString == serverChallenge) return null
         return try {
             clientCrypto.sign(randomString)
         } catch (e: Exception) {
@@ -80,10 +78,13 @@ class Handshake(
     }
 
     override fun next(message: String) {
+        println("State $state")
         when (state) {
             0 -> {
-                if (advertising) sendPayload(clientCertificateString.toPayload())
-                else {
+                if (advertising) {
+                    sendPayload(clientCertificateString.toPayload())
+                    println("Sent payload.")
+                } else {
                     val result = setRemoteCertificate(message)
                     if (!result) {
                         connection.disconnectFromEndpoint(endpointId)
@@ -150,10 +151,12 @@ class Handshake(
                         sendPayload("CONN_OK".toPayload())
                     }
                 } else {
+                    val cert = serverCertificate.certificate
+                    val remoteUser = User(cert.name, cert.id, cert.metadata)
                     connection.disconnectFromEndpoint(endpointId)
                     if (message == "RECORD_OK") {
                         println("Connection established!")
-                        NearbyController.onHandshakeComplete()
+                        NearbyController.onHandshakeComplete(remoteUser)
                         AndroidNearby.stopDiscovery()
                     } else if (message == "CONN_OK") {
                         println("Connection succeeded, but attendance not recorded")

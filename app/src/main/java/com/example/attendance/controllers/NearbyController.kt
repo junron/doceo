@@ -1,5 +1,6 @@
 package com.example.attendance.controllers
 
+import android.Manifest
 import android.graphics.Color
 import android.view.Gravity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -8,6 +9,9 @@ import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.auth.User
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.single.BasePermissionListener
 import kotlinx.android.synthetic.main.fragment_nearby.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -16,7 +20,7 @@ import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
 object NearbyController : FragmentController() {
-    private var advertising = false
+    private var discovering = false
     private lateinit var timerTask: TimerTask
     private var seconds = 0
 
@@ -32,12 +36,19 @@ object NearbyController : FragmentController() {
                 }
             }
             toggleAdvertise.setOnClickListener {
-                advertising = if (!advertising) {
-                    AndroidNearby.startAdvertising()
+                discovering = if (!discovering) {
+                    Dexter.withActivity(context.activity)
+                        .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        .withListener(object : BasePermissionListener() {
+                            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                                AndroidNearby.startDiscovery()
+                            }
+                        })
+                        .check()
                     toggleAdvertise.text = "Stop"
                     true
                 } else {
-                    AndroidNearby.stopAdvertising()
+                    AndroidNearby.stopDiscovery()
                     nearbyStatus.text = "Not connected"
                     stopAnimation()
                     toggleAdvertise.text = "Start"
@@ -71,7 +82,7 @@ object NearbyController : FragmentController() {
         context.cellTowerView.setImageResource(R.drawable.ic_cell_tower2)
     }
 
-    fun startedAdvertising() {
+    fun startedDiscovery() {
         with(context) {
             nearbyStatus.text = "Searching..."
             startAnimation()
@@ -79,11 +90,14 @@ object NearbyController : FragmentController() {
     }
 
     fun onConnected(user: User) {
-        println("Connected to $user")
+        context.nearbyStatus.text = "Connected to ${user.name}"
     }
 
-    fun onHandshakeComplete() {
-        println("handshake complete")
+    fun onHandshakeComplete(user: User) {
+        context.nearbyStatus.text = "Attendance taken by ${user.name}"
+        stopAnimation()
+        discovering = false
+        context.toggleAdvertise.text = "Start"
     }
 
     fun onDisconnected() {

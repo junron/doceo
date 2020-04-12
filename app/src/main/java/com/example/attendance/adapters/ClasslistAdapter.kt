@@ -9,6 +9,7 @@ import com.example.attendance.R
 import com.example.attendance.models.AccessLevel
 import com.example.attendance.models.ClasslistInstance
 import com.example.attendance.models.StatefulStudent
+import com.example.attendance.models.Tags
 import com.example.attendance.util.android.showIcons
 import com.example.attendance.util.auth.UserLoader
 
@@ -21,6 +22,7 @@ class ClasslistAdapter(
     private var attendance = classlist.parent!!
     lateinit var students: List<StatefulStudent>
     private val user = UserLoader.getUser()
+    val state = mutableMapOf<Int, TextView>()
 
     init {
         dataChanged(classlist)
@@ -31,7 +33,7 @@ class ClasslistAdapter(
 
     override fun onBindViewHolder(holder: StudentViewHolder, position: Int) {
         val (student, tag) = getItem(position)
-        holder.textView.apply {
+        state[position] = holder.textView.apply {
             text = if (fullName) student.name else student.shortName
             setTextColor(tag.color)
             setPadding(36, 24, 10, 36)
@@ -49,10 +51,15 @@ class ClasslistAdapter(
                 PopupMenu(context, it, Gravity.TOP).apply {
                     menu.apply {
                         attendance.getParsedTags().drop(2).forEach { tag ->
-                            menu.add(tag.name).icon =
-                                context.getDrawable(R.drawable.ic_circle)?.apply {
-                                    setTint(tag.color)
-                                }
+                            val item = menu.add(tag.name)
+                            item.apply {
+                                icon =
+                                    context.getDrawable(R.drawable.ic_circle)?.constantState?.newDrawable()
+                                        ?.mutate()
+                                        ?.apply {
+                                            setTint(tag.color)
+                                        }
+                            }
                         }
                         setOnMenuItemClickListener { item ->
                             val selectedTag =
@@ -77,7 +84,7 @@ class ClasslistAdapter(
     fun dataChanged(classlist: ClasslistInstance) {
         this.classlist = classlist
         this.attendance = classlist.parent!!
-        val defaultTag = attendance.getParsedTags().first()
+        val defaultTag = attendance.getParsedTags().find { it.id == Tags.absent }!!
         val tags = attendance.getParsedTags().map { it.id to it }.toMap()
         students = attendance.students.map {
             StatefulStudent(it, tags[classlist.studentState[it.id]] ?: defaultTag)
