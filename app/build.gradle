@@ -79,7 +79,7 @@ dependencies {
 
     // Add the SDKs for any other Firebase products you want to use in your app
     implementation 'com.google.firebase:firebase-firestore-ktx:21.4.2'
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'org.whispersystems:curve25519-android:0.5.0'
     implementation 'com.auth0.android:jwtdecode:1.4.0'

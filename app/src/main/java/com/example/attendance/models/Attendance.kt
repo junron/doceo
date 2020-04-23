@@ -185,20 +185,18 @@ data class Attendance(
             .document(id)
             .update(if (edit) "editors" else "viewers", new, "modified", Timestamp.now())
         GlobalScope.launch {
-            NotificationServer.run {
-                sendNotification(
-                    SendNotificationRequest(
-                        students.map { it.id },
-                        mapOf(
-                            "type" to "ITEM_SHARED",
-                            "attendanceId" to id,
-                            "attendanceName" to name,
-                            "owner" to Students.getStudentById(owner)!!.name
-                        ),
-                        ""
-                    )
+            NotificationServer.sendNotification(
+                SendNotificationRequest(
+                    students.map { it.id },
+                    mapOf(
+                        "type" to "ITEM_SHARED",
+                        "attendanceId" to id,
+                        "attendanceName" to name,
+                        "owner" to Students.getStudentById(owner)!!.name
+                    ),
+                    ""
                 )
-            }
+            )
         }
     }
 
