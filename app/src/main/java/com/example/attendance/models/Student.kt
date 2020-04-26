@@ -3,8 +3,8 @@ package com.example.attendance.models
 import android.content.Context
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.list
 
 @Serializable
 data class Student(

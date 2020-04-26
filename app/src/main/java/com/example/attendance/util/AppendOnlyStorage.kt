@@ -2,8 +2,8 @@ package com.example.attendance.util
 
 import android.content.Context
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.list
 
 class AppendOnlyStorage<T>(
     name: String,
