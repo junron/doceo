@@ -15,6 +15,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    ndkVersion "21.3.6528147"
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.example.attendance"
