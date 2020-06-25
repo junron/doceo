@@ -22,11 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.adapters.ClasslistPagerAdapter
-import com.example.attendance.fragments.ClasslistFragment
 import com.example.attendance.models.*
-import com.example.attendance.util.*
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
 import com.example.attendance.util.android.Preferences
@@ -35,6 +32,10 @@ import com.example.attendance.util.android.nearby.AndroidNearby
 import com.example.attendance.util.android.ocr.TextAnalyzer
 import com.example.attendance.util.auth.User
 import com.example.attendance.util.auth.UserLoader
+import com.example.attendance.util.isToday
+import com.example.attendance.util.isYesterday
+import com.example.attendance.util.suffix
+import com.example.attendance.util.toStringValue
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -42,10 +43,6 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.wooplr.spotlight.SpotlightConfig
-import com.wooplr.spotlight.SpotlightView
-import com.wooplr.spotlight.utils.SpotlightSequence
-import kotlinx.android.synthetic.main.fragment_classlist.*
 import kotlinx.android.synthetic.main.fragment_main_content.*
 import kotlinx.serialization.UnstableDefault
 import java.text.SimpleDateFormat
@@ -196,97 +193,9 @@ object ClasslistController : FragmentController() {
                         )
                     }.show()
             }
-            classlistHelp.setOnClickListener {
-                drawer_layout_end.closeDrawer(Gravity.RIGHT)
-                showOnboarding()
-            }
         }
         if (::callback.isInitialized)
             callback()
-    }
-
-    private fun showOnboarding() {
-        val config = SpotlightConfig()
-            .apply {
-                isDismissOnTouch = true
-                lineAndArcColor = Color.parseColor("#eb273f")
-                introAnimationDuration = 200
-                fadingTextDuration = 200
-                lineAnimationDuration = 200
-                maskColor = Color.parseColor("#dc000000")
-                headingTvSize = 32
-                subHeadingTvSize = 16
-                isPerformClick = false
-            }
-        val config2 = SpotlightConfig()
-            .apply {
-                isDismissOnTouch = true
-                maskColor = Color.parseColor("#dc000000")
-                headingTvSize = 32
-                subHeadingTvSize = 16
-                isPerformClick = false
-                lineAndArcColor = Color.parseColor("#dc000000")
-                lineAnimationDuration = 0
-                introAnimationDuration = 200
-                fadingTextDuration = 200
-            }
-        with(context) {
-            val currentFragment =
-                (classlistViewPager.adapter as ClasslistPagerAdapter).state[classlistViewPager.currentItem] as? ClasslistFragment
-                    ?: return@with
-            val adapter = currentFragment.classListView.adapter as ClasslistAdapter
-            SpotlightView.Builder(MainActivity.activity)
-                .setConfiguration(config2)
-                .target(View(context!!))
-                .headingTvText("Welcome!")
-                .subHeadingTvText("This interactive tutorial will guide you through this app.\nTap anywhere to continue.")
-                .setListener {
-                    SpotlightSequence.getInstance(MainActivity.activity, config)
-                        .addSpotlight(
-                            adapter.state[2],
-                            "",
-                            "Tap on a student to toggle its state between Absent (default) and Present (green)\nTap and hold to select other states",
-                            uuid()
-                        )
-                        .addSpotlight(
-                            classlistNavigation.findViewById(R.id.classlist_ocr),
-                            "OCR Mode",
-                            "Tap to use OCR to detect student's names",
-                            uuid()
-                        ).apply {
-                            if (UserLoader.getUser().isMentorRep) {
-                                addSpotlight(
-                                    classlistNavigation.findViewById(R.id.classlist_advertise),
-                                    "Nearby Mode",
-                                    "Tap to detect nearby students using Bluetooth",
-                                    uuid()
-                                )
-                            }
-                        }
-                        .addSpotlight(
-                            classlistNavigation.findViewById(R.id.classlist_analyze),
-                            "Analysis",
-                            "Tap to have a quick overview of the class list",
-                            uuid()
-                        )
-                        .addSpotlight(
-                            classlistAdd,
-                            "History",
-                            "Tap to create a new instance of a class list.\nSwipe to view previous instances of this class list",
-                            uuid()
-                        )
-                        .addSpotlight(
-                            classlistMore,
-                            "",
-                            "Tap to view more options",
-                            uuid()
-                        )
-                        .startSequence()
-                }
-                .usageId(uuid())
-                .show()
-        }
-
     }
 
     private fun getStudentStates(): Map<Student, Tag>? {
@@ -409,16 +318,7 @@ object ClasslistController : FragmentController() {
                     if (index == -1) index = attendance.classlists.lastIndex
                     classlistViewPager.setCurrentItem(index, false)
                 } else classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
-                val user = UserLoader.getUser()
-                if (attendance.getAccessLevel(user.email) == AccessLevel.VIEWER) classlistHelp.visibility =
-                    View.GONE
-                if (attendance.getAccessLevel(user.email) == AccessLevel.OWNER && AttendanceLoader.attendance.size == 1) {
-                    Snackbar.make(classlistViewPager, "Need help?", Snackbar.LENGTH_LONG)
-                        .setAction("Start guide") {
-                            showOnboarding()
-                        }
-                        .show()
-                }
+                UserLoader.getUser()
             }
             attendance.addListener {
                 this.classlist =

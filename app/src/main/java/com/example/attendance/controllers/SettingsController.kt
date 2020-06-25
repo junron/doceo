@@ -1,26 +1,19 @@
 package com.example.attendance.controllers
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.BuildConfig
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.util.Volley
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.auth.UserLoader
 import com.example.attendance.util.auth.models.SignedCertificateWithToken
-import com.example.attendance.util.downloadFile
 import com.example.attendance.util.suffix
 import kotlinx.android.synthetic.main.fragment_settings.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 object SettingsController : FragmentController() {
@@ -80,29 +73,8 @@ object SettingsController : FragmentController() {
                     MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
                 }
             }
-            updateApp.setOnClickListener {
-                updateApp()
-            }
             toolbarSettings.title = "Settings"
         }
     }
 
-    fun updateApp(context: Context = this.context.context!!) {
-        val downloadUrl =
-            "https://junron-github-actions-public-artifacts.s3-ap-southeast-1.amazonaws.com/app-release.apk"
-        GlobalScope.launch {
-            val file = Volley.queue.downloadFile(context.filesDir, downloadUrl)
-            val uri = FileProvider.getUriForFile(
-                context,
-                context.applicationContext.packageName + ".provider",
-                file
-            )
-            val install = Intent(Intent.ACTION_VIEW)
-            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
-            install.setDataAndType(uri, "application/vnd.android.package-archive")
-            context.startActivity(install)
-        }
-    }
 }

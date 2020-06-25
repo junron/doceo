@@ -14,7 +14,6 @@ import androidx.camera.core.CameraXConfig
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.controllers.ClasslistController
-import com.example.attendance.controllers.SettingsController
 import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.Students
 import com.example.attendance.util.AppendOnlyStorage
@@ -82,10 +81,6 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     }
 
     private fun handleIntents(intent: Intent) {
-        if (intent.getBooleanExtra("updateApp", false)) {
-            SettingsController.updateApp(this)
-            return
-        }
         val id = intent.getStringExtra("attendance_id") ?: return
         if (AttendanceLoader.attendance.find { attendance -> attendance.id == id } != null) {
             val attendance =

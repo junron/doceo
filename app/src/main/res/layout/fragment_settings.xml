@@ -57,13 +57,6 @@
                     android:text="Limited alpha-02"
                     android:textSize="16sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/updateApp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Update app" />
-
             </LinearLayout>
 
             <LinearLayout
