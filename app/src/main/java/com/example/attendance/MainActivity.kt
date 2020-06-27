@@ -82,9 +82,8 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
 
     private fun handleIntents(intent: Intent) {
         val id = intent.getStringExtra("attendance_id") ?: return
-        if (AttendanceLoader.attendance.find { attendance -> attendance.id == id } != null) {
-            val attendance =
-                AttendanceLoader.attendance.find { attendance -> attendance.id == id }!!
+        val attendance = AttendanceLoader.attendance.find { attendance -> attendance.id == id }
+        if (attendance != null) {
             attendance.opened()
             ClasslistController.setClasslist(attendance)
             Navigation.navigate(R.id.mainContent)

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.controllers.NewClasslistController
+import com.example.attendance.controllers.NewClasslistGroupController
 import com.example.attendance.models.Tag
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Preferences
@@ -98,7 +98,7 @@ class TagAdapter(var tags: MutableList<Tag>, private val editable: Boolean) :
         if (editable && tags.find { it.color == -1 } == null) {
             tags.plusAssign(Tag(uuid(), "Tag name", -1))
         }
-        NewClasslistController.checkValidState()
+        NewClasslistGroupController.checkValidState()
         super.notifyDataSetChanged()
     }
 }

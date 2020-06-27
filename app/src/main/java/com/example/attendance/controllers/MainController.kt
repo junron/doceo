@@ -8,16 +8,16 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.AttendanceItemsAdapter
-import com.example.attendance.models.Attendance
 import com.example.attendance.models.AttendanceLoader
+import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_attendance.*
 
-object AttendanceListController : FragmentController() {
+object MainController : FragmentController() {
     private var signedIn: Boolean = false
-    var detailAttendance: Attendance? = null
+    var detailClasslistGroup: ClasslistGroup? = null
 
     override fun init(context: Fragment) {
         super.init(context)
@@ -50,10 +50,10 @@ object AttendanceListController : FragmentController() {
                 ClasslistController.attendanceUpdated(data)
                 adapter.data = data.sortedByDescending { attendance -> attendance.getLastAccess() }
                 adapter.notifyDataSetChanged()
-                if (detailAttendance != null) {
-                    val item = data.find { item -> item.id == detailAttendance?.id }
+                if (detailClasslistGroup != null) {
+                    val item = data.find { item -> item.id == detailClasslistGroup?.id }
                         ?: return@addListener kotlin.run {
-                            detailAttendance = null
+                            detailClasslistGroup = null
                         }
                     updateDetails(item)
                 }
@@ -65,16 +65,16 @@ object AttendanceListController : FragmentController() {
         }
     }
 
-    fun updateDetails(item: Attendance) {
+    fun updateDetails(item: ClasslistGroup) {
         if (context.view == null) return
         context.itemDetailsTitle.text = item.name
         context.detailsCreatedTime.text = item.getCreatedTime()
         context.detailsModifiedTime.text = item.getModifiedTime()
     }
 
-    private fun checkIfEmpty(attendance: List<Attendance>) {
+    private fun checkIfEmpty(classlistGroup: List<ClasslistGroup>) {
         if (context.view == null) return
-        if (attendance.isNotEmpty()) {
+        if (classlistGroup.isNotEmpty()) {
             context.attendanceItems.visibility = View.VISIBLE
             context.noClasslists.visibility = View.GONE
         } else {

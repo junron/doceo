@@ -51,7 +51,7 @@ import java.util.*
 @UnstableDefault
 object ClasslistController : FragmentController() {
     private lateinit var cameraProvider: ProcessCameraProvider
-    lateinit var attendance: Attendance
+    lateinit var classlistGroup: ClasslistGroup
     private lateinit var callback: () -> Unit
     private val renderListeners = mutableListOf<(Boolean) -> Unit>()
     private var classlist: ClasslistInstance? = null
@@ -109,7 +109,7 @@ object ClasslistController : FragmentController() {
                         val pieData = PieData(
                             PieDataSet(
                                 entries,
-                                attendance.name
+                                classlistGroup.name
                             ).apply {
                                 this.colors = colors
                             }
@@ -133,14 +133,14 @@ object ClasslistController : FragmentController() {
                 drawer_layout_end.openDrawer(Gravity.RIGHT)
             }
             classlistAdd.setOnClickListener {
-                navigateClasslistId = attendance.newClasslist()
+                navigateClasslistId = classlistGroup.newClasslist()
             }
             classlistViewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     val prevClasslist = this@ClasslistController.classlist
-                    classlist = this@ClasslistController.attendance.classlists[position]
+                    classlist = this@ClasslistController.classlistGroup.classlists[position]
                     val classlist = this@ClasslistController.classlist ?: return
                     var displayDate = formatDate(classlist.created.toDate())
                     if (prevClasslist != null && prevClasslist.id != classlist.id &&
@@ -148,14 +148,14 @@ object ClasslistController : FragmentController() {
                     )
                         displayDate = formatDate(classlist.created.toDate(), true)
                     toolbarClasslistToolbar?.subtitle =
-                        displayDate + if (position == attendance.classlists.lastIndex) " (Latest)"
+                        displayDate + if (position == classlistGroup.classlists.lastIndex) " (Latest)"
                         else ""
                 }
             })
             classlistExport.setOnClickListener {
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
                 val file = context.context!!.filesDir.resolve(
-                    "${attendance.name}_${attendance.created.toDate().toStringValue()}.csv"
+                    "${classlistGroup.name}_${classlistGroup.created.toDate().toStringValue()}.csv"
                 )
                 val data =
                     getStudentStates()?.entries?.sortedBy { (k, _) -> k.id }
@@ -169,7 +169,7 @@ object ClasslistController : FragmentController() {
                 }
                 MaterialAlertDialogBuilder(context.context!!)
                     .setTitle("Export classlist")
-                    .setMessage("Classlist ${attendance.name} has been exported!")
+                    .setMessage("Classlist ${classlistGroup.name} has been exported!")
                     .setPositiveButton("Share") { _, _ ->
                         startActivity(
                             Intent.createChooser(
@@ -202,13 +202,13 @@ object ClasslistController : FragmentController() {
         val classlist = classlist ?: return null
         val data = classlist
             .studentState.mapNotNull { (k, v) ->
-                val student = attendance.students.find { it.id == k } ?: return@mapNotNull null
-                val tag = attendance.getParsedTags()
+                val student = classlistGroup.students.find { it.id == k } ?: return@mapNotNull null
+                val tag = classlistGroup.getParsedTags()
                     .find { it.id == v } ?: return@mapNotNull null
                 student to tag
             }.toMap().toMutableMap()
-        val defaultTag = attendance.getParsedTags().find { it.id == Tags.absent }!!
-        attendance.students.forEach {
+        val defaultTag = classlistGroup.getParsedTags().find { it.id == Tags.absent }!!
+        classlistGroup.students.forEach {
             if (data[it] == null) data[it] = defaultTag
         }
         return data
@@ -255,7 +255,7 @@ object ClasslistController : FragmentController() {
             imageAnalyzer.setAnalyzer(
                 ContextCompat.getMainExecutor(context),
                 TextAnalyzer {
-                    attendance.students.filter { student ->
+                    classlistGroup.students.filter { student ->
                         val idName =
                             if (student.shortName.length > 4) student.shortName.toLowerCase()
                             else student.name.toLowerCase()
@@ -300,27 +300,27 @@ object ClasslistController : FragmentController() {
     }
 
 
-    fun setClasslist(attendance: Attendance, preserveIndex: Boolean = false) {
+    fun setClasslist(classlistGroup: ClasslistGroup, preserveIndex: Boolean = false) {
         val run = {
-            this.attendance = attendance
-            attendance.loadClasslists()
+            this.classlistGroup = classlistGroup
+            classlistGroup.loadClasslists()
             with(context) {
-                initializeFields(attendance)
-                if (!attendance.isInitialized()) return@with
-                this@ClasslistController.classlist = attendance.classlists.last()
+                initializeFields(classlistGroup)
+                if (!classlistGroup.isInitialized()) return@with
+                this@ClasslistController.classlist = classlistGroup.classlists.last()
                 classlistViewPager.adapter = ClasslistPagerAdapter(
-                    attendance,
+                    classlistGroup,
                     this,
-                    Preferences.getShowFullName(attendance.id)
+                    Preferences.getShowFullName(classlistGroup.id)
                 )
                 if (preserveIndex) {
-                    var index = attendance.classlists.indexOfFirst { it.id == classlist?.id }
-                    if (index == -1) index = attendance.classlists.lastIndex
+                    var index = classlistGroup.classlists.indexOfFirst { it.id == classlist?.id }
+                    if (index == -1) index = classlistGroup.classlists.lastIndex
                     classlistViewPager.setCurrentItem(index, false)
-                } else classlistViewPager.setCurrentItem(attendance.classlists.lastIndex, false)
+                } else classlistViewPager.setCurrentItem(classlistGroup.classlists.lastIndex, false)
                 UserLoader.getUser()
             }
-            attendance.addListener {
+            classlistGroup.addListener {
                 this.classlist =
                     it.find { classlistInstance -> classlistInstance.id == classlist?.id }
                 val classlistIndex =
@@ -348,23 +348,23 @@ object ClasslistController : FragmentController() {
         else callback = run
     }
 
-    private fun initializeFields(attendance: Attendance) {
-        this.attendance = attendance
+    private fun initializeFields(classlistGroup: ClasslistGroup) {
+        this.classlistGroup = classlistGroup
         if (context.view == null) return
         with(context) {
-            toolbarClasslistToolbar.title = attendance.name
-            attendanceName.text = attendance.name
-            showFullNames.isChecked = Preferences.getShowFullName(attendance.id)
+            toolbarClasslistToolbar.title = classlistGroup.name
+            attendanceName.text = classlistGroup.name
+            showFullNames.isChecked = Preferences.getShowFullName(classlistGroup.id)
             showFullNames.setOnCheckedChangeListener { _, isChecked ->
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
-                Preferences.setFullName(attendance.id, isChecked)
+                Preferences.setFullName(classlistGroup.id, isChecked)
                 renderListeners.forEach { it(isChecked) }
             }
             detailsClose.setOnClickListener {
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
             }
             val user = UserLoader.getUser()
-            val accessLevel = attendance.getAccessLevel(user.email)
+            val accessLevel = classlistGroup.getAccessLevel(user.email)
             if (accessLevel == AccessLevel.VIEWER) {
                 classlistAdd.visibility = View.GONE
                 // Disable OCR and Nearby
@@ -386,9 +386,9 @@ object ClasslistController : FragmentController() {
         }
     }
 
-    fun attendanceUpdated(attendances: List<Attendance>) {
-        if (::attendance.isInitialized && context.view != null) {
-            val newAttendance = attendances.find { it.id == attendance.id }
+    fun attendanceUpdated(classlistGroups: List<ClasslistGroup>) {
+        if (::classlistGroup.isInitialized && context.view != null) {
+            val newAttendance = classlistGroups.find { it.id == classlistGroup.id }
             if (newAttendance == null) {
                 Toast.makeText(
                     context.context!!,
@@ -399,7 +399,7 @@ object ClasslistController : FragmentController() {
                 Navigation.navigate(R.id.attendanceFragment)
                 return
             }
-            if (newAttendance == attendance) return
+            if (newAttendance == classlistGroup) return
             setClasslist(newAttendance, true)
         }
     }
@@ -412,8 +412,8 @@ object ClasslistController : FragmentController() {
         with(context) {
             val vibrator = context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             val student = Students.getStudentById(user.email) ?: return false
-            val classlist = attendance.classlists[classlistViewPager.currentItem]
-            if (student !in attendance.students) return false
+            val classlist = classlistGroup.classlists[classlistViewPager.currentItem]
+            if (student !in classlistGroup.students) return false
             val state = classlist.studentState[student.id] ?: return false
             if (state != Tags.present) {
                 classlist.setStudentState(student, Tags.defaultTags.last())

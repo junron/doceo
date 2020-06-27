@@ -10,8 +10,8 @@ import android.widget.BaseAdapter
 import androidx.appcompat.widget.PopupMenu
 import com.example.attendance.R
 import com.example.attendance.models.AccessLevel.*
-import com.example.attendance.models.Attendance
 import com.example.attendance.models.AttendanceLoader
+import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.Students
 import com.example.attendance.models.colors
 import com.example.attendance.util.android.showIcons
@@ -19,14 +19,15 @@ import kotlinx.android.synthetic.main.permission_item.view.*
 import kotlin.math.abs
 
 @ExperimentalStdlibApi
-class PermissionsListAdapter(var attendance: Attendance, val currentUser: String) : BaseAdapter() {
-    val id = attendance.id
-    var permissions = attendance.permissions
+class PermissionsListAdapter(var classlistGroup: ClasslistGroup, val currentUser: String) :
+    BaseAdapter() {
+    val id = classlistGroup.id
+    var permissions = classlistGroup.permissions
 
     init {
         AttendanceLoader.addListener {
-            attendance = it.find { item -> item.id == id } ?: return@addListener
-            permissions = attendance.permissions
+            classlistGroup = it.find { item -> item.id == id } ?: return@addListener
+            permissions = classlistGroup.permissions
             notifyDataSetChanged()
         }
     }
@@ -49,7 +50,7 @@ class PermissionsListAdapter(var attendance: Attendance, val currentUser: String
                     permissionsOther.visibility = GONE
                 }
                 EDITOR -> {
-                    if (attendance.getAccessLevel(currentUser) != OWNER) return@with
+                    if (classlistGroup.getAccessLevel(currentUser) != OWNER) return@with
                     permissionsOther.setOnClickListener {
                         PopupMenu(parent.context, permissionsOther)
                             .apply {
@@ -65,7 +66,7 @@ class PermissionsListAdapter(var attendance: Attendance, val currentUser: String
                 }
                 VIEWER -> {
                     permissionsOther.setImageResource(R.drawable.ic_eye_24)
-                    if (attendance.getAccessLevel(currentUser) != OWNER) return@with
+                    if (classlistGroup.getAccessLevel(currentUser) != OWNER) return@with
                     permissionsOther.setOnClickListener {
                         PopupMenu(parent.context, permissionsOther)
                             .apply {
@@ -86,7 +87,7 @@ class PermissionsListAdapter(var attendance: Attendance, val currentUser: String
     }
 
     private fun handlePermissionChange(uid: String, item: MenuItem) {
-        attendance.changePermissions(
+        classlistGroup.changePermissions(
             uid, when (item.itemId) {
                 R.id.permissions_edit -> EDITOR
                 R.id.permissions_view -> VIEWER

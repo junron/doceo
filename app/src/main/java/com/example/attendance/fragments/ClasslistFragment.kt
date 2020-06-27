@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.controllers.ClasslistController
-import com.example.attendance.models.Attendance
+import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.ClasslistInstance
 import kotlinx.android.synthetic.main.fragment_classlist.*
 
 class ClasslistFragment(
-    val attendance: Attendance? = null,
+    val classlistGroup: ClasslistGroup? = null,
     private var classlist: ClasslistInstance? = null,
     private var fullName: Boolean = false
 ) :
@@ -31,7 +31,7 @@ class ClasslistFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var classlist = classlist ?: return
-        val attendance = attendance ?: return
+        val attendance = classlistGroup ?: return
         val adapter = ClasslistAdapter(classlist, fullName)
         attendance.addListener {
             classlist = it.find { classlistInstance -> classlistInstance.id == classlist.id }

@@ -26,7 +26,7 @@ import kotlinx.serialization.json.Json
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
 
-data class Attendance(
+data class ClasslistGroup(
     val id: String = "",
     val name: String = "",
     val owner: String = "",
@@ -44,7 +44,7 @@ data class Attendance(
     val students = Students.filterStudents(constraints.split(" "))
 
     companion object {
-        fun newAttendance(name: String, tags: List<Tag>, constraints: String) {
+        fun newClasslistGroup(name: String, tags: List<Tag>, constraints: String) {
             val id = uuid()
             Firebase.firestore.collection("attendance")
                 .document(id)
@@ -85,10 +85,10 @@ data class Attendance(
             .collection("lists")
             .apply {
                 get().addOnSuccessListener { snapshotList ->
-                    this@Attendance.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                    this@ClasslistGroup.classlists = snapshotList.documents.mapNotNull { snapshot ->
                         try {
                             snapshot.toObject(ClasslistInstance::class.java)
-                                ?.copy(parent = this@Attendance, id = snapshot.id)
+                                ?.copy(parent = this@ClasslistGroup, id = snapshot.id)
                         } catch (e: Exception) {
                             println(e)
                             null
@@ -100,16 +100,16 @@ data class Attendance(
                     }
                 addSnapshotListener { snapshotList, _ ->
                     snapshotList ?: return@addSnapshotListener
-                    this@Attendance.classlists = snapshotList.documents.mapNotNull { snapshot ->
+                    this@ClasslistGroup.classlists = snapshotList.documents.mapNotNull { snapshot ->
                         try {
                             snapshot.toObject(ClasslistInstance::class.java)
-                                ?.copy(parent = this@Attendance, id = snapshot.id)
+                                ?.copy(parent = this@ClasslistGroup, id = snapshot.id)
                         } catch (e: Exception) {
                             println(e)
                             null
                         }
                     }.sortedBy { it.created }
-                    listeners.forEach { it(this@Attendance.classlists) }
+                    listeners.forEach { it(this@ClasslistGroup.classlists) }
                 }
             }
     }
@@ -285,20 +285,20 @@ data class AttendanceHistory(val id: String, val time: String)
 
 object AttendanceLoader {
     val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())
-    var attendance = emptyList<Attendance>()
+    var attendance = emptyList<ClasslistGroup>()
         private set
     private var loadStatus = 0
 
-    private val listeners = mutableListOf<(List<Attendance>) -> Unit>()
+    private val listeners = mutableListOf<(List<ClasslistGroup>) -> Unit>()
 
-    fun addListener(callback: (List<Attendance>) -> Unit) {
+    fun addListener(callback: (List<ClasslistGroup>) -> Unit) {
         listeners += callback
     }
 
     private val processQuery = { documents: List<DocumentSnapshot> ->
         documents.mapNotNull {
             try {
-                it.toObject(Attendance::class.java)?.copy(id = it.id)
+                it.toObject(ClasslistGroup::class.java)?.copy(id = it.id)
             } catch (e: RuntimeException) {
                 null
             }
@@ -380,7 +380,7 @@ object AttendanceLoader {
             }
     }
 
-    private fun getAttendance(callback: (List<Attendance>) -> Unit) {
+    private fun getAttendance(callback: (List<ClasslistGroup>) -> Unit) {
         val user =
             FirebaseAuth.getInstance().currentUser ?: return run {
                 FirebaseAuth.getInstance().addAuthStateListener { auth ->
@@ -388,7 +388,7 @@ object AttendanceLoader {
                 }
             }
         var queries = 0
-        val data = mutableListOf<Attendance>()
+        val data = mutableListOf<ClasslistGroup>()
         Firebase.firestore.collection("attendance")
             .whereEqualTo("owner", user.uid)
             .get().addOnSuccessListener {

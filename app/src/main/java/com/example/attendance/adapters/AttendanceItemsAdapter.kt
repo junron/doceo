@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import androidx.fragment.app.Fragment
 import com.example.attendance.R
-import com.example.attendance.controllers.AttendanceListController
 import com.example.attendance.controllers.ClasslistController
+import com.example.attendance.controllers.MainController
 import com.example.attendance.controllers.StudentSelectController
 import com.example.attendance.models.AccessLevel
-import com.example.attendance.models.Attendance
+import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.requestInputDialog
 import com.example.attendance.util.auth.UserLoader
@@ -21,7 +21,8 @@ import kotlinx.android.synthetic.main.attendance_item.view.*
 import kotlinx.android.synthetic.main.document_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_attendance.*
 
-class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>) : BaseAdapter() {
+class AttendanceItemsAdapter(val fragment: Fragment, var data: List<ClasslistGroup>) :
+    BaseAdapter() {
     private val user = UserLoader.getUser().email
 
     @ExperimentalStdlibApi
@@ -54,8 +55,8 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<Attendance>)
                                     }
                                     itemDetails.setOnClickListener {
                                         hide()
-                                        AttendanceListController.detailAttendance = item
-                                        AttendanceListController.updateDetails(item)
+                                        MainController.detailClasslistGroup = item
+                                        MainController.updateDetails(item)
                                         fragment.detailsClose.setOnClickListener {
                                             fragment.drawer_layout_end.closeDrawer(Gravity.RIGHT)
                                         }

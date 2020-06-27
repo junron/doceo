@@ -7,14 +7,14 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.TagAdapter
-import com.example.attendance.models.Attendance
+import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_new_attendance.*
 
-object NewClasslistController : FragmentController() {
+object NewClasslistGroupController : FragmentController() {
     private var name: String? = null
     private var constraints: String? = null
     private var tags = Tags.defaultTags
@@ -47,7 +47,7 @@ object NewClasslistController : FragmentController() {
             }
             tagList.adapter = adapter
             classlistDone.setOnClickListener {
-                Attendance.newAttendance(
+                ClasslistGroup.newClasslistGroup(
                     classlistName.editText?.text.toString(),
                     adapter.tags.filter { it.color != -1 },
                     constraints!!

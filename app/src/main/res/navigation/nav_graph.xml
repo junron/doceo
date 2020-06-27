@@ -6,7 +6,7 @@
     app:startDestination="@id/attendanceFragment">
     <fragment
         android:id="@+id/mainContent"
-        android:name="com.example.attendance.fragments.MainContent"
+        android:name="com.example.attendance.fragments.ClasslistHolder"
         android:label="fragment_main_content"
         tools:layout="@layout/fragment_main_content" />
     <fragment
@@ -26,7 +26,7 @@
         tools:layout="@layout/fragment_nearby" />
     <fragment
         android:id="@+id/attendanceFragment"
-        android:name="com.example.attendance.fragments.AttendanceFragment"
+        android:name="com.example.attendance.fragments.MainFragment"
         android:label="AttendanceFragment" />
     <fragment
         android:id="@+id/studentSelectFragment"
@@ -40,7 +40,7 @@
         tools:layout="@layout/fragment_sign_in_now" />
     <fragment
         android:id="@+id/newAttendance2"
-        android:name="com.example.attendance.fragments.NewAttendance"
+        android:name="com.example.attendance.fragments.NewClasslistGroup"
         android:label="fragment_new_attendance"
         tools:layout="@layout/fragment_new_attendance" />
 </navigation>
