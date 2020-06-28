@@ -7,14 +7,14 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.models.AccessLevel
-import com.example.attendance.models.ClasslistInstance
+import com.example.attendance.models.Classlist
 import com.example.attendance.models.StatefulStudent
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.showIcons
 import com.example.attendance.util.auth.UserLoader
 
 class ClasslistAdapter(
-    private var classlist: ClasslistInstance,
+    private var classlist: Classlist,
     var fullName: Boolean
 ) : RecyclerView.Adapter<ClasslistAdapter.StudentViewHolder>() {
     class StudentViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
@@ -81,7 +81,7 @@ class ClasslistAdapter(
         }
     }
 
-    fun dataChanged(classlist: ClasslistInstance) {
+    fun dataChanged(classlist: Classlist) {
         this.classlist = classlist
         this.attendance = classlist.parent!!
         val defaultTag = attendance.getParsedTags().find { it.id == Tags.absent }!!

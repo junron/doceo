@@ -10,8 +10,8 @@ import android.widget.BaseAdapter
 import androidx.appcompat.widget.PopupMenu
 import com.example.attendance.R
 import com.example.attendance.models.AccessLevel.*
-import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.ClasslistGroup
+import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.models.Students
 import com.example.attendance.models.colors
 import com.example.attendance.util.android.showIcons
@@ -25,7 +25,7 @@ class PermissionsListAdapter(var classlistGroup: ClasslistGroup, val currentUser
     var permissions = classlistGroup.permissions
 
     init {
-        AttendanceLoader.addListener {
+        ClasslistGroupLoader.addListener {
             classlistGroup = it.find { item -> item.id == id } ?: return@addListener
             permissions = classlistGroup.permissions
             notifyDataSetChanged()

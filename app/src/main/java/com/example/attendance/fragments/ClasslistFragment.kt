@@ -9,13 +9,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.attendance.R
 import com.example.attendance.adapters.ClasslistAdapter
 import com.example.attendance.controllers.ClasslistController
+import com.example.attendance.models.Classlist
 import com.example.attendance.models.ClasslistGroup
-import com.example.attendance.models.ClasslistInstance
 import kotlinx.android.synthetic.main.fragment_classlist.*
 
+// Bottom-most class
+// Responsible for rendering classlists
 class ClasslistFragment(
     val classlistGroup: ClasslistGroup? = null,
-    private var classlist: ClasslistInstance? = null,
+    private var classlist: Classlist? = null,
     private var fullName: Boolean = false
 ) :
     Fragment() {
@@ -31,9 +33,9 @@ class ClasslistFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var classlist = classlist ?: return
-        val attendance = classlistGroup ?: return
+        val classlistGroup = classlistGroup ?: return
         val adapter = ClasslistAdapter(classlist, fullName)
-        attendance.addListener {
+        classlistGroup.addListener {
             classlist = it.find { classlistInstance -> classlistInstance.id == classlist.id }
                 ?: return@addListener
             this.classlist = classlist

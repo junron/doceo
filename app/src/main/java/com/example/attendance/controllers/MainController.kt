@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.AttendanceItemsAdapter
-import com.example.attendance.models.AttendanceLoader
 import com.example.attendance.models.ClasslistGroup
+import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
@@ -40,14 +40,14 @@ object MainController : FragmentController() {
             drawer_layout_end.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             val adapter = AttendanceItemsAdapter(
                 context,
-                AttendanceLoader.attendance.filter { attendance -> !attendance.deleted }
+                ClasslistGroupLoader.classlistGroups.filter { attendance -> !attendance.deleted }
                     .sortedByDescending { attendance -> attendance.getLastAccess() })
-            checkIfEmpty(AttendanceLoader.attendance.filter { attendance -> !attendance.deleted })
+            checkIfEmpty(ClasslistGroupLoader.classlistGroups.filter { attendance -> !attendance.deleted })
             attendanceItems.adapter = adapter
-            AttendanceLoader.addListener {
+            ClasslistGroupLoader.addListener {
                 val data = it.filter { attendance -> !attendance.deleted }
                 checkIfEmpty(data)
-                ClasslistController.attendanceUpdated(data)
+                ClasslistController.classlistGroupUpdated(data)
                 adapter.data = data.sortedByDescending { attendance -> attendance.getLastAccess() }
                 adapter.notifyDataSetChanged()
                 if (detailClasslistGroup != null) {

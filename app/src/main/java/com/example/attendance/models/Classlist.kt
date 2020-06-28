@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-data class ClasslistInstance(
+data class Classlist(
     val parent: ClasslistGroup? = null,
     val id: String = "",
     val studentState: MutableMap<String, String> = mutableMapOf(),

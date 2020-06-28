@@ -1,5 +1,6 @@
 package com.example.attendance
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -14,7 +15,8 @@ import androidx.camera.core.CameraXConfig
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.controllers.ClasslistController
-import com.example.attendance.models.AttendanceLoader
+import com.example.attendance.controllers.classlist.Camera
+import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.models.Students
 import com.example.attendance.util.AppendOnlyStorage
 import com.example.attendance.util.Volley
@@ -31,10 +33,9 @@ import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 
+@SuppressLint("RtlHardcoded")
 class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     companion object {
         lateinit var drawerLayout: DrawerLayout
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
             Navigation.navigate(R.id.signInNow)
             return
         }
-        AttendanceLoader.setup()
+        ClasslistGroupLoader.setup()
         Students.loadStudents(this)
         AndroidNearby.init(this)
         initNavigationHandlers()
@@ -80,27 +81,29 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         if (intent != null) handleIntents(intent)
     }
 
+    @UnstableDefault
     private fun handleIntents(intent: Intent) {
         val id = intent.getStringExtra("attendance_id") ?: return
-        val attendance = AttendanceLoader.attendance.find { attendance -> attendance.id == id }
-        if (attendance != null) {
-            attendance.opened()
-            ClasslistController.setClasslist(attendance)
+        val classlistGroup =
+            ClasslistGroupLoader.classlistGroups.find { classlistGroup -> classlistGroup.id == id }
+        if (classlistGroup != null) {
+            classlistGroup.opened()
+            ClasslistController.setClasslistGroup(classlistGroup)
             Navigation.navigate(R.id.mainContent)
             return
         }
-        AttendanceLoader.addListener {
-            val attendance =
+        ClasslistGroupLoader.addListener {
+            val classlistGroup =
                 it.find { attendance -> attendance.id == id } ?: return@addListener run {
                     Toast.makeText(this, "Classlist could not be found.", Toast.LENGTH_LONG).show()
                 }
-            attendance.opened()
-            ClasslistController.setClasslist(attendance)
+            classlistGroup.opened()
+            ClasslistController.setClasslistGroup(classlistGroup)
             Navigation.navigate(R.id.mainContent)
         }
     }
 
-
+    @UnstableDefault
     fun initNavigationHandlers() {
         if (UserLoader.userExists()) {
             drawerLayout.sideNavView.getHeaderView(0).username.text =
@@ -114,9 +117,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
                     UserLoader.destroyCredentials()
                     FirebaseAuth.getInstance().signOut()
                     drawerLayout.closeDrawer(Gravity.LEFT)
-                    GlobalScope.launch {
-                        FirebaseInstanceId.getInstance().deleteInstanceId()
-                    }
+                    FirebaseInstanceId.getInstance().deleteInstanceId()
                     this@MainActivity.recreate()
                     Navigation.navigate(R.id.signInNow)
                     true
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         }
     }
 
+    @UnstableDefault
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent ?: return
@@ -156,7 +158,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         when (requestCode) {
             0 -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    ClasslistController.initCamera()
+                    Camera.initCamera()
                 }
             }
         }

@@ -33,7 +33,7 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<ClasslistGro
         with(view) {
             setOnClickListener {
                 item.opened()
-                ClasslistController.setClasslist(item)
+                ClasslistController.setClasslistGroup(item)
                 Navigation.navigate(R.id.mainContent)
             }
             itemName.text = item.name

@@ -1,6 +1,9 @@
 name: Kotlin Android CI
 
-on: []
+on:
+  push:
+    branches-ignore:
+      - '**'
 
 jobs:
   build:

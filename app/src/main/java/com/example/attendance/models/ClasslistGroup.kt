@@ -38,9 +38,9 @@ data class ClasslistGroup(
     val tags: List<String> = emptyList(),
     val deleted: Boolean = false
 ) {
-    var classlists: List<ClasslistInstance> = listOf()
+    var classlists: List<Classlist> = listOf()
         private set
-    private val listeners = mutableListOf<(List<ClasslistInstance>) -> Unit>()
+    private val listeners = mutableListOf<(List<Classlist>) -> Unit>()
     val students = Students.filterStudents(constraints.split(" "))
 
     companion object {
@@ -87,7 +87,7 @@ data class ClasslistGroup(
                 get().addOnSuccessListener { snapshotList ->
                     this@ClasslistGroup.classlists = snapshotList.documents.mapNotNull { snapshot ->
                         try {
-                            snapshot.toObject(ClasslistInstance::class.java)
+                            snapshot.toObject(Classlist::class.java)
                                 ?.copy(parent = this@ClasslistGroup, id = snapshot.id)
                         } catch (e: Exception) {
                             println(e)
@@ -102,7 +102,7 @@ data class ClasslistGroup(
                     snapshotList ?: return@addSnapshotListener
                     this@ClasslistGroup.classlists = snapshotList.documents.mapNotNull { snapshot ->
                         try {
-                            snapshot.toObject(ClasslistInstance::class.java)
+                            snapshot.toObject(Classlist::class.java)
                                 ?.copy(parent = this@ClasslistGroup, id = snapshot.id)
                         } catch (e: Exception) {
                             println(e)
@@ -114,7 +114,7 @@ data class ClasslistGroup(
             }
     }
 
-    fun addListener(callback: (List<ClasslistInstance>) -> Unit) {
+    fun addListener(callback: (List<Classlist>) -> Unit) {
         listeners += callback
     }
 
@@ -201,7 +201,7 @@ data class ClasslistGroup(
     }
 
     fun opened() {
-        AttendanceLoader.history += AttendanceHistory(id, Date().toStringValue())
+        ClasslistGroupLoader.history += AttendanceHistory(id, Date().toStringValue())
     }
 
 
@@ -276,16 +276,16 @@ data class ClasslistGroup(
         }
     }
 
-    fun getLastAccess() = AttendanceLoader.history.filter { it.id == id }
+    fun getLastAccess() = ClasslistGroupLoader.history.filter { it.id == id }
         .maxBy { it.time.toDate().time }?.time?.toDate()
 }
 
 @Serializable
 data class AttendanceHistory(val id: String, val time: String)
 
-object AttendanceLoader {
+object ClasslistGroupLoader {
     val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())
-    var attendance = emptyList<ClasslistGroup>()
+    var classlistGroups = emptyList<ClasslistGroup>()
         private set
     private var loadStatus = 0
 
@@ -318,19 +318,19 @@ object AttendanceLoader {
             .addSnapshotListener { snapshot, _ ->
                 snapshot ?: return@addSnapshotListener
                 if (loadStatus != 3) {
-                    attendance = attendance + processQuery(snapshot.documents)
+                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
                     if (loadStatus == 2) {
                         listeners.forEach {
-                            it(attendance)
+                            it(classlistGroups)
                         }
                     }
                     loadStatus++
                     return@addSnapshotListener
                 }
                 getAttendance {
-                    attendance = it
+                    classlistGroups = it
                     listeners.forEach {
-                        it(attendance)
+                        it(classlistGroups)
                     }
                 }
             }
@@ -340,19 +340,19 @@ object AttendanceLoader {
             .addSnapshotListener { snapshot, _ ->
                 snapshot ?: return@addSnapshotListener
                 if (loadStatus != 3) {
-                    attendance = attendance + processQuery(snapshot.documents)
+                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
                     if (loadStatus == 2) {
                         listeners.forEach {
-                            it(attendance)
+                            it(classlistGroups)
                         }
                     }
                     loadStatus++
                     return@addSnapshotListener
                 }
                 getAttendance {
-                    attendance = it
+                    classlistGroups = it
                     listeners.forEach {
-                        it(attendance)
+                        it(classlistGroups)
                     }
                 }
             }
@@ -362,19 +362,19 @@ object AttendanceLoader {
             .addSnapshotListener { snapshot, _ ->
                 snapshot ?: return@addSnapshotListener
                 if (loadStatus != 3) {
-                    attendance = attendance + processQuery(snapshot.documents)
+                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
                     if (loadStatus == 2) {
                         listeners.forEach {
-                            it(attendance)
+                            it(classlistGroups)
                         }
                     }
                     loadStatus++
                     return@addSnapshotListener
                 }
                 getAttendance {
-                    attendance = it
+                    classlistGroups = it
                     listeners.forEach {
-                        it(attendance)
+                        it(classlistGroups)
                     }
                 }
             }
