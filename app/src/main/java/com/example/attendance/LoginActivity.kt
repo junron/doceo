@@ -30,7 +30,7 @@ class LoginActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
         setContentView(R.layout.activity_login)
-        supportActionBar!!.hide()
+        supportActionBar?.hide()
         login_microsoft.setOnClickListener {
             val params = mapOf("tenant" to "d72a7172-d5f8-4889-9a85-d7424751592a")
             signIn(AuthUI.IdpConfig.MicrosoftBuilder().setCustomParameters(params).build())
