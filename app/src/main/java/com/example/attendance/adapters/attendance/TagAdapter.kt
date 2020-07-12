@@ -1,4 +1,4 @@
-package com.example.attendance.adapters
+package com.example.attendance.adapters.attendance
 
 import android.graphics.Color
 import android.view.LayoutInflater

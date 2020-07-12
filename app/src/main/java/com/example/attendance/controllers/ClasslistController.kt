@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.ClasslistPagerAdapter
+import com.example.attendance.adapters.attendance.ClasslistPagerAdapter
 import com.example.attendance.controllers.classlist.Camera
 import com.example.attendance.controllers.classlist.export
 import com.example.attendance.controllers.classlist.formatDate
@@ -137,11 +137,12 @@ object ClasslistController : FragmentController() {
                 initializeFields(classlistGroup)
                 if (!classlistGroup.isInitialized()) return@with
                 this@ClasslistController.classlist = classlistGroup.classlists.last()
-                classlistViewPager.adapter = ClasslistPagerAdapter(
-                    classlistGroup,
-                    this,
-                    Preferences.getShowFullName(classlistGroup.id)
-                )
+                classlistViewPager.adapter =
+                    ClasslistPagerAdapter(
+                        classlistGroup,
+                        this,
+                        Preferences.getShowFullName(classlistGroup.id)
+                    )
                 if (preserveIndex) {
                     var index = classlistGroup.classlists.indexOfFirst { it.id == classlist.id }
                     if (index == -1) index = classlistGroup.classlists.lastIndex

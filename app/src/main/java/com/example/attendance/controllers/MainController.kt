@@ -7,7 +7,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.AttendanceItemsAdapter
+import com.example.attendance.adapters.attendance.AttendanceItemsAdapter
 import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.util.android.Navigation
@@ -38,10 +38,11 @@ object MainController : FragmentController() {
                 (activity as MainActivity).initNavigationHandlers()
             }
             drawer_layout_end.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            val adapter = AttendanceItemsAdapter(
-                context,
-                ClasslistGroupLoader.classlistGroups.filter { attendance -> !attendance.deleted }
-                    .sortedByDescending { attendance -> attendance.getLastAccess() })
+            val adapter =
+                AttendanceItemsAdapter(
+                    context,
+                    ClasslistGroupLoader.classlistGroups.filter { attendance -> !attendance.deleted }
+                        .sortedByDescending { attendance -> attendance.getLastAccess() })
             checkIfEmpty(ClasslistGroupLoader.classlistGroups.filter { attendance -> !attendance.deleted })
             attendanceItems.adapter = adapter
             ClasslistGroupLoader.addListener {

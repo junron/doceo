@@ -1,4 +1,4 @@
-package com.example.attendance.adapters
+package com.example.attendance.adapters.attendance
 
 import android.view.Gravity
 import android.view.ViewGroup
@@ -16,7 +16,9 @@ class ImmutableClasslistAdapter(private val _students: List<Student>) :
     class StudentViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        StudentViewHolder(TextView(parent.context))
+        StudentViewHolder(
+            TextView(parent.context)
+        )
 
     override fun onBindViewHolder(holder: StudentViewHolder, position: Int) {
         val student = getItem(position)

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.attendance.R
-import com.example.attendance.adapters.ClasslistAdapter
+import com.example.attendance.adapters.attendance.ClasslistAdapter
 import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.models.Classlist
 import com.example.attendance.models.ClasslistGroup
@@ -34,7 +34,11 @@ class ClasslistFragment(
         super.onViewCreated(view, savedInstanceState)
         var classlist = classlist ?: return
         val classlistGroup = classlistGroup ?: return
-        val adapter = ClasslistAdapter(classlist, fullName)
+        val adapter =
+            ClasslistAdapter(
+                classlist,
+                fullName
+            )
         classlistGroup.addListener {
             classlist = it.find { classlistInstance -> classlistInstance.id == classlist.id }
                 ?: return@addListener

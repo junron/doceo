@@ -6,7 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.TagAdapter
+import com.example.attendance.adapters.attendance.TagAdapter
 import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
@@ -18,7 +18,11 @@ object NewClasslistGroupController : FragmentController() {
     private var name: String? = null
     private var constraints: String? = null
     private var tags = Tags.defaultTags
-    private val adapter = TagAdapter(Tags.defaultTags.toMutableList(), true)
+    private val adapter = TagAdapter(
+        Tags.defaultTags.toMutableList(),
+        true
+    )
+
     override fun init(context: Fragment) {
         super.init(context)
         MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)

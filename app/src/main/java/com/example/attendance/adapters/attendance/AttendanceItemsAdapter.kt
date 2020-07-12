@@ -1,4 +1,4 @@
-package com.example.attendance.adapters
+package com.example.attendance.adapters.attendance
 
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -60,7 +60,11 @@ class AttendanceItemsAdapter(val fragment: Fragment, var data: List<ClasslistGro
                                         fragment.detailsClose.setOnClickListener {
                                             fragment.drawer_layout_end.closeDrawer(Gravity.RIGHT)
                                         }
-                                        val adapter = PermissionsListAdapter(item, user)
+                                        val adapter =
+                                            PermissionsListAdapter(
+                                                item,
+                                                user
+                                            )
                                         fragment.permissionsListView.adapter = adapter
                                         fragment.drawer_layout_end.openDrawer(Gravity.RIGHT)
                                     }

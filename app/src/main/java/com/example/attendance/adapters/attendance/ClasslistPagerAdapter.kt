@@ -1,4 +1,4 @@
-package com.example.attendance.adapters
+package com.example.attendance.adapters.attendance
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter

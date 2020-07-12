@@ -4,7 +4,7 @@ import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.StudentChip
+import com.example.attendance.adapters.attendance.StudentChip
 import com.example.attendance.models.Student
 import com.example.attendance.models.Students
 import com.example.attendance.util.android.Navigation
@@ -36,7 +36,10 @@ object StudentSelectController : FragmentController() {
                 }
 
                 studentFilter.filterableList = Students.students.filter { it.id !in exclude }.map {
-                    StudentChip(context!!, it)
+                    StudentChip(
+                        context!!,
+                        it
+                    )
                 }
                 studentFilter.addChipsListener(object : ChipsInput.ChipsListener {
                     override fun onChipAdded(chip: ChipInterface?, newSize: Int) {
