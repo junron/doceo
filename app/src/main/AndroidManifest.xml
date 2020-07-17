@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:screenOrientation="portrait"
-            android:name="com.example.attendance.LoginActivity"
+            android:name="com.example.attendance.MainActivity"
             android:launchMode="standard"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>

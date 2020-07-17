@@ -28,7 +28,9 @@ suspend fun <T> RequestQueue.postJson(
     url: String,
     data: T,
     serializer: KSerializer<T>,
-    error: ((Exception) -> Unit)? = null
+    error: ((Exception) -> Unit) = {
+        print(it)
+    }
 ) =
     suspendCoroutine<String> { cont ->
         this.add(generateObject(url, data, serializer, cont, error))

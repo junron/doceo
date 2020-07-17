@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.onboard_image.view.*
 
 
 internal class OnBoardingAdapter : RecyclerView.Adapter<OnBoardingAdapter.Image>() {
-    private var images =
+    private val images =
         intArrayOf(R.drawable.onboard1, R.drawable.onboard2, R.drawable.onboard3)
 
     override fun onCreateViewHolder(

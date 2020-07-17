@@ -35,6 +35,7 @@ object UserLoader {
         println(context.filesDir.resolve("user/token").readText())
     }
 
+    // Only used for sudo
     fun loadFirebaseUser(failure: (String) -> Unit) {
         with(context) {
             val token = filesDir.resolve("user/token").readText()
