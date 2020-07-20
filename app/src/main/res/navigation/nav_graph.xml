@@ -43,4 +43,8 @@
         android:name="com.example.attendance.fragments.NewClasslistGroup"
         android:label="fragment_new_attendance"
         tools:layout="@layout/fragment_new_attendance" />
+    <fragment
+        android:id="@+id/submitFragment"
+        android:name="com.example.attendance.fragments.snapmit.SubmitFragment"
+        android:label="SubmitFragment" />
 </navigation>

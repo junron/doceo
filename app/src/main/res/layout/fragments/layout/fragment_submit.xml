@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_main"
+    style="@style/FragmentBase"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.submit.SubmitFragment">
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/perms_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Grant permissions"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/overlay_holder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/camera_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="40dp"
+        android:layout_marginBottom="36dp"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:src="@drawable/ic_camera_black_24dp"
+        android:tag="cam_dependant"
+        android:visibility="gone"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bottom_bar_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="0sp"
+        android:tag="cam_dependant"
+        android:visibility="gone"
+        app:borderWidth="0sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_format_list_bulleted_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="0sp"
+        android:tag="cam_dependant"
+        android:visibility="gone"
+        app:borderWidth="0sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_navigate_next_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/scanner_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="48dp"
+        android:backgroundTint="#CCf7f7f7"
+        app:borderWidth="0sp"
+        app:elevation="-0sp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="@id/camera_button"
+        app:layout_constraintStart_toEndOf="@id/camera_button"
+        app:layout_constraintTop_toTopOf="@id/camera_button"
+        app:srcCompat="@drawable/ic_scan_blank" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/import_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="48dp"
+        android:backgroundTint="#CCf7f7f7"
+        app:borderWidth="0sp"
+        app:elevation="-0sp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="@id/camera_button"
+        app:layout_constraintEnd_toStartOf="@id/camera_button"
+        app:layout_constraintTop_toTopOf="@id/camera_button"
+        app:srcCompat="@drawable/ic_library_add_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/media_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#CCf7f7f7"
+        app:borderWidth="0sp"
+        app:elevation="-0sp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@id/import_button"
+        app:layout_constraintEnd_toEndOf="@id/import_button"
+        app:layout_constraintStart_toStartOf="@id/import_button"
+        app:srcCompat="@drawable/ic_photo_library_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/camera_inbuilt_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#CCf7f7f7"
+        app:borderWidth="0sp"
+        app:elevation="-0sp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@id/media_button"
+        app:layout_constraintEnd_toEndOf="@id/import_button"
+        app:layout_constraintStart_toStartOf="@id/import_button"
+        app:srcCompat="@drawable/ic_camera" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

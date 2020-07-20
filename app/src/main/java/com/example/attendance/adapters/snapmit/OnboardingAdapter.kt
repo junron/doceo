@@ -1,4 +1,4 @@
-package com.example.attendance.adapters
+package com.example.attendance.adapters.snapmit
 
 import android.view.LayoutInflater
 import android.view.View

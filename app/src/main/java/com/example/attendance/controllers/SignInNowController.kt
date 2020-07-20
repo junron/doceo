@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.attendance.MainActivity
-import com.example.attendance.adapters.OnBoardingAdapter
+import com.example.attendance.adapters.snapmit.OnBoardingAdapter
 import com.example.attendance.util.auth.SignIn
 import kotlinx.android.synthetic.main.fragment_login.*
 import java.util.*
@@ -18,7 +18,7 @@ object SignInNowController : FragmentController() {
     override fun init(context: Fragment) {
         super.init(context)
         MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        activity = context.activity!!
+        activity = context.requireActivity()
         with(context) {
             login_microsoft.setOnClickListener {
                 SignIn.startSignIn(this@SignInNowController.activity) {
@@ -29,7 +29,8 @@ object SignInNowController : FragmentController() {
                 login_microsoft.isEnabled = false
                 login_microsoft.text = "Signing in..."
             }
-            viewpager.adapter = OnBoardingAdapter()
+            viewpager.adapter =
+                OnBoardingAdapter()
             viewpager.isUserInputEnabled = false
             viewpager.offscreenPageLimit = 1
             scrollTimer = fixedRateTimer("viewpagerScroller", false, period = 5000) {

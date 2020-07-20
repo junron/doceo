@@ -10,6 +10,9 @@
             android:id="@+id/nav_nearby"
             android:icon="@drawable/ic_cell_tower"
             android:title="Nearby" />
+        <item
+            android:id="@+id/nav_snapmit"
+            android:title="Snapmit" />
 
         <item
             android:id="@+id/logout"
