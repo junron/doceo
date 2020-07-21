@@ -27,10 +27,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.util.android.SafeLiveData
 import com.example.attendance.viewmodels.SubmitViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -108,8 +108,7 @@ class SubmitFragment : Fragment() {
                         //         Imgproc.cvtColor(warped, warped, Imgproc.COLOR_RGB2BGR)
                         //         Imgcodecs.imwrite(finalOutFile.absolutePath, warped)
                         //         val newVal =
-                        //             submitViewModel.imagesData.value?.toMutableList()
-                        //                 ?: return@Runnable
+                        //             submitViewModel.imagesData.value.toMutableList()
                         //         newVal += finalOutFile
                         //         submitViewModel.imagesData.postValue(newVal)
                         //         runBlocking(Dispatchers.Main) {
@@ -132,7 +131,7 @@ class SubmitFragment : Fragment() {
                                 undoAddImage()
                             }.show()
                         }
-                        val newVal = submitViewModel.imagesData.value?.toMutableList() ?: return
+                        val newVal = submitViewModel.imagesData.value.toMutableList()
                         newVal += finalOutFile
                         submitViewModel.imagesData.postValue(newVal)
                     }
@@ -154,8 +153,8 @@ class SubmitFragment : Fragment() {
                 })
         }
         root.next_button.setOnClickListener {
-            if (submitViewModel.imagesData.value?.isNotEmpty() ?: 0 == 0) {
-                ImagesBottomFragment.newInstance(MutableLiveData(emptyList<File>()))
+            if (submitViewModel.imagesData.value.isNotEmpty()) {
+                ImagesBottomFragment.newInstance(SafeLiveData(emptyList()))
                     .show(this.parentFragmentManager, "no_images_botfrag")
                 return@setOnClickListener
             }
@@ -302,9 +301,7 @@ class SubmitFragment : Fragment() {
             if (requestCode == 0) camPath else getRealPathFromURI(intent!!.data)
         Log.d("SUBMIT", path)
         if (resultCode == Activity.RESULT_OK && (requestCode == 1 || requestCode == 0)) {
-            val newVal = submitViewModel.imagesData.value?.toMutableList() ?: return run {
-                Log.d("SUBMIT", "Submit view model imagedata null")
-            }
+            val newVal = submitViewModel.imagesData.value.toMutableList()
             newVal += File(path)
             submitViewModel.imagesData.postValue(newVal)
             runBlocking(Dispatchers.Main) {
@@ -318,10 +315,7 @@ class SubmitFragment : Fragment() {
 
     private fun undoAddImage() {
         val newVal1 =
-            submitViewModel.imagesData.value?.toMutableList()
-                ?: return run {
-                    Log.d("SUBMIT", "Submit view model imagedata null")
-                }
+            submitViewModel.imagesData.value.toMutableList()
         newVal1.removeAt(newVal1.size - 1)
         submitViewModel.imagesData.postValue(newVal1)
     }

@@ -4,16 +4,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.util.android.SafeLiveData
 import kotlinx.android.synthetic.main.image_card.view.*
 import java.io.File
 
-internal class ImageAdapter(var images: MutableLiveData<List<File>>) :
+internal class ImageAdapter(var images: SafeLiveData<List<File>>) :
     RecyclerView.Adapter<ImageAdapter.Card>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -32,7 +32,7 @@ internal class ImageAdapter(var images: MutableLiveData<List<File>>) :
     ) {
         val target =
             holder.view.image
-        val imageValue = images.value ?: return
+        val imageValue = images.value
         Glide.with(MainActivity.activity)
             .load(imageValue[imageValue.lastIndex - position].path)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -40,7 +40,7 @@ internal class ImageAdapter(var images: MutableLiveData<List<File>>) :
             .into(target)
         holder.view.remove_button
             .setOnClickListener {
-                val newVal = images.value?.toMutableList() ?: return@setOnClickListener
+                val newVal = images.value.toMutableList()
                 newVal.removeAt(newVal.lastIndex - 1 - position)
                 images.postValue(newVal)
                 notifyDataSetChanged()
@@ -48,8 +48,8 @@ internal class ImageAdapter(var images: MutableLiveData<List<File>>) :
     }
 
     override fun getItemCount(): Int {
-        Log.d("imagesSize", "" + images.value!!.size)
-        return images.value!!.size
+        Log.d("imagesSize", images.value.size.toString())
+        return images.value.size
     }
 
     internal class Card(var view: View) :

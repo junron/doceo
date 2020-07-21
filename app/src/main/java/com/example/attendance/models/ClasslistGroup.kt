@@ -15,7 +15,6 @@ import com.example.attendance.util.toStringValue
 import com.example.attendance.util.uuid
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.GlobalScope
@@ -201,7 +200,7 @@ data class ClasslistGroup(
     }
 
     fun opened() {
-        ClasslistGroupLoader.history += AttendanceHistory(id, Date().toStringValue())
+        history += AttendanceHistory(id, Date().toStringValue())
     }
 
 
@@ -276,141 +275,11 @@ data class ClasslistGroup(
         }
     }
 
-    fun getLastAccess() = ClasslistGroupLoader.history.filter { it.id == id }
+    fun getLastAccess() = history.filter { it.id == id }
         .maxBy { it.time.toDate().time }?.time?.toDate()
 }
 
 @Serializable
 data class AttendanceHistory(val id: String, val time: String)
 
-object ClasslistGroupLoader {
-    val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())
-    var classlistGroups = emptyList<ClasslistGroup>()
-        private set
-    private var loadStatus = 0
-
-    private val listeners = mutableListOf<(List<ClasslistGroup>) -> Unit>()
-
-    fun addListener(callback: (List<ClasslistGroup>) -> Unit) {
-        listeners += callback
-    }
-
-    private val processQuery = { documents: List<DocumentSnapshot> ->
-        documents.mapNotNull {
-            try {
-                it.toObject(ClasslistGroup::class.java)?.copy(id = it.id)
-            } catch (e: RuntimeException) {
-                null
-            }
-        }
-    }
-
-
-    fun setup() {
-        val user =
-            FirebaseAuth.getInstance().currentUser ?: return run {
-                FirebaseAuth.getInstance().addAuthStateListener { auth ->
-                    if (auth.currentUser != null) setup()
-                }
-            }
-        Firebase.firestore.collection("attendance")
-            .whereEqualTo("owner", user.uid)
-            .addSnapshotListener { snapshot, _ ->
-                snapshot ?: return@addSnapshotListener
-                if (loadStatus != 3) {
-                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
-                    if (loadStatus == 2) {
-                        listeners.forEach {
-                            it(classlistGroups)
-                        }
-                    }
-                    loadStatus++
-                    return@addSnapshotListener
-                }
-                getAttendance {
-                    classlistGroups = it
-                    listeners.forEach {
-                        it(classlistGroups)
-                    }
-                }
-            }
-
-        Firebase.firestore.collection("attendance")
-            .whereArrayContains("editors", user.uid)
-            .addSnapshotListener { snapshot, _ ->
-                snapshot ?: return@addSnapshotListener
-                if (loadStatus != 3) {
-                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
-                    if (loadStatus == 2) {
-                        listeners.forEach {
-                            it(classlistGroups)
-                        }
-                    }
-                    loadStatus++
-                    return@addSnapshotListener
-                }
-                getAttendance {
-                    classlistGroups = it
-                    listeners.forEach {
-                        it(classlistGroups)
-                    }
-                }
-            }
-
-        Firebase.firestore.collection("attendance")
-            .whereArrayContains("viewers", user.uid)
-            .addSnapshotListener { snapshot, _ ->
-                snapshot ?: return@addSnapshotListener
-                if (loadStatus != 3) {
-                    classlistGroups = classlistGroups + processQuery(snapshot.documents)
-                    if (loadStatus == 2) {
-                        listeners.forEach {
-                            it(classlistGroups)
-                        }
-                    }
-                    loadStatus++
-                    return@addSnapshotListener
-                }
-                getAttendance {
-                    classlistGroups = it
-                    listeners.forEach {
-                        it(classlistGroups)
-                    }
-                }
-            }
-    }
-
-    private fun getAttendance(callback: (List<ClasslistGroup>) -> Unit) {
-        val user =
-            FirebaseAuth.getInstance().currentUser ?: return run {
-                FirebaseAuth.getInstance().addAuthStateListener { auth ->
-                    if (auth.currentUser != null) setup()
-                }
-            }
-        var queries = 0
-        val data = mutableListOf<ClasslistGroup>()
-        Firebase.firestore.collection("attendance")
-            .whereEqualTo("owner", user.uid)
-            .get().addOnSuccessListener {
-                data += processQuery(it.documents)
-                queries++
-                if (queries == 3) callback(data)
-            }
-
-        Firebase.firestore.collection("attendance")
-            .whereArrayContains("editors", user.uid)
-            .get().addOnSuccessListener {
-                data += processQuery(it.documents)
-                queries++
-                if (queries == 3) callback(data)
-            }
-        Firebase.firestore.collection("attendance")
-            .whereArrayContains("viewers", user.uid)
-            .get().addOnSuccessListener {
-                data += processQuery(it.documents)
-                queries++
-                if (queries == 3) callback(data)
-            }
-    }
-}
-
+val history = AppendOnlyStorage("attendance-history", AttendanceHistory.serializer())

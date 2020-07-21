@@ -20,6 +20,7 @@ import com.example.attendance.controllers.classlist.Camera
 import com.example.attendance.controllers.classlist.export
 import com.example.attendance.controllers.classlist.formatDate
 import com.example.attendance.controllers.classlist.renderChart
+import com.example.attendance.fragments.ClasslistHolder
 import com.example.attendance.models.*
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Permissions
@@ -43,8 +44,12 @@ object ClasslistController : FragmentController() {
     @UnstableDefault
     override fun init(context: Fragment) {
         super.init(context)
+        context as ClasslistHolder
         MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         with(context) {
+            viewModel.classlistGroups.observe({ lifecycle }) {
+                classlistGroupUpdated(it)
+            }
             toolbarClasslistToolbar.apply {
                 setNavigationIcon(R.drawable.ic_baseline_close_24)
                 navigationIcon?.setTint(Color.WHITE)
@@ -65,11 +70,11 @@ object ClasslistController : FragmentController() {
                     }
                     R.id.classlist_ocr -> {
                         Permissions.requestPermissions(
-                            context.activity!!,
+                            context.requireActivity(),
                             Manifest.permission.CAMERA
                         )
                         Camera.classlist = classlist
-                        Camera.classlistGroup = classlistGroup
+                        Camera.classlistGroup = this@ClasslistController.classlistGroup
                         classlistViewPager.visibility = View.VISIBLE
                         preview_view.visibility = View.VISIBLE
                         pieChartContainer.visibility = View.GONE
@@ -90,7 +95,7 @@ object ClasslistController : FragmentController() {
                     R.id.classlist_analyze -> {
                         preview_view.visibility = View.GONE
                         classlistViewPager.visibility = View.GONE
-                        renderChart(this, classlistGroup, classlist)
+                        renderChart(this, this@ClasslistController.classlistGroup, classlist)
                     }
                 }
                 true
@@ -99,7 +104,7 @@ object ClasslistController : FragmentController() {
                 drawer_layout_end.openDrawer(Gravity.RIGHT)
             }
             classlistAdd.setOnClickListener {
-                navigateClasslistId = classlistGroup.newClasslist()
+                navigateClasslistId = this@ClasslistController.classlistGroup.newClasslist()
             }
             classlistViewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
@@ -114,13 +119,13 @@ object ClasslistController : FragmentController() {
                         displayDate = formatDate(classlist.created.toDate(), true)
                     }
                     toolbarClasslistToolbar?.subtitle =
-                        displayDate + if (position == classlistGroup.classlists.lastIndex) " (Latest)"
+                        displayDate + if (position == this@ClasslistController.classlistGroup.classlists.lastIndex) " (Latest)"
                         else ""
                 }
             })
             classlistExport.setOnClickListener {
                 drawer_layout_end.closeDrawer(Gravity.RIGHT)
-                export(context.context!!, classlistGroup, classlist)
+                export(context.requireContext(), this@ClasslistController.classlistGroup, classlist)
             }
         }
         if (::callback.isInitialized)
@@ -221,7 +226,7 @@ object ClasslistController : FragmentController() {
             val newAttendance = classlistGroups.find { it.id == classlistGroup.id }
             if (newAttendance == null) {
                 Toast.makeText(
-                    context.context!!,
+                    context.requireContext(),
                     "You no longer have access to this classlist.",
                     Toast.LENGTH_SHORT
                 )
