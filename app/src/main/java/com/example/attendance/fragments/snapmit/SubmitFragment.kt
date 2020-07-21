@@ -49,7 +49,7 @@ import java.io.File
 import java.io.IOException
 
 class SubmitFragment : Fragment() {
-    private val submitViewModel: SubmitViewModel by viewModels()
+    val submitViewModel: SubmitViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
     lateinit var previewView: PreviewView
     lateinit var root: View
