@@ -50,13 +50,13 @@ import java.io.IOException
 
 class SubmitFragment : Fragment() {
     val submitViewModel: SubmitViewModel by viewModels()
-    private var imageCapture: ImageCapture? = null
+    private lateinit var imageCapture: ImageCapture
     lateinit var previewView: PreviewView
     lateinit var root: View
-    var scannerType = 0
+    private var scannerType = 0
     var latestImage: Mat? = null
     lateinit var camPath: String
-    var overflowState = 0
+    private var overflowState = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
@@ -75,7 +75,7 @@ class SubmitFragment : Fragment() {
 
         }
         val camBut = root.camera_button
-        camBut.setOnClickListener { v ->
+        camBut.setOnClickListener {
             var outFile: File? = null
             try {
                 outFile = File.createTempFile("image", ".png", MainActivity.activity.cacheDir)
@@ -86,7 +86,7 @@ class SubmitFragment : Fragment() {
             camBut.animate().alpha(0.2f)
             val outputFileOptions = OutputFileOptions.Builder(outFile!!).build()
             val finalOutFile = outFile
-            imageCapture!!.takePicture(outputFileOptions,
+            imageCapture.takePicture(outputFileOptions,
                 { command: Runnable? ->
                     Thread(
                         command
@@ -295,7 +295,7 @@ class SubmitFragment : Fragment() {
     ) {
         super.onActivityResult(requestCode, resultCode, intent)
         if (resultCode != Activity.RESULT_OK) {
-            Log.d("SUBMIT", " Requets code not ok")
+            Log.d("SUBMIT", "Result code not ok")
             return
         }
         val path =
