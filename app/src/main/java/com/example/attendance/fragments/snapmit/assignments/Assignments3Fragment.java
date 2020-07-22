@@ -33,9 +33,9 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.snapmit.MainActivity;
-import com.example.snapmit.MyImageProcessing;
-import com.example.snapmit.R;
+import com.example.attendance.MainActivity;
+import com.example.attendance.R;
+import com.example.attendance.models.snapmit.Submission;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.functions.FirebaseFunctions;
@@ -70,7 +70,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static com.example.snapmit.MainActivity.main;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -183,13 +182,14 @@ public class    Assignments3Fragment extends Fragment {
         });
 
         root.findViewById(R.id.export_button).setOnClickListener((v -> {
-            if (ContextCompat.checkSelfPermission(main, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(main, READ_EXTERNAL_STORAGE)
+            if (ContextCompat.checkSelfPermission(MainActivity.activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.activity, READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 MultiplePermissionsListener customListener = new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()) root.findViewById(R.id.export_button).callOnClick();
+                        if (report.areAllPermissionsGranted())
+                            root.findViewById(R.id.export_button).callOnClick();
                     }
 
                     @Override
@@ -198,14 +198,14 @@ public class    Assignments3Fragment extends Fragment {
                     }
                 };
                 MultiplePermissionsListener failureListener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
-                        .withContext(main)
+                        .withContext(MainActivity.activity)
                         .withTitle("Storage permissions are needed")
                         .withButtonText(android.R.string.ok)
                         .withIcon(R.drawable.ic_menu_camera)
                         .build();
 
                 MultiplePermissionsListener listener = new CompositeMultiplePermissionsListener(customListener, failureListener);
-                Dexter.withActivity(main)
+                Dexter.withActivity(MainActivity.activity)
                         .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE)
                         .withListener(listener)
                         .check();

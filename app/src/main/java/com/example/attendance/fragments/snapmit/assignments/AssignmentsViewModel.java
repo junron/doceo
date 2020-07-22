@@ -3,6 +3,8 @@ package com.example.attendance.fragments.snapmit.assignments;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.attendance.models.snapmit.Submission;
+
 import java.util.ArrayList;
 import java.util.List;
 
