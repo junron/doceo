@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/image_section"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="match_parent"
+        android:layout_width="150dp">
+
+        <Space
+            android:id="@+id/space"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="40dp"
+            android:layout_height="10dp"
+            tools:ignore="MissingConstraints" />
+
+        <ImageView
+            android:id="@+id/grab_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX="1.3333333333"
+            android:scaleY="1.3333333333"
+            app:layout_constraintEnd_toStartOf="@id/card"
+            app:layout_constraintTop_toTopOf="@id/card"
+            app:layout_constraintBottom_toBottomOf="@id/card"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_drag_handle_black_24dp"
+            android:tint="@color/colorAccent"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.cardview.widget.CardView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/space"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/card"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            android:layout_width="0dp">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_placeholder" />
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TableLayout
+        android:id="@+id/control_section"
+        app:layout_constraintStart_toEndOf="@id/image_section"
+        app:layout_constraintEnd_toStartOf="@id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TableRow>
+            <ImageButton
+                android:scaleX="1.33333333"
+                android:scaleY="1.33333333"
+                android:id="@+id/proc_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_rotate_left_black_24dp"
+                android:background="@color/fui_transparent"
+                android:tint="@color/colorPrimary"
+                android:layout_margin="12dp"/>
+            <ImageButton
+                android:scaleX="1.33333333"
+                android:scaleY="1.33333333"
+                android:id="@+id/proc_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_rotate_right_black_24dp"
+                android:background="@color/fui_transparent"
+                android:tint="@color/colorPrimary"
+                android:layout_margin="12dp"/>
+        </TableRow>
+        <TableRow>
+            <ImageButton
+                android:scaleX="1.33333333"
+                android:scaleY="1.33333333"
+                android:id="@+id/proc_hori"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_flip_black_24dp"
+                android:background="@color/fui_transparent"
+                android:tint="@color/colorPrimary"
+                android:layout_margin="12dp"/>
+            <ImageButton
+                android:scaleX="1.33333333"
+                android:scaleY="1.33333333"
+                android:id="@+id/proc_vert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_flip_vert"
+                android:background="@color/fui_transparent"
+                android:tint="@color/colorPrimary"
+                android:layout_margin="12dp"/>
+        </TableRow>
+    </TableLayout>
+
+    <ImageButton
+        android:scaleX="1.3333333"
+        android:scaleY="1.3333333"
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="#00FFFFFF"
+        android:src="@drawable/ic_delete_black_24dp"
+        android:tint="@color/errorRed"
+        app:layout_constraintBottom_toBottomOf="@id/control_section"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/control_section"
+        app:layout_constraintTop_toTopOf="@id/control_section" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

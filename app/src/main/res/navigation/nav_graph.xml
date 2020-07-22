@@ -45,6 +45,15 @@
         tools:layout="@layout/fragment_new_attendance" />
     <fragment
         android:id="@+id/submitFragment"
-        android:name="com.example.attendance.fragments.snapmit.SubmitFragment"
+        android:name="com.example.attendance.fragments.snapmit.submit.SubmitFragment"
         android:label="SubmitFragment" />
+    <fragment
+        android:id="@+id/submit2Fragment"
+        android:name="com.example.attendance.fragments.snapmit.submit.Submit2Fragment"
+        android:label="fragment_submit2"
+        tools:layout="@layout/fragment_submit2" />
+    <fragment
+        android:id="@+id/loadingFragment"
+        android:name="com.example.attendance.fragments.snapmit.submit.LoadingFragment"
+        android:label="LoadingFragment" />
 </navigation>

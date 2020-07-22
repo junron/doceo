@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:background="@color/back2"
+    android:id="@+id/card">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/back2">
+
+        <TextView
+            android:id="@+id/name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/numPages"
+            android:layout_marginEnd="8dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Display name"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@id/email"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            app:layout_constraintEnd_toEndOf="@id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="baguette@honhon.com"
+            app:layout_constraintStart_toStartOf="@id/name"
+            android:textColor="@color/textColor"/>
+
+        <TextView
+            android:id="@+id/numPages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/paperIcon"
+            android:text="9"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/name"
+            app:layout_constraintTop_toTopOf="@id/name" />
+
+        <ImageView
+            android:id="@+id/paperIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_paper"
+            app:layout_constraintBottom_toBottomOf="@id/numPages"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/numPages"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp"
+            android:tint="@color/textColor"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

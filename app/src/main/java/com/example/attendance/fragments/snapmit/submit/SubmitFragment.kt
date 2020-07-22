@@ -1,4 +1,4 @@
-package com.example.attendance.fragments.snapmit
+package com.example.attendance.fragments.snapmit.submit
 
 import android.Manifest.permission
 import android.animation.Animator
@@ -31,6 +31,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.fragments.snapmit.ImagesBottomFragment
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.viewmodels.SubmitViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -65,7 +67,9 @@ class SubmitFragment : Fragment() {
         with(root) {
             bottom_bar_button.setOnClickListener {
                 val addPhotoBottomDialogFragment: ImagesBottomFragment =
-                    ImagesBottomFragment.newInstance(submitViewModel.imagesData)
+                    ImagesBottomFragment.newInstance(
+                        submitViewModel.imagesData
+                    )
                 addPhotoBottomDialogFragment.show(
                     this@SubmitFragment.parentFragmentManager,
                     "images_bottom_fragment"
@@ -155,12 +159,15 @@ class SubmitFragment : Fragment() {
         }
         root.next_button.setOnClickListener {
             if (submitViewModel.imagesData.value?.isNotEmpty() ?: 0 == 0) {
-                ImagesBottomFragment.newInstance(MutableLiveData(emptyList<File>()))
+                ImagesBottomFragment.newInstance(
+                    MutableLiveData(emptyList<File>())
+                )
                     .show(this.parentFragmentManager, "no_images_botfrag")
                 return@setOnClickListener
             }
             // NavHostFragment.findNavController(this)
             //     .navigate(R.id.action_nav_ssubmit_to_submit2Fragment)
+            Navigation.navigate(R.id.submit2Fragment);
         }
         val scannerButton: FloatingActionButton = root.findViewById(R.id.scanner_button)
         val overlayHolder =

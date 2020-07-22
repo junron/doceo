@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MyDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitlePanelStyle">@style/TitlePaneStyleCenter</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TitleTextStyleCenter</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/BodyTextStyleCenter</item>
+        <item name="android:background">@color/back1</item>
+    </style>
+
+    <style name="ErrorDialog" parent="MyDialog">
+        <item name="materialAlertDialogTitleIconStyle">@style/IconError</item>
+    </style>
+
+    <style name="SuccessDialog" parent="MyDialog">
+        <item name="materialAlertDialogTitleIconStyle">@style/IconSuccess</item>
+    </style>
+
+    <style name="TitlePaneStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Title.Panel.CenterStacked">
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="IconSuccess" parent="MaterialAlertDialog.MaterialComponents.Title.Icon.CenterStacked">
+        <item name="android:tint">@color/successGreen</item>
+    </style>
+
+    <style name="IconError" parent="MaterialAlertDialog.MaterialComponents.Title.Icon.CenterStacked">
+        <item name="android:tint">@color/errorRed</item>
+    </style>
+
+    <style name="TitleTextStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Title.Text.CenterStacked">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/onBack</item>
+    </style>
+
+    <style name="BodyTextStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/onBack</item>
+    </style>
+</resources>

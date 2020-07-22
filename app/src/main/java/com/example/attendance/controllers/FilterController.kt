@@ -11,7 +11,6 @@ import com.example.attendance.adapters.attendance.ImmutableClasslistAdapter
 import com.example.attendance.models.FilterParam
 import com.example.attendance.models.Students
 import com.example.attendance.util.android.hideKeyboard
-import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 object FilterController : FragmentController() {

@@ -3,17 +3,13 @@ package com.example.attendance
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.fragment.findNavController
 import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.controllers.classlist.Camera
 import com.example.attendance.models.ClasslistGroupLoader
@@ -28,9 +24,8 @@ import com.example.attendance.util.android.notifications.NotificationServer
 import com.example.attendance.util.android.notifications.Notifications.createNotificationChannel
 import com.example.attendance.util.auth.UserLoader
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.activity_main_snapmit.*
+import kotlinx.android.synthetic.main.activity_main_snapmit.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
 import kotlinx.serialization.UnstableDefault
 

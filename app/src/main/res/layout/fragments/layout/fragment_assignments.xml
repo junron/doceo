@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.assignments.AssignmentsFragment"
+    android:paddingTop="54dp"
+    android:animateLayoutChanges="true">
+
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Assignments"
+        android:gravity="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="32sp"
+        android:transitionName="name"
+        app:layout_constraintEnd_toEndOf="@id/recycler"
+        app:layout_constraintStart_toStartOf="@id/recycler"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="8dp"
+        android:id="@+id/recycler"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layoutAnimation="@anim/recycler_ltr_la"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <TextView
+        android:id="@+id/no_items"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:text="No assignments"
+        android:textColor="@color/colorPrimary"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@id/recycler"
+        app:layout_constraintEnd_toEndOf="@id/recycler"
+        app:layout_constraintStart_toStartOf="@id/recycler"
+        app:layout_constraintTop_toTopOf="@id/recycler"
+        app:layout_constraintVertical_bias="0.183" />
+
+    <ProgressBar
+        android:indeterminateTint="@color/colorPrimary"
+        android:id="@+id/loading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/recycler" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/colorAccent"
+        android:elevation="0sp"
+        app:borderWidth="0sp"
+        app:srcCompat="@drawable/ic_add_black_24dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
