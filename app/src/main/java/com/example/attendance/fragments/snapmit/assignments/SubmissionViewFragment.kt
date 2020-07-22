@@ -64,13 +64,8 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class SubmissionViewFragment : Fragment() {
     private val assignmentsViewModel: AssignmentsViewModel by viewModels()
-    var comment = ""
-    var commentInit: String? = ""
-    var edited = false
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        submissionViewFragment = this
-    }
+    private var comment = ""
+    private var commentInit: String? = ""
 
     @SuppressLint("CheckResult")
     override fun onCreateView(
@@ -414,9 +409,5 @@ class SubmissionViewFragment : Fragment() {
                     0
                 }
             )
-    }
-
-    companion object {
-        var submissionViewFragment: SubmissionViewFragment? = null
     }
 }
