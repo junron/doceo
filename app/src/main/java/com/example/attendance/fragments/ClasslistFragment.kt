@@ -19,8 +19,7 @@ class ClasslistFragment(
     val classlistGroup: ClasslistGroup? = null,
     private var classlist: Classlist? = null,
     private var fullName: Boolean = false
-) :
-    Fragment() {
+) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

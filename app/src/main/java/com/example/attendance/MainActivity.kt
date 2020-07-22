@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
@@ -16,7 +17,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import com.example.attendance.controllers.ClasslistController
 import com.example.attendance.controllers.classlist.Camera
-import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.models.Students
 import com.example.attendance.util.AppendOnlyStorage
 import com.example.attendance.util.Volley
@@ -27,6 +27,7 @@ import com.example.attendance.util.android.nearby.protocols.Handshake
 import com.example.attendance.util.android.notifications.NotificationServer
 import com.example.attendance.util.android.notifications.Notifications.createNotificationChannel
 import com.example.attendance.util.auth.UserLoader
+import com.example.attendance.viewmodels.ClasslistGroupViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
@@ -70,7 +71,6 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
             Navigation.navigate(R.id.signInNow)
             return
         }
-        ClasslistGroupLoader.setup()
         Students.loadStudents(this)
         AndroidNearby.init(this)
         initNavigationHandlers()
@@ -83,18 +83,19 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
 
     @UnstableDefault
     private fun handleIntents(intent: Intent) {
+        val viewModel: ClasslistGroupViewModel by viewModels()
         val id = intent.getStringExtra("attendance_id") ?: return
         val classlistGroup =
-            ClasslistGroupLoader.classlistGroups.find { classlistGroup -> classlistGroup.id == id }
+            viewModel.classlistGroups.value.find { classlistGroup -> classlistGroup.id == id }
         if (classlistGroup != null) {
             classlistGroup.opened()
             ClasslistController.setClasslistGroup(classlistGroup)
             Navigation.navigate(R.id.mainContent)
             return
         }
-        ClasslistGroupLoader.addListener {
+        viewModel.classlistGroups.observe({ lifecycle }) {
             val classlistGroup =
-                it.find { attendance -> attendance.id == id } ?: return@addListener run {
+                it.find { attendance -> attendance.id == id } ?: return@observe run {
                     Toast.makeText(this, "Classlist could not be found.", Toast.LENGTH_LONG).show()
                 }
             classlistGroup.opened()

@@ -5,17 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.ImageAdapter
+import com.example.attendance.util.android.SafeLiveData
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_image_bottom.view.*
 import java.io.File
 
 class ImagesBottomFragment : BottomSheetDialogFragment() {
-    lateinit var images: MutableLiveData<List<File>>
+    lateinit var images: SafeLiveData<List<File>>
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,7 +47,7 @@ class ImagesBottomFragment : BottomSheetDialogFragment() {
                 }
             }
         )
-        if (images.value!!.isNotEmpty()) view.no_images.visibility = View.GONE
+        if (images.value.isNotEmpty()) view.no_images.visibility = View.GONE
         return view
     }
 
@@ -57,7 +57,7 @@ class ImagesBottomFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(images: MutableLiveData<List<File>>): ImagesBottomFragment {
+        fun newInstance(images: SafeLiveData<List<File>>): ImagesBottomFragment {
             val frag = ImagesBottomFragment()
             frag.images = images
             return frag

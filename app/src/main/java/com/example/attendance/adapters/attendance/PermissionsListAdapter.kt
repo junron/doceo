@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import androidx.appcompat.widget.PopupMenu
 import com.example.attendance.R
+import com.example.attendance.fragments.MainFragment
 import com.example.attendance.models.AccessLevel.*
 import com.example.attendance.models.ClasslistGroup
-import com.example.attendance.models.ClasslistGroupLoader
 import com.example.attendance.models.Students
 import com.example.attendance.models.colors
 import com.example.attendance.util.android.showIcons
@@ -19,14 +19,18 @@ import kotlinx.android.synthetic.main.permission_item.view.*
 import kotlin.math.abs
 
 @ExperimentalStdlibApi
-class PermissionsListAdapter(var classlistGroup: ClasslistGroup, val currentUser: String) :
+class PermissionsListAdapter(
+    private val fragment: MainFragment,
+    var classlistGroup: ClasslistGroup,
+    private val currentUser: String
+) :
     BaseAdapter() {
     val id = classlistGroup.id
     var permissions = classlistGroup.permissions
 
     init {
-        ClasslistGroupLoader.addListener {
-            classlistGroup = it.find { item -> item.id == id } ?: return@addListener
+        fragment.viewModel.classlistGroups.observe({ fragment.lifecycle }) {
+            classlistGroup = it.find { item -> item.id == id } ?: return@observe
             permissions = classlistGroup.permissions
             notifyDataSetChanged()
         }
