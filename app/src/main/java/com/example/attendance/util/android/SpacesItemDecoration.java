@@ -1,4 +1,4 @@
-package com.example.attendance.fragments.snapmit.assignments;
+package com.example.attendance.util.android;
 
 import android.graphics.Rect;
 import android.view.View;

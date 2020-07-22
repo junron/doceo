@@ -36,7 +36,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:clickable="false"
-        android:id="@+id/delete_button"
+        android:id="@+id/assignment_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#989898"

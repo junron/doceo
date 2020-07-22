@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Assignment(
     // UUID
     val id: String,
-    val deletes: Boolean = false,
+    val deleted: Boolean = false,
     val name: String = "Unknown assignment",
     val submissions: List<Submission>
 )

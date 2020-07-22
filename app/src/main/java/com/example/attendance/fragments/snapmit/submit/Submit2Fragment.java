@@ -16,15 +16,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.ObjectKey;
-import com.example.attendance.R;
 import com.example.attendance.MainActivity;
+import com.example.attendance.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.woxthebox.draglistview.DragItemAdapter;
@@ -249,7 +248,7 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHo
             }).start();
         });
 
-        holder.itemView.findViewById(R.id.delete_button).setOnClickListener((v) -> {
+        holder.itemView.findViewById(R.id.assignment_delete_button).setOnClickListener((v) -> {
             new MaterialAlertDialogBuilder(v.getContext(), R.style.ErrorDialog)
                     .setTitle("Delete page")
                     .setIcon(R.drawable.ic_delete_black_24dp)
