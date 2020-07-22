@@ -11,6 +11,7 @@ import com.example.attendance.adapters.attendance.ImmutableClasslistAdapter
 import com.example.attendance.models.FilterParam
 import com.example.attendance.models.Students
 import com.example.attendance.util.android.hideKeyboard
+import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 object FilterController : FragmentController() {
@@ -33,7 +34,7 @@ object FilterController : FragmentController() {
                     Students.students
                 )
             classListView.adapter = classListAdapter
-            classListView.layoutManager = GridLayoutManager(context.context!!, 2)
+            classListView.layoutManager = GridLayoutManager(context.requireContext(), 2)
             filterEditText.onTextChange {
                 adapter.updateFilters(it)
                 if (callback == null) {
@@ -54,12 +55,12 @@ object FilterController : FragmentController() {
                 }
             }
             filterDone.setOnClickListener {
-                hideKeyboard(this.activity!!)
+                hideKeyboard(this.requireActivity())
                 callback?.invoke(filterEditText.text.toString())
                 callback = null
             }
             filterCancel.setOnClickListener {
-                hideKeyboard(this.activity!!)
+                hideKeyboard(this.requireActivity())
                 callback?.invoke(null)
                 callback = null
             }

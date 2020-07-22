@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -24,20 +22,12 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.snapmit.R;
-import com.google.android.gms.tasks.Continuation;
+import com.example.attendance.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class   Assignments2Fragment extends Fragment {
@@ -164,104 +154,5 @@ public class   Assignments2Fragment extends Fragment {
         });
 
         return root;
-    }
-}
-
-class SubmissionAdapter extends RecyclerView.Adapter<SubmissionAdapter.Card>{
-    ArrayList<Submission> submissions;
-    AssignmentsViewModel assignmentsViewModel;
-
-    SubmissionAdapter(AssignmentsViewModel assignmentsViewModel, View hideOnLoad, View noItems) {
-        this.assignmentsViewModel = assignmentsViewModel;
-        submissions = new ArrayList<>();
-        Map<String, Object> data = new HashMap<>();
-        data.put("code", assignmentsViewModel.assignment.getValue().code);
-        FirebaseFunctions.getInstance().getHttpsCallable("getSubmissionsByAssignment")
-            .call(data)
-            .continueWith((Continuation<HttpsCallableResult, Object>) task -> {
-                if (!task.isSuccessful()) return 0;
-                hideOnLoad.animate().alpha(0);
-                Log.d("SUBMISSION", task.getResult().toString());
-                JsonObject response = (JsonObject) JsonParser.parseString((String)task.getResult().getData());
-                if (!response.get("success").getAsBoolean()) return 0;
-                Log.d("SUBMISSION", response.toString());
-                JsonObject submissions = response.get("message").getAsJsonObject();
-                if (submissions.keySet().size() == 0) return 0;
-                for (String id : submissions.keySet()) {
-                    Submission submission = (new Gson()).fromJson(submissions.get(id), Submission.class);
-                    submission.id = id;
-                    submission.time = submissions.get(id).getAsJsonObject().get("time").getAsJsonObject().get("_seconds").getAsLong();
-                    Log.d("SUBMISSION", submissions.get(id).toString());
-                    Log.d("SUBMISSION", submission.toString());
-                    assignmentsViewModel.submissions.getValue().add(submission);
-                    this.submissions.add(submission);
-                    notifyDataSetChanged();
-                }
-                return 1;
-            }).continueWith(task -> {
-                if ((int) task.getResult() == 0) noItems.animate().alpha(1);
-                return 1;
-        });
-    }
-
-    @NonNull
-    @Override
-    public Card onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.submission_card, parent, false);
-        return new Card(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull Card holder, int position) {
-        String name = submissions.get(position).name;
-        if (name == null) name = "";
-        String email = submissions.get(position).email;
-        if (email == null) email = "";
-        String num = "" + submissions.get(position).images.size();
-
-        ((TextView)holder.view.findViewById(R.id.name)).setText(name);
-        ((TextView)holder.view.findViewById(R.id.email)).setText(email);
-        ((TextView)holder.view.findViewById(R.id.numPages)).setText(num);
-
-        holder.view.setOnClickListener((v) -> {
-            assignmentsViewModel.submission.postValue(submissions.get(position));
-            NavHostFragment.findNavController(Assignments2Fragment.assignments2Fragment).navigate(R.id.action_nav_tassignments2_to_assignments3Fragment);
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return submissions.size();
-    }
-
-    public class Card extends RecyclerView.ViewHolder {
-        View view;
-        public Card(@NonNull View itemView) {
-            super(itemView);
-            view = itemView;
-        }
-    }
-}
-
-class Submission {
-    public String assignmentName;
-    public String id;
-    public List<String> images;
-    public String email;
-    public String name;
-    //prevent gson unpacking failure
-    @SerializedName("'nothin")
-    public long time;
-    public String comment;
-
-
-    @Override
-    public String toString() {
-        return "Submission{" +
-                "id='" + id + '\'' +
-                ", images=" + images +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                '}';
     }
 }

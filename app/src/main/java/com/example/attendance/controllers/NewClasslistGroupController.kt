@@ -11,6 +11,7 @@ import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.models.Students
 import com.example.attendance.models.Tags
 import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.android.onTextChange
 import kotlinx.android.synthetic.main.fragment_new_attendance.*
 
 object NewClasslistGroupController : FragmentController() {
