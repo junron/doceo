@@ -41,7 +41,7 @@ internal class ImageAdapter(var images: SafeLiveData<List<File>>) :
         holder.view.remove_button
             .setOnClickListener {
                 val newVal = images.value.toMutableList()
-                newVal.removeAt(newVal.lastIndex - 1 - position)
+                newVal.removeAt(newVal.lastIndex - position)
                 images.postValue(newVal)
                 notifyDataSetChanged()
             }

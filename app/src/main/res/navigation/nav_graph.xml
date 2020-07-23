@@ -68,4 +68,8 @@
         android:id="@+id/submissionViewFragment"
         android:name="com.example.attendance.fragments.snapmit.assignments.SubmissionViewFragment"
         android:label="SubmissionViewFragment" />
+    <fragment
+        android:id="@+id/history2Fragment"
+        android:name="com.example.attendance.fragments.snapmit.history.History2Fragment"
+        android:label="History2Fragment" />
 </navigation>

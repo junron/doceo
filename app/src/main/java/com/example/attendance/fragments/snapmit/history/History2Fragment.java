@@ -14,9 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.snapmit.R;
-import com.example.snapmit.ui.assignments.ImagesAdapter;
-
+import com.example.attendance.adapters.snapmit.ImagesAdapter;
+import com.example.attendance.R;
 
 public class History2Fragment extends Fragment {
 

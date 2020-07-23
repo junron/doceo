@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.side_navigation.view.*
 import kotlinx.serialization.UnstableDefault
+import org.opencv.android.OpenCVLoader
 
 @SuppressLint("RtlHardcoded")
 class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         NotificationServer.init()
         if (intent != null) handleIntents(intent)
+        OpenCVLoader.initDebug();
     }
 
     @UnstableDefault
