@@ -3,19 +3,12 @@ package com.example.attendance.adapters.snapmit
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.models.snapmit.Submission
 import com.example.attendance.viewmodels.AssignmentsViewModel
-import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.android.synthetic.main.submission_card.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.boolean
 
 
 @UnstableDefault
@@ -58,22 +51,4 @@ class AssignmentSubmissionAdapter(
     }
 
     inner class Card(var view: View) : RecyclerView.ViewHolder(view)
-
-    init {
-        val query = mapOf("id" to assignmentsViewModel.currentAssignmentId)
-        FirebaseFunctions.getInstance().getHttpsCallable("getSubmissionsByAssignment")
-            .call(query)
-            .continueWith {
-                hideOnLoad.animate().alpha(0f)
-                assignmentsViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    val data = it.await().data.toString()
-                    if (Json.parseJson(data).jsonObject["success"]?.boolean != true) return@launch
-                    val response = Json.parse(UserSubmissionAdapter.ApiResponse.serializer(), data)
-                    submissions = response.submissions
-                    if (submissions.isEmpty()) noItems.animate().alpha(1f)
-                    assignmentsViewModel.submissions.value = submissions
-                    notifyDataSetChanged()
-                }
-            }
-    }
 }

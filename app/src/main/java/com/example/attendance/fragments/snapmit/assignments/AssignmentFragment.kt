@@ -75,9 +75,9 @@ class AssignmentFragment : Fragment() {
                     dialog.setCancelable(false)
                     dialog.setCanceledOnTouchOutside(false)
                     dialog.show()
-                    assignmentsViewModel.deleteAssignment { task ->
+                    assignmentsViewModel.deleteAssignment { success ->
                         val dialogBuilder: MaterialAlertDialogBuilder
-                        if (task.isSuccessful) {
+                        if (success) {
                             dialogBuilder = MaterialAlertDialogBuilder(
                                 v.context,
                                 R.style.SuccessDialog

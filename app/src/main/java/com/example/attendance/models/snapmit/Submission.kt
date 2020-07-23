@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Submission(
-    val assignmentId: String,
-    val id: String,
+    val assignmentId: String = "",
+    val id: String = "",
     val deleted: Boolean = false,
     val images: List<String>,
     val owner: String,
