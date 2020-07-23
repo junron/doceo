@@ -56,4 +56,8 @@
         android:id="@+id/loadingFragment"
         android:name="com.example.attendance.fragments.snapmit.submit.LoadingFragment"
         android:label="LoadingFragment" />
+    <fragment
+        android:id="@+id/history2Fragment"
+        android:name="com.example.attendance.fragments.snapmit.history.History2Fragment"
+        android:label="History2Fragment" />
 </navigation>

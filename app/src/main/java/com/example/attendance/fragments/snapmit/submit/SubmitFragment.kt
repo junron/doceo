@@ -8,6 +8,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -31,6 +32,7 @@ import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.ImagesBottomFragment
+import com.example.attendance.fragments.snapmit.assignments.MyImageProcessing
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SafeLiveData
 import com.example.attendance.viewmodels.SubmitViewModel
@@ -43,12 +45,17 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.CompositeMultiplePermissionsListener
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.quickbirdstudios.yuv2mat.Yuv
 import kotlinx.android.synthetic.main.fragment_submit.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.opencv.core.Core.rotate
 import org.opencv.core.Mat
+import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
 import java.io.File
 import java.io.IOException
+import kotlin.math.sqrt
 
 class SubmitFragment : Fragment() {
     val submitViewModel: SubmitViewModel by viewModels()
@@ -95,35 +102,36 @@ class SubmitFragment : Fragment() {
                     ).start()
                 }, object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: OutputFileResults) {
-                        // //on saved, read out image, perform correction and write back in.
-                        // if (scannerType == 1 || scannerType == 2) {
-                        //     Thread(Runnable {
-                        //         val imageMat: Mat = Imgcodecs.imread(finalOutFile.absolutePath)
-                        //         Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_RGB2BGR)
-                        //         val warped: Mat = MyImageProcessing.warpImageToPageFromOtherImage(
-                        //             latestImage,
-                        //             imageMat,
-                        //             2000,
-                        //             Math.sqrt(2.0),
-                        //             true
-                        //         )
-                        //         Imgproc.cvtColor(warped, warped, Imgproc.COLOR_RGB2BGR)
-                        //         Imgcodecs.imwrite(finalOutFile.absolutePath, warped)
-                        //         val newVal =
-                        //             submitViewModel.imagesData.value.toMutableList()
-                        //         newVal += finalOutFile
-                        //         submitViewModel.imagesData.postValue(newVal)
-                        //         runBlocking(Dispatchers.Main) {
-                        //             camBut.isClickable = true
-                        //             camBut.animate().alpha(1f)
-                        //             Snackbar.make(root, "Snapped!", 2000).setAction(
-                        //                 "UNDO"
-                        //             ) {
-                        //                 undoAddImage()
-                        //             }.show()
-                        //         }
-                        //     }).start()
-                        // }
+                        //on saved, read out image, perform correction and write back in.
+                        if (scannerType == 1 || scannerType == 2) {
+                            Thread(Runnable {
+                                val imageMat: Mat = Imgcodecs.imread(finalOutFile.absolutePath)
+                                Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_RGB2BGR)
+                                val warped: Mat = MyImageProcessing.warpImageToPageFromOtherImage(
+                                    latestImage,
+                                    imageMat,
+                                    2000,
+                                    sqrt(2.0),
+                                    true
+                                )
+                                Imgproc.cvtColor(warped, warped, Imgproc.COLOR_RGB2BGR)
+                                Imgcodecs.imwrite(finalOutFile.absolutePath, warped)
+                                val newVal =
+                                    submitViewModel.imagesData.value.toMutableList()
+                                newVal += finalOutFile
+                                submitViewModel.imagesData.postValue(newVal)
+                                runBlocking(Dispatchers.Main) {
+                                    camBut.isClickable = true
+                                    camBut.animate().alpha(1f)
+                                    Snackbar.make(root, "Snapped!", 2000).setAction(
+                                        "UNDO"
+                                    ) {
+                                        undoAddImage()
+                                    }.show()
+                                }
+                            }).start()
+                            return
+                        }
                         root.camera_button.isClickable = true
                         camBut.animate().alpha(1f)
                         runBlocking(Dispatchers.Main) {
@@ -155,7 +163,7 @@ class SubmitFragment : Fragment() {
                 })
         }
         root.next_button.setOnClickListener {
-            if (submitViewModel.imagesData.value.isNotEmpty()) {
+            if (submitViewModel.imagesData.value.isEmpty()) {
                 ImagesBottomFragment.newInstance(SafeLiveData(emptyList()))
                     .show(this.parentFragmentManager, "no_images_botfrag")
                 return@setOnClickListener
@@ -424,47 +432,47 @@ class SubmitFragment : Fragment() {
             .setCameraSelector(cameraSelector)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
-        // imageAnalysis.setAnalyzer(
-        //     { r: Runnable? ->
-        //         Thread(r).start()
-        //     }
-        // ) { image: ImageProxy ->
-        //     if (scannerType == 0) {
-        //         image.close()
-        //         return@setAnalyzer
-        //     }
-        //     try {
-        //         @SuppressLint("UnsafeExperimentalUsageError") val imageMat: Mat =
-        //             Yuv.rgb(image.image)
-        //         var rotation = 2
-        //         when (image.imageInfo.rotationDegrees) {
-        //             90 -> rotation = 0
-        //             180 -> rotation = 1
-        //             270 -> rotation = -1
-        //         }
-        //         if (rotation != 2) rotate(imageMat, imageMat, rotation)
-        //         latestImage = imageMat
-        //         var overlay: Mat? = null
-        //         if (scannerType == 1) overlay =
-        //             MyImageProcessing.drawPagePolygonTransparent(imageMat)
-        //         if (scannerType == 2) overlay = MyImageProcessing.warpImageToPage(imageMat)
-        //         val overlayBitmap: Bitmap
-        //         overlayBitmap = if (overlay == null) {
-        //             return@setAnalyzer
-        //         } else {
-        //             MyImageProcessing.matToBitmap(overlay)
-        //         }
-        //         main.runOnUiThread({
-        //             (root.overlay_holder as ImageView).setImageBitmap(
-        //                 overlayBitmap
-        //             )
-        //         })
-        //     } catch (e: Exception) {
-        //         e.printStackTrace()
-        //     } finally {
-        //         image.close()
-        //     }
-        // }
+        imageAnalysis.setAnalyzer(
+            { r: Runnable? ->
+                Thread(r).start()
+            }
+        ) { image: ImageProxy ->
+            if (scannerType == 0) {
+                image.close()
+                return@setAnalyzer
+            }
+            try {
+                @SuppressLint("UnsafeExperimentalUsageError")
+                val imageMat: Mat? = image.image?.let { Yuv.rgb(it) }
+                var rotation = 2
+                when (image.imageInfo.rotationDegrees) {
+                    90 -> rotation = 0
+                    180 -> rotation = 1
+                    270 -> rotation = -1
+                }
+                if (rotation != 2) rotate(imageMat, imageMat, rotation)
+                latestImage = imageMat
+                var overlay: Mat? = null
+                if (scannerType == 1) overlay =
+                    MyImageProcessing.drawPagePolygonTransparent(imageMat)
+                if (scannerType == 2) overlay = MyImageProcessing.warpImageToPage(imageMat)
+                val overlayBitmap: Bitmap
+                overlayBitmap = if (overlay == null) {
+                    return@setAnalyzer
+                } else {
+                    MyImageProcessing.matToBitmap(overlay)
+                }
+                activity?.runOnUiThread {
+                    (root.overlay_holder as ImageView).setImageBitmap(
+                        overlayBitmap
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                image.close()
+            }
+        }
         cameraProvider.bindToLifecycle(
             this,
             cameraSelector,

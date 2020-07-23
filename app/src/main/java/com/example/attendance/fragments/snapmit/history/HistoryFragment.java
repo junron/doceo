@@ -14,8 +14,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.snapmit.R;
-import com.example.snapmit.ui.assignments.SpacesItemDecoration;
+import com.example.attendance.R;
+import com.example.attendance.util.android.Navigation;
+import com.example.attendance.util.android.SpacesItemDecoration;
 import com.google.android.gms.tasks.Continuation;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -119,7 +120,7 @@ class UserSubmissionAdapter extends RecyclerView.Adapter<UserSubmissionAdapter.C
             HistoryFragment.historyViewModel.submission.setValue(submission);
             Log.d("HISTORY", String.valueOf(submission));
             Log.d("HISTORY", String.valueOf(HistoryFragment.historyViewModel.submission.getValue()));
-            NavHostFragment.findNavController(HistoryFragment.historyFragment).navigate(R.id.action_nav_sgallery_to_history2Fragment);
+            Navigation.INSTANCE.navigate(R.id.history2Fragment);
         });
 
         ((TextView)holder.view.findViewById(R.id.name)).setText(name);
