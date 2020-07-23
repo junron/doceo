@@ -1,6 +1,7 @@
 package com.example.attendance.fragments.snapmit.assignments
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,21 +9,23 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.AssignmentSubmissionAdapter
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SpacesItemDecoration
 import com.example.attendance.util.android.onTextChange
+import com.example.attendance.util.toShortString
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.delete_dialog.view.*
-import kotlinx.android.synthetic.main.fragment_assignments2.view.*
+import kotlinx.android.synthetic.main.fragment_assignment.view.*
 
 class AssignmentFragment : Fragment() {
-    private val assignmentsViewModel: AssignmentsViewModel by viewModels()
+    private val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,10 +33,19 @@ class AssignmentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root =
-            inflater.inflate(R.layout.fragment_assignments2, container, false)
+            inflater.inflate(R.layout.fragment_assignment, container, false)
+        root.toolbarMain.apply {
+            setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+            navigationIcon?.setTint(Color.WHITE)
+            setNavigationOnClickListener {
+                assignmentsViewModel.currentAssignmentId = null
+                Navigation.navigate(R.id.assignmentsListFragment)
+            }
+        }
         // NPE if assignment doesn't exist
         val assignment = assignmentsViewModel.getAssignment()!!
-        root.name.text = assignment.name
+        root.toolbarMain.title = assignment.name
+        root.dueDate.text = assignment.dueDate.toDate().toShortString()
         val recycler = root.recycler
         val llm = LinearLayoutManager(root.context)
         llm.orientation = RecyclerView.VERTICAL

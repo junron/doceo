@@ -50,3 +50,29 @@ fun String.formatDate(): String = SimpleDateFormat("dd MMM yyyy").format(toDate(
 infix fun Int.suffix(suffix: String) = if (this == 1) "1 $suffix" else "$this $suffix" + "s"
 
 fun uuid() = UUID.randomUUID().toString()
+
+fun Date.toShortString(): String {
+    val day = SimpleDateFormat("dd MMM").format(this)
+    return when {
+        isTomorrow() -> "Tomorrow"
+        isToday() -> "Today"
+        else -> day
+    }
+}
+
+val Date.calendar: Calendar
+    get() = Calendar.getInstance().apply { time = this@calendar }
+
+fun Calendar.dateOnly() = apply {
+    set(Calendar.HOUR_OF_DAY, 0)
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+    set(Calendar.MILLISECOND, 0)
+}
+
+fun Date.isTomorrow(relativeTo: Calendar = Calendar.getInstance()) = isToday(relativeTo.apply {
+    add(Calendar.DATE, 1)
+})
+
+fun Date.isToday(relativeTo: Calendar = Calendar.getInstance()) =
+    calendar.dateOnly() == relativeTo.dateOnly()

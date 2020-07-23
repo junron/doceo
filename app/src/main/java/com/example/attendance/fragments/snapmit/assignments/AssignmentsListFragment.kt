@@ -2,9 +2,11 @@ package com.example.attendance.fragments.snapmit.assignments
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +14,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.attendance.MainActivity
 import com.example.attendance.R
-import com.example.attendance.adapters.snapmit.AssignmentAdapter
-import com.example.attendance.models.snapmit.Assignment
+import com.example.attendance.adapters.snapmit.AssignmentListAdapter
 import com.example.attendance.util.android.SpacesItemDecoration
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.android.gms.tasks.Task
@@ -27,11 +30,11 @@ import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.fragment_assignments.view.*
+import kotlinx.android.synthetic.main.fragment_assignment_list.view.*
 import java.util.*
 
 class AssignmentsListFragment : Fragment() {
-    private val assignmentsViewModel: AssignmentsViewModel by viewModels()
+    val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,15 +42,23 @@ class AssignmentsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root =
-            inflater.inflate(R.layout.fragment_assignments, container, false)
+            inflater.inflate(R.layout.fragment_assignment_list, container, false)
         val recyclerView: RecyclerView = root.findViewById(R.id.recycler)
         recyclerView.adapter =
-            AssignmentAdapter(
-                assignmentsViewModel,
+            AssignmentListAdapter(
+                this,
                 root.loading,
                 root.fab,
                 root.no_items
             )
+        MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        root.toolbarMain.apply {
+            setNavigationIcon(R.drawable.ic_baseline_menu_24)
+            navigationIcon?.setTint(Color.WHITE)
+            setNavigationOnClickListener {
+                MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
+            }
+        }
         val llm = LinearLayoutManager(container!!.context)
         llm.orientation = RecyclerView.VERTICAL
         recyclerView.layoutManager = llm
@@ -112,15 +123,15 @@ class AssignmentsListFragment : Fragment() {
                                 dialogBuilder.setIcon(R.drawable.ic_check_black_24dp)
                                 dialogBuilder.setTitle("Success!")
                                 dialogBuilder.setOnDismissListener { dialog2: DialogInterface? ->
-                                    (recyclerView.adapter as AssignmentAdapter?)!!.assignments.add(
-                                        0,
-                                        Assignment(
-                                            code,
-                                            false,
-                                            finalName,
-                                            listOf()
-                                        )
-                                    )
+                                    // (recyclerView.adapter as AssignmentListAdapter?)!!.assignments.add(
+                                    //     0,
+                                    //     Assignment(
+                                    //         code,
+                                    //         false,
+                                    //         finalName,
+                                    //         listOf()
+                                    //     )
+                                    // )
                                     root.findViewById<View>(R.id.no_items)
                                         .animate().alpha(0f)
                                     recyclerView.adapter!!.notifyItemInserted(0)

@@ -58,8 +58,10 @@ class AssignmentsViewModel : ViewModel() {
                     .addOnSuccessListener { submissionSnapshot ->
                         val submissions = submissionSnapshot.toObjects(Submission::class.java)
                         this.submissions.value += submissions
+                        this.submissions.value = this.submissions.value.distinctBy { it.id }
                     }
                 this.assignments.value += assignments
+                this.assignments.value = this.assignments.value.distinctBy { it.id }
             }
         // Student assignments
         Firebase.firestore
@@ -69,6 +71,7 @@ class AssignmentsViewModel : ViewModel() {
             .addOnSuccessListener {
                 val objects = it.toObjects(Assignment::class.java)
                 assignments.value += objects
+                this.assignments.value = this.assignments.value.distinctBy { it.id }
             }
         // Own submissions
         Firebase.firestore
@@ -78,6 +81,7 @@ class AssignmentsViewModel : ViewModel() {
             .addOnSuccessListener {
                 val objects = it.toObjects(Submission::class.java)
                 submissions.value += objects
+                this.submissions.value = this.submissions.value.distinctBy { it.id }
             }
     }
 

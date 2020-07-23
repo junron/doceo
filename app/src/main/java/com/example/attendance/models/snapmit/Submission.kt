@@ -10,8 +10,8 @@ data class Submission(
     val assignmentId: String = "",
     val id: String = "",
     val deleted: Boolean = false,
-    val images: List<String>,
-    val owner: String,
+    val images: List<String> = emptyList(),
+    val owner: String = "",
     @Serializable(with = TimestampSerializer::class)
     val submissionTime: Timestamp = Timestamp.now(),
     val comment: String = ""

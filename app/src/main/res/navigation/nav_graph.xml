@@ -56,4 +56,16 @@
         android:id="@+id/loadingFragment"
         android:name="com.example.attendance.fragments.snapmit.submit.LoadingFragment"
         android:label="LoadingFragment" />
+    <fragment
+        android:id="@+id/assignmentFragment"
+        android:name="com.example.attendance.fragments.snapmit.assignments.AssignmentFragment"
+        android:label="AssignmentFragment" />
+    <fragment
+        android:id="@+id/assignmentsListFragment"
+        android:name="com.example.attendance.fragments.snapmit.assignments.AssignmentsListFragment"
+        android:label="AssignmentsListFragment" />
+    <fragment
+        android:id="@+id/submissionViewFragment"
+        android:name="com.example.attendance.fragments.snapmit.assignments.SubmissionViewFragment"
+        android:label="SubmissionViewFragment" />
 </navigation>

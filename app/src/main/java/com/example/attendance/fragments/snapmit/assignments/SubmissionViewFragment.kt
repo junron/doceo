@@ -47,7 +47,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.CompositeMultiplePermissionsListener
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.fragment_assignment_view.view.*
+import kotlinx.android.synthetic.main.fragment_submission_view.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opencv.imgcodecs.Imgcodecs
@@ -75,7 +75,7 @@ class SubmissionViewFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val root =
-            inflater.inflate(R.layout.fragment_assignment_view, container, false)
+            inflater.inflate(R.layout.fragment_submission_view, container, false)
         // Shouldn't NPE but could
         val submission = assignmentsViewModel.getSubmission()!!
         comment = if (comment.isEmpty()) "" else comment
@@ -336,8 +336,8 @@ class SubmissionViewFragment : Fragment() {
                             val spannable = SpannableStringBuilder("")
                             val title: String
                             try {
-                                val scans: Array<String> =
-                                    MyImageProcessing.readOASPage(image)
+                                val scans: Array<String> = emptyArray()
+                                //     MyImageProcessing.readOASPage(image)
                                 for (q in 0..19) {
                                     val get = scans[q]
                                     var col: String? = null

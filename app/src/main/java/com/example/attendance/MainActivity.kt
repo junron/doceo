@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
             mapOf(
                 R.id.nav_attendance to R.id.attendanceFragment,
                 R.id.nav_nearby to R.id.nearbyFragment,
-                R.id.nav_snapmit to R.id.submitFragment
+                R.id.nav_snapmit to R.id.assignmentsListFragment
             ), navController, drawerLayout.sideNavView
         )
         AppendOnlyStorage.init(this)
