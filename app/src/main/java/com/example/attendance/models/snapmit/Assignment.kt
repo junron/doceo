@@ -1,12 +1,14 @@
 package com.example.attendance.models.snapmit
 
-import kotlinx.serialization.Serializable
+import com.google.firebase.Timestamp
 
-@Serializable
 data class Assignment(
     // UUID
-    val id: String,
+    val id: String = "",
     val deleted: Boolean = false,
     val name: String = "Unknown assignment",
-    val submissions: List<Submission>
+    val submissions: List<String> = emptyList(),
+    val students: List<String> = emptyList(),
+    val owner: String = "",
+    val dueDate: Timestamp = Timestamp.now()
 )
