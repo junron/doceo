@@ -4,7 +4,8 @@ import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.snapmit.R;
+import com.example.attendance.R;
+
 
 public class SlideshowFragment extends PreferenceFragmentCompat {
 

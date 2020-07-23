@@ -1,0 +1,65 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory />
+    <PreferenceCategory />
+
+
+    <PreferenceCategory android:title="Scanner parameters">
+
+        <SeekBarPreference
+            android:defaultValue="4"
+            android:max="10"
+            android:title="Blur kernel size"
+            app:key="blurKernelSize"
+            app:min="1"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:defaultValue="50"
+            android:max="200"
+            android:title="Canny parameter 1"
+            app:key="cannyParam1"
+            app:min="0"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:defaultValue="50"
+            android:max="200"
+            android:title="Canny parameter 2"
+            app:key="cannyParam2"
+            app:min="0"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:defaultValue="2"
+            android:max="10"
+            android:title="Dilation kernel size"
+            app:key="dilationKernelSize"
+            app:min="1"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:defaultValue="3"
+            android:max="10"
+            android:title="Dilation iterations"
+            app:key="dilationIterations"
+            app:min="1"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:defaultValue="5"
+            android:max="10"
+            android:title="Tolerance"
+            app:key="tolerance"
+            app:min="1"
+            app:showSeekBarValue="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
