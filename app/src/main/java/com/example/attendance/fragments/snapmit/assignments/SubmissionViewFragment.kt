@@ -87,7 +87,7 @@ class SubmissionViewFragment : Fragment() {
             name.text = submission.name
             email.text = submission.owner
             val sfd = SimpleDateFormat("d MMMM yyyy  HH:mm")
-            time.text = sfd.format(Date(submission.time * 1000))
+            time.text = sfd.format(submission.submissionTime.toDate())
             numPages.text = "1/${submission.images.size}"
             backButton.setOnClickListener {
                 val curr = viewPager.currentItem
@@ -197,7 +197,7 @@ class SubmissionViewFragment : Fragment() {
                 val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
                 val assignment = assignmentsViewModel.getAssignment()!!
                 val date = SimpleDateFormat("d MMMM yyyy  HH:mm")
-                    .format(Date(submission.time * 1000))
+                    .format(submission.submissionTime)
                 var cutName: String = assignment.name.replace(Regex("[^a-zA-Z0-9]"), "")
                 if (cutName.length > 10) cutName = cutName.substring(0, 10)
                 val parent =

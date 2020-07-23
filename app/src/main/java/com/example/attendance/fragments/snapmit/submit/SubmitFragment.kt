@@ -30,6 +30,8 @@ import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.fragments.snapmit.ImagesBottomFragment
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SafeLiveData
 import com.example.attendance.viewmodels.SubmitViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -64,7 +66,7 @@ class SubmitFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_submit, container, false)
         with(root) {
             bottom_bar_button.setOnClickListener {
-                val addPhotoBottomDialogFragment: ImagesBottomFragment =
+                val addPhotoBottomDialogFragment =
                     ImagesBottomFragment.newInstance(submitViewModel.imagesData)
                 addPhotoBottomDialogFragment.show(
                     this@SubmitFragment.parentFragmentManager,
@@ -160,7 +162,7 @@ class SubmitFragment : Fragment() {
             }
             // NavHostFragment.findNavController(this)
             //     .navigate(R.id.action_nav_ssubmit_to_submit2Fragment)
-            Navigation.navigate(R.id.submit2Fragment);
+            Navigation.navigate(R.id.submit2Fragment)
         }
         val scannerButton: FloatingActionButton = root.findViewById(R.id.scanner_button)
         val overlayHolder =
