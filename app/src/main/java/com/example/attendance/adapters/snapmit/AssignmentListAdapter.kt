@@ -16,7 +16,7 @@ class AssignmentListAdapter(
     showOnInflate: View,
     noItems: View
 ) : RecyclerView.Adapter<AssignmentListAdapter.Card>() {
-    val viewModel = fragment.assignmentsViewModel
+    private val viewModel = fragment.assignmentsViewModel
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -53,6 +53,8 @@ class AssignmentListAdapter(
         hideOnInflate.animate().alpha(0f)
         showOnInflate.animate().alpha(1f)
         viewModel.assignments.observe({ fragment.lifecycle }) {
+            if (it.isEmpty()) noItems.animate().alpha(1F)
+            else noItems.animate().alpha(0F)
             notifyDataSetChanged()
         }
     }

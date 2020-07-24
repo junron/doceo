@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.delete_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_assignment.view.*
 
 class AssignmentFragment : Fragment() {
-    private val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
+     val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +51,7 @@ class AssignmentFragment : Fragment() {
         llm.orientation = RecyclerView.VERTICAL
         recycler.layoutManager = llm
         recycler.adapter = AssignmentSubmissionAdapter(
-            assignmentsViewModel,
+            this,
             root.loading,
             root.no_items
         )

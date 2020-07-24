@@ -81,7 +81,11 @@ class AssignmentsViewModel : ViewModel() {
             .addOnSuccessListener {
                 val objects = it.toObjects(Submission::class.java)
                 submissions.value += objects
+                println(submissions)
                 this.submissions.value = this.submissions.value.distinctBy { it.id }
+            }
+            .addOnFailureListener {
+                println("Failure: $it")
             }
     }
 

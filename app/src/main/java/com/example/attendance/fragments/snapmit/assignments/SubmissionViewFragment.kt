@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.text.Html
@@ -21,7 +22,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
@@ -29,6 +30,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.ZoomableImageAdapter
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.onTextChange
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.android.gms.tasks.Continuation
@@ -63,7 +65,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * A simple [Fragment] subclass.
  */
 class SubmissionViewFragment : Fragment() {
-    private val assignmentsViewModel: AssignmentsViewModel by viewModels()
+    private val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
     private var comment = ""
     private var commentInit: String? = ""
 
@@ -78,16 +80,25 @@ class SubmissionViewFragment : Fragment() {
             inflater.inflate(R.layout.fragment_submission_view, container, false)
         // Shouldn't NPE but could
         val submission = assignmentsViewModel.getSubmission()!!
+        root.toolbarMain.apply {
+            setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+            navigationIcon?.setTint(Color.WHITE)
+            setNavigationOnClickListener {
+                assignmentsViewModel.currentSubmissionId = null
+                Navigation.navigate(R.id.assignmentFragment)
+            }
+            title = assignmentsViewModel.getAssignment()!!.name
+            subtitle = submission.name
+        }
         comment = if (comment.isEmpty()) "" else comment
         comment = submission.comment
         commentInit = comment
         val viewPager = root.images
         viewPager.adapter = ZoomableImageAdapter(submission.images, this)
         with(root) {
-            name.text = submission.name
             email.text = submission.owner
             val sfd = SimpleDateFormat("d MMMM yyyy  HH:mm")
-            time.text = sfd.format(submission.submissionTime.toDate())
+            time.text = "Submitted at: " + sfd.format(submission.submissionTime.toDate())
             numPages.text = "1/${submission.images.size}"
             backButton.setOnClickListener {
                 val curr = viewPager.currentItem

@@ -4,13 +4,11 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/back2"
     app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/back2"
         android:padding="16dp">
 
         <TextView
@@ -31,7 +29,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="baguette@honhon.com"
-            android:textColor="@color/textColor"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@id/name"
             app:layout_constraintStart_toStartOf="@id/name"
@@ -55,7 +52,7 @@
             android:paddingTop="7dp"
             android:paddingBottom="5dp"
             android:src="@drawable/ic_paper"
-            android:tint="@color/textColor"
+            android:tint="?android:attr/textColorPrimaryNoDisable"
             app:layout_constraintBottom_toBottomOf="@id/numPages"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/numPages" />
