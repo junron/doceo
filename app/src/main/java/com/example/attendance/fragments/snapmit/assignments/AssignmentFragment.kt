@@ -56,6 +56,9 @@ class AssignmentFragment : Fragment() {
             root.no_items
         )
         recycler.addItemDecoration(SpacesItemDecoration(64))
+        root.submit_button.setOnClickListener {
+            Navigation.navigate(R.id.submitFragment)
+        }
         root.delete_button
             .setOnClickListener { v: View ->
                 val view =

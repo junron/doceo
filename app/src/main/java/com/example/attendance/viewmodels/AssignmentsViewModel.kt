@@ -49,7 +49,10 @@ class AssignmentsViewModel : ViewModel() {
             .get()
             .addOnSuccessListener {
                 val assignments = it.toObjects(Assignment::class.java)
+                this.assignments.value += assignments
+                this.assignments.value = this.assignments.value.distinctBy { it.id }
                 val assignmentIds = assignments.map { it.id }
+                if (assignmentIds.isEmpty()) return@addOnSuccessListener
                 // Own submissions
                 Firebase.firestore
                     .collection("submissions")
@@ -60,8 +63,6 @@ class AssignmentsViewModel : ViewModel() {
                         this.submissions.value += submissions
                         this.submissions.value = this.submissions.value.distinctBy { it.id }
                     }
-                this.assignments.value += assignments
-                this.assignments.value = this.assignments.value.distinctBy { it.id }
             }
         // Student assignments
         Firebase.firestore
