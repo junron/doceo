@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class Submit2Fragment extends Fragment {
 
-    private SubmitViewModel submitViewModel;
+    private com.example.attendance.viewmodels.SubmitViewModel submitViewModel;
     private DragListView board;
 
     public Submit2Fragment() {
@@ -55,7 +55,7 @@ public class Submit2Fragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        submitViewModel = ViewModelProviders.of(MainActivity.activity).get(SubmitViewModel.class);
+        submitViewModel = SubmitFragment.submitViewModel;
     }
 
     @Override
@@ -72,12 +72,13 @@ public class Submit2Fragment extends Fragment {
         board.setDragEnabled(true);
 
         ArrayList<Pair<Long, String>> itemArr = new ArrayList<>();
-        for (File f : submitViewModel.imagesData.getValue()){
+
+        for (File f : submitViewModel.getImagesData().getValue()){
             Log.d("image", f.getAbsolutePath());
             itemArr.add(new Pair<>((long)f.getAbsolutePath().hashCode(), f.getAbsolutePath()));
         }
 
-        board.setAdapter(new ItemAdapter(itemArr, R.id.grab_handle, false, submitViewModel.versionMap.getValue()), false);
+        board.setAdapter(new ItemAdapter(itemArr, R.id.grab_handle, false, submitViewModel.getVersionMap().getValue()), false);
 
         root.findViewById(R.id.next_button).setOnClickListener(v -> {
             if (board.getAdapter().getItemList().size() == 0) {
@@ -102,7 +103,7 @@ public class Submit2Fragment extends Fragment {
                     editText.setError("Invalid code");
                 } else {
                     editText.setError(null);
-                    submitViewModel.code.setValue(editText.getText().toString());
+                    submitViewModel.getCode().setValue(editText.getText().toString());
                     NavHostFragment.findNavController(this).navigate(R.id.loadingFragment);
                     builder.dismiss();
                 }
@@ -151,8 +152,8 @@ public class Submit2Fragment extends Fragment {
     private ArrayList<File> updateData(List dataList, Map<String, Integer> versionMaps) {
         ArrayList<File> data = new ArrayList<>();
         for (Object o : dataList) data.add(new File(((Pair<Long, String>) o).second));
-        submitViewModel.imagesData.postValue(data);
-        submitViewModel.versionMap.postValue(versionMaps);
+        submitViewModel.getImagesData().postValue(data);
+        submitViewModel.getVersionMap().postValue(versionMaps);
         return data;
     }
 }
@@ -248,7 +249,7 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHo
             }).start();
         });
 
-        holder.itemView.findViewById(R.id.assignment_delete_button).setOnClickListener((v) -> {
+        holder.itemView.findViewById(R.id.delete_button).setOnClickListener((v) -> {
             new MaterialAlertDialogBuilder(v.getContext(), R.style.ErrorDialog)
                     .setTitle("Delete page")
                     .setIcon(R.drawable.ic_delete_black_24dp)

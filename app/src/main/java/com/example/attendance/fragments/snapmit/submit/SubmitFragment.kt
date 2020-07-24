@@ -59,8 +59,9 @@ import java.io.IOException
 import kotlin.math.sqrt
 
 class SubmitFragment : Fragment() {
-    lateinit var submitViewModel: SubmitViewModel
-
+    companion object {
+        public lateinit var submitViewModel: SubmitViewModel
+    }
     private lateinit var imageCapture: ImageCapture
     lateinit var previewView: PreviewView
     lateinit var root: View
