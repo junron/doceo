@@ -10,5 +10,6 @@ data class Assignment(
     val submissions: List<String> = emptyList(),
     val students: List<String> = emptyList(),
     val owner: String = "",
-    val dueDate: Timestamp = Timestamp.now()
+    val dueDate: Timestamp = Timestamp.now(),
+    val description: String = "No description provided"
 )

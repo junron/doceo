@@ -1,4 +1,4 @@
-package com.example.attendance.fragments.snapmit.assignments;
+package com.example.attendance.util.android.ocr;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;

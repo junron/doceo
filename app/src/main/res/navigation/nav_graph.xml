@@ -36,8 +36,7 @@
     <fragment
         android:id="@+id/signInNow"
         android:name="com.example.attendance.fragments.SignInNow"
-        android:label="fragment_sign_in_now"
-        tools:layout="@layout/fragment_sign_in" />
+        android:label="fragment_sign_in_now" />
     <fragment
         android:id="@+id/newAttendance2"
         android:name="com.example.attendance.fragments.NewClasslistGroup"
@@ -72,4 +71,8 @@
         android:id="@+id/history2Fragment"
         android:name="com.example.attendance.fragments.snapmit.history.History2Fragment"
         android:label="History2Fragment" />
+    <fragment
+        android:id="@+id/newAssignmentFragment"
+        android:name="com.example.attendance.fragments.snapmit.assignments.NewAssignmentFragment"
+        android:label="NewAssignmentFragment" />
 </navigation>

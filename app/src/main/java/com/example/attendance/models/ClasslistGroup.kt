@@ -50,7 +50,7 @@ data class ClasslistGroup(
                 .set(
                     mapOf(
                         "name" to name,
-                        "owner" to FirebaseAuth.getInstance().uid,
+                        "owner" to FirebaseAuth.getInstance().currentUser!!.email,
                         "editors" to emptyList<String>(),
                         "viewers" to emptyList<String>(),
                         "tags" to tags.map { Json.stringify(Tag.serializer(), it) },

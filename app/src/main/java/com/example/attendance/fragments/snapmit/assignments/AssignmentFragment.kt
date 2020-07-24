@@ -46,6 +46,7 @@ class AssignmentFragment : Fragment() {
         val assignment = assignmentsViewModel.getAssignment()!!
         root.toolbarMain.title = assignment.name
         root.dueDate.text = assignment.dueDate.toDate().toShortString()
+        root.description.text = assignment.description
         val recycler = root.recycler
         val llm = LinearLayoutManager(root.context)
         llm.orientation = RecyclerView.VERTICAL

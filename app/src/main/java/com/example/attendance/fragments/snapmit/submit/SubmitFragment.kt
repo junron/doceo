@@ -32,9 +32,9 @@ import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.ImagesBottomFragment
-import com.example.attendance.fragments.snapmit.assignments.MyImageProcessing
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SafeLiveData
+import com.example.attendance.util.android.ocr.MyImageProcessing
 import com.example.attendance.viewmodels.SubmitViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar

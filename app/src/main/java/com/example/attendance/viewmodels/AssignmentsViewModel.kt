@@ -34,6 +34,13 @@ class AssignmentsViewModel : ViewModel() {
             }
     }
 
+    fun createAssignment(assignment: Assignment) {
+        Firebase.firestore.collection("assignments")
+            .document(assignment.id)
+            .set(assignment)
+        assignments.value += assignment
+    }
+
     init {
         setup()
     }
@@ -53,7 +60,7 @@ class AssignmentsViewModel : ViewModel() {
                 this.assignments.value = this.assignments.value.distinctBy { it.id }
                 val assignmentIds = assignments.map { it.id }
                 if (assignmentIds.isEmpty()) return@addOnSuccessListener
-                // Own submissions
+                // Student submissions
                 Firebase.firestore
                     .collection("submissions")
                     .whereIn("assignmentId", assignmentIds)
