@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
         createNotificationChannel(this, "NUSH Attendance", "NUS High attendance")
         NotificationServer.init()
         if (intent != null) handleIntents(intent)
-        OpenCVLoader.initDebug();
+        OpenCVLoader.initDebug()
     }
 
     @UnstableDefault
