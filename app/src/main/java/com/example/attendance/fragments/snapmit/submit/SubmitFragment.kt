@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
@@ -58,7 +59,8 @@ import java.io.IOException
 import kotlin.math.sqrt
 
 class SubmitFragment : Fragment() {
-    val submitViewModel: SubmitViewModel by viewModels()
+    lateinit var submitViewModel: SubmitViewModel
+
     private lateinit var imageCapture: ImageCapture
     lateinit var previewView: PreviewView
     lateinit var root: View
@@ -70,6 +72,10 @@ class SubmitFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
+        submitViewModel = ViewModelProviders.of(MainActivity.activity)
+            .get<SubmitViewModel>(
+                SubmitViewModel::class.java
+            )
         val root = inflater.inflate(R.layout.fragment_submit, container, false)
         with(root) {
             bottom_bar_button.setOnClickListener {

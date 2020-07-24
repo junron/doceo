@@ -43,6 +43,10 @@ class AssignmentListAdapter(
         }
     }
 
+    fun clear() {
+        viewModel.assignments.postValue(ArrayList(viewModel.assignments.value.size))
+    }
+
     override fun getItemCount(): Int {
         return viewModel.assignments.value.size
     }

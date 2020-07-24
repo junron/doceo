@@ -55,7 +55,7 @@ public class Submit2Fragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        submitViewModel = ViewModelProviders.of(this.getActivity()).get(SubmitViewModel.class);
+        submitViewModel = ViewModelProviders.of(MainActivity.activity).get(SubmitViewModel.class);
     }
 
     @Override

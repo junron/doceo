@@ -26,21 +26,28 @@
         android:layout_marginTop="56dp"
         android:animateLayoutChanges="true">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:clipToPadding="false"
-            android:layoutAnimation="@anim/recycler_ltr_la"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/recycler"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/recycler_ltr_la"
+                />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <TextView
             android:id="@+id/no_items"
@@ -50,10 +57,10 @@
             android:text="No assignments"
             android:textColor="@color/colorPrimary"
             android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="@id/recycler"
-            app:layout_constraintEnd_toEndOf="@id/recycler"
-            app:layout_constraintStart_toStartOf="@id/recycler"
-            app:layout_constraintTop_toTopOf="@id/recycler"
+            app:layout_constraintBottom_toBottomOf="@id/swipe"
+            app:layout_constraintEnd_toEndOf="@id/swipe"
+            app:layout_constraintStart_toStartOf="@id/swipe"
+            app:layout_constraintTop_toTopOf="@id/swipe"
             app:layout_constraintVertical_bias="0.183" />
 
         <ProgressBar
@@ -65,7 +72,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/recycler" />
+            app:layout_constraintTop_toTopOf="@id/swipe" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

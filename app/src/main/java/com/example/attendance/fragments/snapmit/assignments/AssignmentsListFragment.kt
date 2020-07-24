@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.AssignmentListAdapter
@@ -53,6 +54,14 @@ class AssignmentsListFragment : Fragment() {
             .setOnClickListener {
                 Navigation.navigate(R.id.newAssignmentFragment)
             }
+
+        var swipeContainer = root.findViewById(R.id.swipe) as SwipeRefreshLayout
+        swipeContainer.setOnRefreshListener {
+            assignmentsViewModel.appendOwnAssignments(true).continueWith {
+                swipeContainer.isRefreshing = false
+            }
+        }
+
         return root
     }
 
