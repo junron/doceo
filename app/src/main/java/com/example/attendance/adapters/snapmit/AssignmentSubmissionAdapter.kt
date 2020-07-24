@@ -6,12 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.assignments.AssignmentFragment
+import com.example.attendance.models.snapmit.Submission
 import com.example.attendance.util.android.Navigation
 import kotlinx.android.synthetic.main.submission_card.view.*
-import kotlinx.serialization.UnstableDefault
 
 
-@UnstableDefault
 class AssignmentSubmissionAdapter(
     private val assignmentFragment: AssignmentFragment,
     hideOnLoad: View,
@@ -19,6 +18,7 @@ class AssignmentSubmissionAdapter(
 ) :
     RecyclerView.Adapter<AssignmentSubmissionAdapter.Card>() {
     private val assignmentsViewModel = assignmentFragment.assignmentsViewModel
+    private var relevantSubmissions = listOf<Submission>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -32,7 +32,7 @@ class AssignmentSubmissionAdapter(
         holder: Card,
         position: Int
     ) {
-        val submission = assignmentsViewModel.submissions.value[position]
+        val submission = relevantSubmissions[position]
         with(holder.view) {
             name.text = submission.name
             email.text = submission.owner
@@ -40,13 +40,12 @@ class AssignmentSubmissionAdapter(
         }
         holder.view.setOnClickListener {
             assignmentsViewModel.currentSubmissionId = submission.id
-            println(submission.id)
             Navigation.navigate(R.id.submissionViewFragment)
         }
     }
 
     override fun getItemCount(): Int {
-        return assignmentsViewModel.submissions.value.size
+        return relevantSubmissions.size
     }
 
     inner class Card(var view: View) : RecyclerView.ViewHolder(view)
@@ -56,6 +55,9 @@ class AssignmentSubmissionAdapter(
         assignmentsViewModel.submissions.observe({ assignmentFragment.lifecycle }) {
             if (it.isEmpty()) noItems.animate().alpha(1F)
             else noItems.animate().alpha(0F)
+            relevantSubmissions = assignmentsViewModel.submissions.value
+                .filter { it.assignmentId == assignmentsViewModel.currentAssignmentId }
+            assignmentFragment.updateCanSubmit(relevantSubmissions.isEmpty())
             notifyDataSetChanged()
         }
     }

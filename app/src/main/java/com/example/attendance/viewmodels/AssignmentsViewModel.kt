@@ -7,6 +7,7 @@ import com.example.attendance.util.android.SafeLiveData
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -25,16 +26,26 @@ class AssignmentsViewModel : ViewModel() {
         it.id == currentSubmissionId
     }
 
-    fun deleteAssignment(callback: (success: Boolean) -> Unit) {
+    fun deleteAssignment() {
         Firebase.firestore.collection("assignments")
             .document(currentAssignmentId!!)
-            .delete()
-            .addOnSuccessListener {
-                callback(true)
-            }
-            .addOnFailureListener {
-                callback(false)
-            }
+            .set(
+                mapOf(
+                    "deleted" to true
+                ),
+                SetOptions.merge()
+            )
+    }
+
+    fun restoreAssignment(id: String) {
+        Firebase.firestore.collection("assignments")
+            .document(id)
+            .set(
+                mapOf(
+                    "deleted" to false
+                ),
+                SetOptions.merge()
+            )
     }
 
     fun createAssignment(assignment: Assignment) {
@@ -46,6 +57,7 @@ class AssignmentsViewModel : ViewModel() {
 
     init {
         setup()
+        setListeners()
     }
 
     fun setup() {
@@ -64,24 +76,25 @@ class AssignmentsViewModel : ViewModel() {
                 val objects = it.toObjects(Assignment::class.java)
                 assignments.value += objects
                 this.assignments.value = this.assignments.value.distinctBy { it.id }
+                    .filter { !it.deleted }
             }
         // Own submissions
         Firebase.firestore
             .collection("submissions")
-            .whereArrayContains("owner", user)
+            .whereEqualTo("owner", user)
             .get()
             .addOnSuccessListener {
                 val objects = it.toObjects(Submission::class.java)
                 submissions.value += objects
-                println(submissions)
                 this.submissions.value = this.submissions.value.distinctBy { it.id }
+                    .filter { !it.deleted }
             }
             .addOnFailureListener {
                 println("Failure: $it")
             }
     }
 
-    fun appendOwnAssignments(refreshing:Boolean): Task<QuerySnapshot> {
+    fun appendOwnAssignments(refreshing: Boolean): Task<QuerySnapshot> {
         return Firebase.firestore
             .collection("assignments")
             .whereEqualTo("owner", user)
@@ -90,18 +103,81 @@ class AssignmentsViewModel : ViewModel() {
                 val assignments = it.toObjects(Assignment::class.java)
                 this.assignments.value += assignments
                 this.assignments.value = this.assignments.value.distinctBy { it.id }
+                    .filter { !it.deleted }
                 val assignmentIds = assignments.map { it.id }
-                if (assignmentIds.isEmpty()) return@addOnSuccessListener
+                reloadSubmissions(assignmentIds)
+            }
+    }
+
+    private fun reloadSubmissions(assignmentIds: List<String>) {
+        if (assignmentIds.isEmpty()) return
+        // Student submissions
+        Firebase.firestore
+            .collection("submissions")
+            .whereIn("assignmentId", assignmentIds)
+            .get()
+            .addOnSuccessListener { submissionSnapshot ->
+                val submissions = submissionSnapshot.toObjects(Submission::class.java)
+                this.submissions.value += submissions
+                this.submissions.value = this.submissions.value.distinctBy { it.id }
+                    .filter { !it.deleted }
+            }
+    }
+
+    fun setListeners() {
+        Firebase.firestore
+            .collection("assignments")
+            .whereEqualTo("owner", user)
+            .addSnapshotListener { value, _ ->
+                value ?: return@addSnapshotListener
+                val assignments = value.toObjects(Assignment::class.java)
+                this.assignments.value = ((this.assignments.value - this.assignments.value.filter {
+                    it.owner == user
+                }) + assignments)
+                    .distinctBy { it.id }
+                    .filter { !it.deleted }
+
+                val assignmentIds = assignments.map { it.id }
+                reloadSubmissions(assignmentIds)
+                if (assignmentIds.isEmpty()) return@addSnapshotListener
                 // Student submissions
                 Firebase.firestore
                     .collection("submissions")
                     .whereIn("assignmentId", assignmentIds)
-                    .get()
-                    .addOnSuccessListener { submissionSnapshot ->
+                    .addSnapshotListener submissionsSnapshot@{ submissionSnapshot, _ ->
+                        submissionSnapshot ?: return@submissionsSnapshot
                         val submissions = submissionSnapshot.toObjects(Submission::class.java)
-                        this.submissions.value += submissions
-                        this.submissions.value = this.submissions.value.distinctBy { it.id }
+                        this.submissions.value =
+                            ((this.submissions.value - this.submissions.value.filter {
+                                it.assignmentId in assignmentIds
+                            }) + submissions)
+                                .distinctBy { it.id }
+                                .filter { !it.deleted }
                     }
+            }
+        Firebase.firestore
+            .collection("assignments")
+            .whereArrayContains("students", user)
+            .addSnapshotListener { value, _ ->
+                value ?: return@addSnapshotListener
+                val assignments = value.toObjects(Assignment::class.java)
+                this.assignments.value = ((this.assignments.value - this.assignments.value.filter {
+                    user in it.students
+                }) + assignments)
+                    .distinctBy { it.id }
+                    .filter { !it.deleted }
+            }
+        Firebase.firestore
+            .collection("submissions")
+            .whereEqualTo("owner", user)
+            .addSnapshotListener { value, _ ->
+                value ?: return@addSnapshotListener
+                val objects = value.toObjects(Submission::class.java)
+                this.submissions.value = ((this.submissions.value - this.submissions.value.filter {
+                    it.owner == user
+                }) + objects)
+                    .distinctBy { it.id }
+                    .filter { !it.deleted }
             }
     }
 
