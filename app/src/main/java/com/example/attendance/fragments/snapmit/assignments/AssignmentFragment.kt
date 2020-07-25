@@ -13,7 +13,7 @@ import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.AssignmentSubmissionAdapter
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SpacesItemDecoration
-import com.example.attendance.util.toShortString
+import com.example.attendance.util.toDetailedString
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -41,7 +41,7 @@ class AssignmentFragment : Fragment() {
         // NPE if assignment doesn't exist
         val assignment = assignmentsViewModel.getAssignment()!!
         root.toolbarMain.title = assignment.name
-        root.dueDate.text = assignment.dueDate.toDate().toShortString()
+        root.toolbarMain.subtitle = "Due " + assignment.dueDate.toDate().toDetailedString()
         root.description.text = assignment.description
         val recycler = root.recycler
         val llm = LinearLayoutManager(root.context)

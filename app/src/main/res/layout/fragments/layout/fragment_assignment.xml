@@ -15,6 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_collapseMode="pin"
+            app:subtitleTextAppearance="@style/TextAppearance.MaterialComponents.Caption"
+            app:subtitleTextColor="@color/white"
             app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,56 +31,31 @@
             android:id="@+id/descriptionLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
             android:text="Description:"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/dueDateLabel"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Methods of Proof"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/dueDateLabel"
+            android:text="No description provided"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="@+id/descriptionLabel"
             app:layout_constraintTop_toBottomOf="@id/descriptionLabel" />
-
-        <TextView
-            android:id="@+id/dueDateLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Due:"
-            android:textSize="20sp"
-            android:transitionName="code"
-            app:layout_constraintBottom_toBottomOf="@+id/dueDate"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description" />
-
-        <TextView
-            android:id="@+id/dueDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="ABC 123 DEF"
-            android:textSize="20sp"
-            android:transitionName="code"
-            app:layout_constraintStart_toEndOf="@+id/dueDateLabel"
-            app:layout_constraintTop_toBottomOf="@id/description" />
 
         <TextView
             android:id="@+id/submissionLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="64dp"
             android:text="Submissions"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/dueDateLabel"
-            app:layout_constraintTop_toBottomOf="@+id/dueDateLabel" />
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/descriptionLabel"
+            app:layout_constraintTop_toBottomOf="@+id/descriptionLabel" />
 
 
         <androidx.recyclerview.widget.RecyclerView

@@ -26,6 +26,17 @@ class AssignmentsViewModel : ViewModel() {
         it.id == currentSubmissionId
     }
 
+    fun updateComment(comment: String) {
+        Firebase.firestore.collection("submissions")
+            .document(currentSubmissionId!!)
+            .set(
+                mapOf(
+                    "comment" to comment
+                ),
+                SetOptions.merge()
+            )
+    }
+
     fun deleteAssignment() {
         Firebase.firestore.collection("assignments")
             .document(currentAssignmentId!!)

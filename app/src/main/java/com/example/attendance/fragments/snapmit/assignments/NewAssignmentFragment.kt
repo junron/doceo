@@ -131,6 +131,11 @@ class NewAssignmentFragment : Fragment() {
             val dateString = sdf.format(date)
             dueDate = date
             assignmentDueDate.helperText = dateString
+            if (date.time - Date().time > 63_113_904_000) {
+                assignmentDueDate.error = "Date is more than 2 years in the future.\nAre you sure?"
+            }
+        } else {
+            assignmentDueDate.error = "Dates must be in the future"
         }
     }
 

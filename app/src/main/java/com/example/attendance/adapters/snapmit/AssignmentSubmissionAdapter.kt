@@ -8,6 +8,7 @@ import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.assignments.AssignmentFragment
 import com.example.attendance.models.snapmit.Submission
 import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.toDetailedString
 import kotlinx.android.synthetic.main.submission_card.view.*
 
 
@@ -33,10 +34,14 @@ class AssignmentSubmissionAdapter(
         position: Int
     ) {
         val submission = relevantSubmissions[position]
+        val assignment =
+            assignmentsViewModel.assignments.value.find { it.id == submission.assignmentId }!!
         with(holder.view) {
             name.text = submission.name
-            email.text = submission.owner
+            submittedAt.text = submission.submissionTime.toDate().toDetailedString()
             numPages.text = submission.images.size.toString()
+            overdueChip.visibility = if (assignment.dueDate < submission.submissionTime)
+                View.VISIBLE else View.GONE
         }
         holder.view.setOnClickListener {
             assignmentsViewModel.currentSubmissionId = submission.id

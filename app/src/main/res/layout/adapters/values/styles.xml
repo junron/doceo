@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MyDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="materialAlertDialogTitlePanelStyle">@style/TitlePaneStyleCenter</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/TitleTextStyleCenter</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/BodyTextStyleCenter</item>
-        <item name="android:background">@color/back1</item>
-    </style>
-
-    <style name="ErrorDialog" parent="MyDialog">
+    <style name="ErrorDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="materialAlertDialogTitleIconStyle">@style/IconError</item>
     </style>
 
-    <style name="SuccessDialog" parent="MyDialog">
+    <style name="SuccessDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="materialAlertDialogTitleIconStyle">@style/IconSuccess</item>
     </style>
 

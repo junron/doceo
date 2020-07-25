@@ -135,4 +135,5 @@ dependencies {
     implementation 'com.joestelmach:natty:0.12'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.firebase:firebase-storage-ktx:19.1.1'
+    implementation 'com.robertlevonyan.view:MaterialExpansionPanel:2.0.8'
 }

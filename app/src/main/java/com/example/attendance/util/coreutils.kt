@@ -74,5 +74,20 @@ fun Date.isTomorrow(relativeTo: Calendar = Calendar.getInstance()) = isToday(rel
     add(Calendar.DATE, 1)
 })
 
+
 fun Date.isToday(relativeTo: Calendar = Calendar.getInstance()) =
     calendar.dateOnly() == relativeTo.dateOnly()
+
+fun Date.toDetailedString(): String {
+    val sdf = SimpleDateFormat("dd MMM")
+    val sdf2 = SimpleDateFormat("hh:mm a")
+    val day: String = when {
+        isToday() -> "Today"
+        isTomorrow() -> "Tomorrow"
+        this.isYesterday() -> "Yesterday"
+        // isThisWeek() -> dayOfWeek.toString().toLowerCase()
+        //     .capitalize() + " (${sdf.format(this)})"
+        else -> sdf.format(this)
+    }
+    return "$day at ${sdf2.format(this)}"
+}

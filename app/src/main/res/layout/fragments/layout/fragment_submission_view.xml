@@ -49,37 +49,34 @@
                 android:visibility="visible" />
         </androidx.cardview.widget.CardView>
 
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/submissionLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="asdaoahnfofhidffd@asoda.com"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@+id/email_button"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginHorizontal="32dp"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="@id/card"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="some time idk 2069"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@id/email"
-            app:layout_constraintTop_toBottomOf="@id/email" />
-
-        <ImageButton
-            android:id="@+id/email_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimary"
-            android:src="@drawable/ic_email_black_24dp"
-            android:tint="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="@id/email"
             app:layout_constraintEnd_toEndOf="@id/card"
-            app:layout_constraintTop_toTopOf="@id/email" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/submissionDescription"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Submitted by XXYY at 2020"
+                android:textSize="16sp" />
+
+            <ImageButton
+                android:id="@+id/email_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
+                android:src="@drawable/ic_email_black_24dp"
+                android:tint="#FFFFFF" />
+        </LinearLayout>
+
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card"
@@ -93,7 +90,7 @@
             app:layout_constraintBottom_toTopOf="@id/edit_comment_box"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/time"
+            app:layout_constraintTop_toBottomOf="@id/submissionLayout"
             app:layout_constraintVertical_weight="1">
 
             <androidx.viewpager2.widget.ViewPager2
@@ -148,8 +145,7 @@
             android:layout_height="0dp"
             android:gravity="top"
             android:hint="Write a comment here! {NAME} will be able to see it."
-            android:textColor="@color/textColor"
-            android:textColorHint="@color/onBack"
+            android:textColor="?android:attr/textColorPrimaryNoDisable"
             app:layout_constraintBottom_toTopOf="@id/comment_button"
             app:layout_constraintEnd_toEndOf="@id/card"
             app:layout_constraintStart_toStartOf="@id/card"

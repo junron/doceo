@@ -31,15 +31,11 @@ import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.ZoomableImageAdapter
 import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.android.ocr.MyImageProcessing
 import com.example.attendance.util.android.onTextChange
 import com.example.attendance.viewmodels.AssignmentsViewModel
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.HttpsCallableResult
-import com.google.gson.JsonParser
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfWriter
 import com.karumi.dexter.Dexter
@@ -55,10 +51,8 @@ import kotlinx.coroutines.launch
 import org.opencv.imgcodecs.Imgcodecs
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -80,6 +74,8 @@ class SubmissionViewFragment : Fragment() {
             inflater.inflate(R.layout.fragment_submission_view, container, false)
         // Shouldn't NPE but could
         val submission = assignmentsViewModel.getSubmission()!!
+        val assignment = assignmentsViewModel.getAssignment()!!
+        val isOwner = assignment.owner == FirebaseAuth.getInstance().currentUser?.email
         root.toolbarMain.apply {
             setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
             navigationIcon?.setTint(Color.WHITE)
@@ -87,8 +83,7 @@ class SubmissionViewFragment : Fragment() {
                 assignmentsViewModel.currentSubmissionId = null
                 Navigation.navigate(R.id.assignmentFragment)
             }
-            title = assignmentsViewModel.getAssignment()!!.name
-            subtitle = submission.name
+            title = assignment.name
         }
         comment = if (comment.isEmpty()) "" else comment
         comment = submission.comment
@@ -96,15 +91,30 @@ class SubmissionViewFragment : Fragment() {
         val viewPager = root.images
         viewPager.adapter = ZoomableImageAdapter(submission.images, this)
         with(root) {
-            email.text = submission.owner
             val sfd = SimpleDateFormat("d MMMM yyyy  HH:mm")
-            time.text = "Submitted at: " + sfd.format(submission.submissionTime.toDate())
+            submissionDescription.text =
+                "Submitted by ${submission.name}\nat " + sfd.format(submission.submissionTime.toDate())
             numPages.text = "1/${submission.images.size}"
+            if (isOwner) {
+                oasButton.visibility = View.VISIBLE
+                comment_button.text = "Edit comment"
+                email_button.visibility = View.VISIBLE
+                edit_comment_box.isEnabled = true
+                edit_comment_box.hint =
+                    "Write a comment here! ${submission.name} will be able to see it!"
+            } else {
+                oasButton.visibility = View.GONE
+                comment_button.text = "View comment"
+                email_button.visibility = View.GONE
+                edit_comment_box.isEnabled = false
+                edit_comment_box.hint = "There are currently no comments"
+            }
             backButton.setOnClickListener {
                 val curr = viewPager.currentItem
                 if (curr == 0) return@setOnClickListener
                 viewPager.setCurrentItem(curr - 1, true)
                 numPages.text = "${viewPager.currentItem + 1}/${submission.images.size}"
+
             }
             nextButton.setOnClickListener {
                 val curr = viewPager.currentItem
@@ -115,10 +125,14 @@ class SubmissionViewFragment : Fragment() {
             edit_comment_box.onTextChange {
                 comment = it
             }
-            edit_comment_box.hint =
-                "Write a comment here! ${submission.name} will be able to see it!"
             edit_comment_box.setText(comment)
             comment_button.setOnClickListener { v: View ->
+                if (comment_button.text == "Edit comment") {
+                    comment_button.text = "Save comment"
+                } else if (comment_button.text == "Save comment") {
+                    comment_button.text = "Edit comment"
+                    updateComment()
+                }
                 v.isClickable = false
                 val a: Animation = object : Animation() {
                     var initHeight = edit_comment_box.height
@@ -206,9 +220,8 @@ class SubmissionViewFragment : Fragment() {
                     return@setOnClickListener
                 }
                 val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-                val assignment = assignmentsViewModel.getAssignment()!!
                 val date = SimpleDateFormat("d MMMM yyyy  HH:mm")
-                    .format(submission.submissionTime)
+                    .format(submission.submissionTime.toDate())
                 var cutName: String = assignment.name.replace(Regex("[^a-zA-Z0-9]"), "")
                 if (cutName.length > 10) cutName = cutName.substring(0, 10)
                 val parent =
@@ -238,7 +251,7 @@ class SubmissionViewFragment : Fragment() {
                             val spinner = ProgressBar(v.context)
                             spinner.setPadding(16, 16, 16, 16)
                             val dialogLoad =
-                                MaterialAlertDialogBuilder(v.context, R.style.MyDialog)
+                                MaterialAlertDialogBuilder(v.context)
                                     .setTitle("Please wait")
                                     .setView(spinner)
                                     .create()
@@ -251,7 +264,7 @@ class SubmissionViewFragment : Fragment() {
                                 try {
                                     PdfWriter.getInstance(
                                         document,
-                                        FileOutputStream(file)
+                                        file.outputStream()
                                     )
                                 } catch (e: DocumentException) {
                                     e.printStackTrace()
@@ -259,13 +272,15 @@ class SubmissionViewFragment : Fragment() {
                                     e.printStackTrace()
                                 }
                                 try {
-                                    document.open()
-                                    document.newPage()
-                                    document.pageSize = PageSize.A4
-                                    document.addAuthor(
-                                        FirebaseAuth.getInstance().currentUser!!.displayName
-                                    )
-                                    document.addCreator("Snapmit")
+                                    with(document) {
+                                        open()
+                                        newPage()
+                                        pageSize = PageSize.A4
+                                        addAuthor(
+                                            FirebaseAuth.getInstance().currentUser!!.displayName
+                                        )
+                                        addCreator("Snapmit-Attendance")
+                                    }
                                     val comment = submission.comment
                                     var text =
                                         """
@@ -347,8 +362,8 @@ class SubmissionViewFragment : Fragment() {
                             val spannable = SpannableStringBuilder("")
                             val title: String
                             try {
-                                val scans: Array<String> = emptyArray()
-                                //     MyImageProcessing.readOASPage(image)
+                                val scans: Array<String> =
+                                    MyImageProcessing.readOASPage(image)
                                 for (q in 0..19) {
                                     val get = scans[q]
                                     var col: String? = null
@@ -375,6 +390,9 @@ class SubmissionViewFragment : Fragment() {
                                 e.printStackTrace()
                                 MaterialAlertDialogBuilder(context, R.style.ErrorDialog)
                                     .setTitle("No OAS found")
+                                    .setPositiveButton("Ok") { dialog: DialogInterface, _: Int ->
+                                        dialog.dismiss()
+                                    }
                                     .setIcon(R.drawable.ic_oas)
                                     .show()
                             }
@@ -386,39 +404,9 @@ class SubmissionViewFragment : Fragment() {
         return root
     }
 
-    override fun onPause() {
-        super.onPause()
+    fun updateComment() {
         if (commentInit == null) return
         if (commentInit == comment) return
-        val data: MutableMap<String, Any> =
-            HashMap()
-        val submission = assignmentsViewModel.getSubmission()!!
-        data["comment"] = if (comment.isEmpty()) " " else comment
-        data["id"] = submission.id
-        FirebaseFunctions.getInstance().getHttpsCallable("writeComment")
-            .call(data)
-            .continueWith { task: Task<HttpsCallableResult> ->
-                Log.d("COMMENT", task.result.toString())
-                if (!task.isSuccessful) return@continueWith "An error occurred"
-                val response =
-                    JsonParser.parseString(
-                        task.result!!.data as String?
-                    ).asJsonObject
-                if (!response["success"]
-                        .asBoolean
-                ) return@continueWith response["message"].asString
-                1
-            }
-            .continueWith(
-                Continuation<Any, Int> { task: Task<Any> ->
-                    if (task.result is Int) return@Continuation 1
-                    MaterialAlertDialogBuilder(MainActivity.activity, R.style.ErrorDialog)
-                        .setTitle("Error while commenting")
-                        .setIcon(R.drawable.ic_chat_black_24dp)
-                        .setMessage(task.result as String?)
-                        .show()
-                    0
-                }
-            )
+        assignmentsViewModel.updateComment(comment)
     }
 }
