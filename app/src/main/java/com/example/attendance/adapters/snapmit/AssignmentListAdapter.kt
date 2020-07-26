@@ -13,6 +13,7 @@ import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.util.toShortString
 import kotlinx.android.synthetic.main.assignment_card.view.*
 import java.util.*
+import java.text.SimpleDateFormat as SimpleDateFormat1
 
 class AssignmentListAdapter(
     private val fragment: AssignmentsListFragment,
@@ -27,6 +28,8 @@ class AssignmentListAdapter(
 ) : RecyclerView.Adapter<AssignmentListAdapter.Card>() {
     private val viewModel = fragment.assignmentsViewModel
     private var relevantAssignments = listOf<Assignment>()
+    private val user = currentUserEmail()
+
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -44,7 +47,27 @@ class AssignmentListAdapter(
         val assignment = relevantAssignments[position]
         with(holder.view) {
             name.text = assignment.name
-            numSubmissions.text = assignment.submissions.size.toString()
+            if (user == assignment.owner) {
+                numSubmissions.text = assignment.submissions.size.toString()
+                status.text = "Submissions"
+            } else {
+                val submissions = getSubmissions(assignment.id)
+                val submitted = submissions.isNotEmpty()
+                if (submitted) {
+                    val sdf = SimpleDateFormat1("d MMMM yyyy  HH:mm")
+                    status.text = "Submitted at"
+                    numSubmissions.text = sdf.format(submissions.first().submissionTime.toDate())
+                } else {
+                    status.text = "Status"
+                    numSubmissions.text = "Not submitted"
+                }
+                if (assignment.dueDate.toDate().after(Date()) ||
+                    (submitted && submissions.first().submissionTime.toDate()
+                        .before(assignment.dueDate.toDate()))
+                ) {
+                    overdueChip.visibility = View.GONE
+                }
+            }
             dueDate.text = assignment.dueDate.toDate().toShortString()
         }
         holder.view.setOnClickListener {
@@ -57,20 +80,23 @@ class AssignmentListAdapter(
         return relevantAssignments.size
     }
 
+    private fun getSubmissions(id: String) =
+        viewModel.submissions.value.filter { it.assignmentId == id && user == it.owner }
+
+
     inner class Card(var view: ViewGroup) : RecyclerView.ViewHolder(view)
 
     init {
         hideOnInflate.animate().alpha(0f)
         hideOnInflate.visibility = View.GONE
-        val user = currentUserEmail()
         viewModel.assignments.observe({ fragment.lifecycle }) {
             relevantAssignments = it.filter { assignment ->
                 if (ownerOnly && assignment.owner != user) return@filter false
                 return@filter when (this.restrictions) {
                     0 -> assignment.dueDate.toDate().after(Date())
-                    1 -> viewModel.submissions.value.any { it.assignmentId == assignment.id && user == it.owner }
-                    2 -> assignment.dueDate.toDate().before(Date()) &&
-                            viewModel.submissions.value.none { it.assignmentId == assignment.id && user == it.owner }
+                    1 -> getSubmissions(assignment.id).isNotEmpty()
+                    2 -> assignment.dueDate.toDate()
+                        .before(Date()) && getSubmissions(assignment.id).isEmpty()
                     else -> false
                 }
             }

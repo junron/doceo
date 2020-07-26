@@ -49,7 +49,7 @@ object Students {
     fun getStudentByName(name: String) = students.find { it.name == name }
     fun filterStudents(
         query: List<String>,
-        _students: List<Student> = Students.students
+        _students: List<Student> = students
     ): List<Student> {
         var students = _students
         query.forEach {

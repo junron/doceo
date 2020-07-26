@@ -38,31 +38,28 @@ class AssignmentFragment : Fragment() {
                 Navigation.navigate(R.id.assignmentsListFragment)
             }
         }
-        // NPE if assignment doesn't exist
-        val assignment = assignmentsViewModel.getAssignment()!!
-        root.toolbarMain.title = assignment.name
-        root.toolbarMain.subtitle = "Due " + assignment.dueDate.toDate().toDetailedString()
-        root.description.text = assignment.description
-        val recycler = root.recycler
-        val llm = LinearLayoutManager(root.context)
-        llm.orientation = RecyclerView.VERTICAL
-        recycler.layoutManager = llm
-        recycler.adapter = AssignmentSubmissionAdapter(
-            this,
-            root.loading,
-            root.no_items
-        )
-        recycler.addItemDecoration(SpacesItemDecoration(64))
-        if (assignment.owner == FirebaseAuth.getInstance().currentUser?.email) {
-            root.submit_button.visibility = View.GONE
-        } else {
-            root.delete_button.visibility = View.GONE
+
+        updateDisplay(root)
+        assignmentsViewModel.assignments.observe({ lifecycle }) {
+            if (assignmentsViewModel.currentAssignmentId in it.map { assignment -> assignment.id }) {
+                updateDisplay()
+            } else {
+                Snackbar.make(
+                    container!!,
+                    "You no longer have access to this assignment",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                assignmentsViewModel.currentAssignmentId = null
+                Navigation.navigate(R.id.assignmentsListFragment)
+            }
         }
+
         root.submit_button.setOnClickListener {
             Navigation.navigate(R.id.submitFragment)
         }
         root.delete_button
             .setOnClickListener {
+                val assignmentId = assignmentsViewModel.currentAssignmentId!!
                 assignmentsViewModel.deleteAssignment()
                 assignmentsViewModel.currentAssignmentId = null
                 Snackbar.make(
@@ -70,7 +67,7 @@ class AssignmentFragment : Fragment() {
                     "Assignment removed",
                     Snackbar.LENGTH_LONG
                 ).setAction("Undo") {
-                    assignmentsViewModel.restoreAssignment(assignment.id)
+                    assignmentsViewModel.restoreAssignment(assignmentId)
                     Snackbar.make(
                         container,
                         "Assignment restored",
@@ -80,6 +77,31 @@ class AssignmentFragment : Fragment() {
                 Navigation.navigate(R.id.assignmentsListFragment)
             }
         return root
+    }
+
+    private fun updateDisplay(root: View? = view) {
+        // NPE if assignment doesn't exist
+        root ?: return
+        val assignment = assignmentsViewModel.getAssignment()!!
+        with(root) {
+            toolbarMain.title = assignment.name
+            toolbarMain.subtitle = "Due " + assignment.dueDate.toDate().toDetailedString()
+            description.text = assignment.description
+            val llm = LinearLayoutManager(context)
+            llm.orientation = RecyclerView.VERTICAL
+            recycler.layoutManager = llm
+            recycler.adapter = AssignmentSubmissionAdapter(
+                this@AssignmentFragment,
+                loading,
+                no_items
+            )
+            recycler.addItemDecoration(SpacesItemDecoration(64))
+            if (assignment.owner == FirebaseAuth.getInstance().currentUser?.email) {
+                submit_button.visibility = View.GONE
+            } else {
+                delete_button.visibility = View.GONE
+            }
+        }
     }
 
     fun updateCanSubmit(visible: Boolean) {
