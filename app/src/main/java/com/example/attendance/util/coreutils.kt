@@ -1,6 +1,9 @@
 package com.example.attendance.util
 
 import android.text.format.DateUtils
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -90,4 +93,8 @@ fun Date.toDetailedString(): String {
         else -> sdf.format(this)
     }
     return "$day at ${sdf2.format(this)}"
+}
+
+suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+    map { async { f(it) } }.awaitAll()
 }
