@@ -3,20 +3,30 @@ package com.example.attendance.adapters.snapmit
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.assignments.AssignmentsListFragment
+import com.example.attendance.models.snapmit.Assignment
 import com.example.attendance.util.android.Navigation
+import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.util.toShortString
 import kotlinx.android.synthetic.main.assignment_card.view.*
+import java.util.*
 
 class AssignmentListAdapter(
     private val fragment: AssignmentsListFragment,
     hideOnInflate: View,
-    showOnInflate: View,
-    noItems: View
+    noItems: View,
+    // 0 - current
+    // 1 - completed
+    // 2 - past due
+    private val restrictions: Int,
+    private val ownerOnly: Boolean,
+    private val titleElement: TextView
 ) : RecyclerView.Adapter<AssignmentListAdapter.Card>() {
     private val viewModel = fragment.assignmentsViewModel
+    private var relevantAssignments = listOf<Assignment>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,7 +41,7 @@ class AssignmentListAdapter(
         holder: Card,
         position: Int
     ) {
-        val assignment = viewModel.assignments.value[position]
+        val assignment = relevantAssignments[position]
         with(holder.view) {
             name.text = assignment.name
             numSubmissions.text = assignment.submissions.size.toString()
@@ -43,22 +53,36 @@ class AssignmentListAdapter(
         }
     }
 
-    fun clear() {
-        viewModel.assignments.postValue(ArrayList(viewModel.assignments.value.size))
-    }
-
     override fun getItemCount(): Int {
-        return viewModel.assignments.value.size
+        return relevantAssignments.size
     }
 
     inner class Card(var view: ViewGroup) : RecyclerView.ViewHolder(view)
 
     init {
         hideOnInflate.animate().alpha(0f)
-        showOnInflate.animate().alpha(1f)
+        hideOnInflate.visibility = View.GONE
+        val user = currentUserEmail()
         viewModel.assignments.observe({ fragment.lifecycle }) {
-            if (it.isEmpty()) noItems.animate().alpha(1F)
-            else noItems.animate().alpha(0F)
+            relevantAssignments = it.filter { assignment ->
+                if (ownerOnly && assignment.owner != user) return@filter false
+                return@filter when (this.restrictions) {
+                    0 -> assignment.dueDate.toDate().after(Date())
+                    1 -> viewModel.submissions.value.any { it.assignmentId == assignment.id && user == it.owner }
+                    2 -> assignment.dueDate.toDate().before(Date()) &&
+                            viewModel.submissions.value.none { it.assignmentId == assignment.id && user == it.owner }
+                    else -> false
+                }
+            }
+            titleElement.text =
+                titleElement.text.replace(Regex("\\([0-9]+\\)"), "(${relevantAssignments.size})")
+            if (relevantAssignments.isEmpty()) {
+                noItems.visibility = View.VISIBLE
+                noItems.animate().alpha(1F)
+            } else {
+                noItems.animate().alpha(0F)
+                noItems.visibility = View.GONE
+            }
             notifyDataSetChanged()
         }
     }

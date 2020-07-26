@@ -36,6 +36,8 @@ object Students {
         "h1710159@nushigh.edu.sg",
         "h1930009@nushigh.edu.sg"
     )
+    fun createAssignmentAuthorized(email: String) =
+        (email in mentorReps) or (email.endsWith("@nus.edu.sg"))
 
     @UnstableDefault
     fun loadStudents(context: Context) {
@@ -43,7 +45,7 @@ object Students {
         students = Json.parse(Student.serializer().list, fileData)
     }
 
-    fun getStudentById(id: String) = students.find { it.id == id }
+    fun getStudentByEmail(id: String) = students.find { it.id == id }
     fun getStudentByName(name: String) = students.find { it.name == name }
     fun filterStudents(
         query: List<String>,
@@ -69,3 +71,4 @@ object Students {
         return students
     }
 }
+

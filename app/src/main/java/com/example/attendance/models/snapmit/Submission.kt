@@ -17,5 +17,5 @@ data class Submission(
     val comment: String = ""
 ) {
     val name: String
-        get() = Students.getStudentById(owner)!!.name
+        get() = Students.getStudentByEmail(owner)!!.name
 }

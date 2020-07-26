@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.attendance.models.snapmit.Assignment
 import com.example.attendance.models.snapmit.Submission
 import com.example.attendance.util.android.SafeLiveData
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.QuerySnapshot
+import com.example.attendance.util.auth.currentUserEmail
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -72,12 +70,22 @@ class AssignmentsViewModel : ViewModel() {
     }
 
     fun setup() {
-        user = FirebaseAuth.getInstance().currentUser?.email!!
+        user = currentUserEmail()
         assignments.value = emptyList()
         submissions.value = emptyList()
         // Owned assignments
-
-        appendOwnAssignments(false)
+        Firebase.firestore
+            .collection("assignments")
+            .whereEqualTo("owner", user)
+            .get()
+            .addOnSuccessListener {
+                val assignments = it.toObjects(Assignment::class.java)
+                this.assignments.value += assignments
+                this.assignments.value = this.assignments.value.distinctBy { it.id }
+                    .filter { !it.deleted }
+                val assignmentIds = assignments.map { it.id }
+                reloadSubmissions(assignmentIds)
+            }
         // Student assignments
         Firebase.firestore
             .collection("assignments")
@@ -105,21 +113,6 @@ class AssignmentsViewModel : ViewModel() {
             }
     }
 
-    fun appendOwnAssignments(refreshing: Boolean): Task<QuerySnapshot> {
-        return Firebase.firestore
-            .collection("assignments")
-            .whereEqualTo("owner", user)
-            .get()
-            .addOnSuccessListener {
-                val assignments = it.toObjects(Assignment::class.java)
-                this.assignments.value += assignments
-                this.assignments.value = this.assignments.value.distinctBy { it.id }
-                    .filter { !it.deleted }
-                val assignmentIds = assignments.map { it.id }
-                reloadSubmissions(assignmentIds)
-            }
-    }
-
     private fun reloadSubmissions(assignmentIds: List<String>) {
         if (assignmentIds.isEmpty()) return
         // Student submissions
@@ -135,7 +128,7 @@ class AssignmentsViewModel : ViewModel() {
             }
     }
 
-    fun setListeners() {
+    private fun setListeners() {
         Firebase.firestore
             .collection("assignments")
             .whereEqualTo("owner", user)

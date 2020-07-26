@@ -11,13 +11,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.AssignmentListAdapter
+import com.example.attendance.models.Students
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SpacesItemDecoration
+import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.viewmodels.AssignmentsViewModel
+import kotlinx.android.synthetic.main.assignment_category.view.*
 import kotlinx.android.synthetic.main.fragment_assignment_list.view.*
 
 class AssignmentsListFragment : Fragment() {
@@ -30,14 +32,49 @@ class AssignmentsListFragment : Fragment() {
     ): View? {
         val root =
             inflater.inflate(R.layout.fragment_assignment_list, container, false)
-        val recyclerView: RecyclerView = root.findViewById(R.id.recycler)
-        recyclerView.adapter =
-            AssignmentListAdapter(
-                this,
-                root.loading,
-                root.fab,
-                root.no_items
+        val authorized =
+            Students.createAssignmentAuthorized(currentUserEmail())
+        with(inflater.inflate(R.layout.assignment_category, container, false)) {
+            assignmentCategory.text = if (authorized) "Ongoing (0)" else "Assigned (0)"
+            recycler.adapter = AssignmentListAdapter(
+                this@AssignmentsListFragment,
+                loading,
+                no_items,
+                0,
+                authorized,
+                assignmentCategory
             )
+            applyLayoutManager(recycler)
+            root.frameLayout.addView(this)
+        }
+        if (!authorized) {
+            with(inflater.inflate(R.layout.assignment_category, container, false)) {
+                assignmentCategory.text = "Completed (0)"
+                recycler.adapter = AssignmentListAdapter(
+                    this@AssignmentsListFragment,
+                    loading,
+                    no_items,
+                    1,
+                    false,
+                    assignmentCategory
+                )
+                applyLayoutManager(recycler)
+                root.frameLayout.addView(this)
+            }
+        }
+        with(inflater.inflate(R.layout.assignment_category, container, false)) {
+            assignmentCategory.text = if (authorized) "Past due (0)" else "Overdue (0)"
+            recycler.adapter = AssignmentListAdapter(
+                this@AssignmentsListFragment,
+                loading,
+                no_items,
+                2,
+                authorized,
+                assignmentCategory
+            )
+            applyLayoutManager(recycler)
+            root.frameLayout.addView(this)
+        }
         MainActivity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         root.toolbarMain.apply {
             setNavigationIcon(R.drawable.ic_baseline_menu_24)
@@ -46,23 +83,19 @@ class AssignmentsListFragment : Fragment() {
                 MainActivity.drawerLayout.openDrawer(Gravity.LEFT)
             }
         }
-        val llm = LinearLayoutManager(container!!.context)
-        llm.orientation = RecyclerView.VERTICAL
-        recyclerView.layoutManager = llm
-        recyclerView.addItemDecoration(SpacesItemDecoration(64))
+
         root.fab
             .setOnClickListener {
                 Navigation.navigate(R.id.newAssignmentFragment)
             }
-
-        var swipeContainer = root.findViewById(R.id.swipe) as SwipeRefreshLayout
-        swipeContainer.setOnRefreshListener {
-            assignmentsViewModel.appendOwnAssignments(true).continueWith {
-                swipeContainer.isRefreshing = false
-            }
-        }
-
         return root
+    }
+
+    private fun applyLayoutManager(recyclerView: RecyclerView) {
+        val llm = LinearLayoutManager(context)
+        llm.orientation = RecyclerView.VERTICAL
+        recyclerView.layoutManager = llm
+        recyclerView.addItemDecoration(SpacesItemDecoration(64))
     }
 
     companion object {

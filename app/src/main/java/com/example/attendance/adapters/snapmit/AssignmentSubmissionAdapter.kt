@@ -58,10 +58,10 @@ class AssignmentSubmissionAdapter(
     init {
         hideOnLoad.animate().alpha(0F)
         assignmentsViewModel.submissions.observe({ assignmentFragment.lifecycle }) {
-            if (it.isEmpty()) noItems.animate().alpha(1F)
-            else noItems.animate().alpha(0F)
             relevantSubmissions = assignmentsViewModel.submissions.value
                 .filter { it.assignmentId == assignmentsViewModel.currentAssignmentId }
+            if (relevantSubmissions.isEmpty()) noItems.animate().alpha(1F)
+            else noItems.animate().alpha(0F)
             assignmentFragment.updateCanSubmit(relevantSubmissions.isEmpty())
             notifyDataSetChanged()
         }

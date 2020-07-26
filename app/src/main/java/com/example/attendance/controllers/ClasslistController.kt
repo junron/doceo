@@ -246,7 +246,7 @@ object ClasslistController : FragmentController() {
     fun onNearbyCompleted(user: User): Boolean {
         with(context) {
             val vibrator = context!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            val student = Students.getStudentById(user.email) ?: return false
+            val student = Students.getStudentByEmail(user.email) ?: return false
             val classlist = classlistGroup.classlists[classlistViewPager.currentItem]
             if (student !in classlistGroup.students) return false
             val state = classlist.studentState[student.id] ?: return false

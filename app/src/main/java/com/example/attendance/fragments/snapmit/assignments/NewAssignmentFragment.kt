@@ -13,10 +13,10 @@ import com.example.attendance.models.Students
 import com.example.attendance.models.snapmit.Assignment
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.onTextChange
+import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.util.uuid
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.joestelmach.natty.Parser
 import kotlinx.android.synthetic.main.fragment_new_assignment.*
 import kotlinx.android.synthetic.main.fragment_new_assignment.view.*
@@ -91,7 +91,7 @@ class NewAssignmentFragment : Fragment() {
                         ).map {
                             it.id
                         },
-                    FirebaseAuth.getInstance().currentUser?.email!!,
+                    currentUserEmail(),
                     Timestamp(dueDate!!),
                     description
                 )

@@ -191,7 +191,7 @@ data class ClasslistGroup(
                         "type" to "ITEM_SHARED",
                         "attendanceId" to id,
                         "attendanceName" to name,
-                        "owner" to Students.getStudentById(owner)!!.name
+                        "owner" to Students.getStudentByEmail(owner)!!.name
                     ),
                     ""
                 )

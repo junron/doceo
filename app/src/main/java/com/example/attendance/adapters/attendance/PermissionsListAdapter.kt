@@ -39,7 +39,7 @@ class PermissionsListAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val item = getItem(position)
         val view = LayoutInflater.from(parent.context).inflate(R.layout.permission_item, null)
-        val name = Students.getStudentById(item.uid)?.name ?: return view
+        val name = Students.getStudentByEmail(item.uid)?.name ?: return view
         val initials = name.split(" ").take(2).fold("") { acc, it ->
             acc + it.first()
         }

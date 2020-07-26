@@ -74,3 +74,6 @@ data class User(val name: String, val email: String, val metadata: Map<String, S
     val isMentorRep: Boolean
         get() = metadata["mentorRep"] == "true"
 }
+
+
+fun currentUserEmail() = FirebaseAuth.getInstance().currentUser?.email!!

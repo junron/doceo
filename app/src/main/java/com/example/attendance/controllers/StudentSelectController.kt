@@ -60,7 +60,7 @@ object StudentSelectController : FragmentController() {
                     Navigation.navigate(back)
                     hideKeyboard(activity!!)
                     callback(
-                        studentFilter.selectedChipList.map { Students.getStudentById(it.id.toString())!! },
+                        studentFilter.selectedChipList.map { Students.getStudentByEmail(it.id.toString())!! },
                         edit
                     )
                 }
