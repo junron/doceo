@@ -7,5 +7,6 @@ import java.io.File
 class SubmitViewModel : ViewModel() {
     var imagesData: SafeLiveData<List<File>> = SafeLiveData(arrayListOf())
     var versionMap: SafeLiveData<Map<String, Int>> = SafeLiveData(mutableMapOf())
-    var code: SafeLiveData<String> = SafeLiveData("")
+    var assignmentUUID: SafeLiveData<String> = SafeLiveData("")
+
 }

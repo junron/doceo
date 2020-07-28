@@ -27,12 +27,12 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.ImagesBottomFragment
+import com.example.attendance.fragments.snapmit.assignments.AssignmentFragment
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SafeLiveData
 import com.example.attendance.util.android.ocr.MyImageProcessing
@@ -77,6 +77,8 @@ class SubmitFragment : Fragment() {
             .get<SubmitViewModel>(
                 SubmitViewModel::class.java
             )
+        submitViewModel.assignmentUUID.postValue(AssignmentFragment.assignmentUUID);
+
         val root = inflater.inflate(R.layout.fragment_submit, container, false)
         with(root) {
             bottom_bar_button.setOnClickListener {

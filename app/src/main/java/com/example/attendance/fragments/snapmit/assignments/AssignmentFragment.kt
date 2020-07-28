@@ -21,6 +21,15 @@ import kotlinx.android.synthetic.main.fragment_assignment.*
 import kotlinx.android.synthetic.main.fragment_assignment.view.*
 
 class AssignmentFragment : Fragment() {
+    companion object {
+        lateinit var assignmentUUID : String;
+        fun newInstance(): AssignmentFragment {
+            val fragment = AssignmentFragment()
+            val args = Bundle()
+            fragment.arguments = args
+            return fragment
+        }
+    }
     val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -40,6 +49,7 @@ class AssignmentFragment : Fragment() {
         }
         // NPE if assignment doesn't exist
         val assignment = assignmentsViewModel.getAssignment()!!
+        assignmentUUID = assignment.id;
         root.toolbarMain.title = assignment.name
         root.toolbarMain.subtitle = "Due " + assignment.dueDate.toDate().toDetailedString()
         root.description.text = assignment.description
@@ -89,12 +99,4 @@ class AssignmentFragment : Fragment() {
         submit_button.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
-    companion object {
-        fun newInstance(): AssignmentFragment {
-            val fragment = AssignmentFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
-    }
 }

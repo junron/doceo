@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +25,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.ObjectKey;
 import com.example.attendance.MainActivity;
 import com.example.attendance.R;
+import com.example.attendance.util.android.Navigation;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.woxthebox.draglistview.DragItemAdapter;
@@ -90,52 +92,7 @@ public class Submit2Fragment extends Fragment {
                 return;
             }
 
-            AlertDialog builder = new MaterialAlertDialogBuilder(getContext(), R.style.SuccessDialog)
-                    .setTitle("Assignment code").create();
-
-            final ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.code_input, null);
-
-            TextInputEditText editText = view.findViewById(R.id.code_input);
-            view.findViewById(R.id.button_done).setOnClickListener((v1) -> {
-                String code = editText.getText().toString();
-                if (!code.matches("[a-zA-Z0-9]{9}")) {
-                    editText.setError("Invalid code");
-                } else {
-                    editText.setError(null);
-                    submitViewModel.getCode().setValue(editText.getText().toString());
-                    NavHostFragment.findNavController(this).navigate(R.id.loadingFragment);
-                    builder.dismiss();
-                }
-            });
-
-            editText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (s.toString().matches("[a-zA-Z0-9]*")) return;
-                    s.replace(0, s.length(), s.toString().replaceAll("[^a-zA-Z0-9]", ""));
-                }
-            });
-
-            String clipboard = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
-            View pasteButton = view.findViewById(R.id.button_paste);
-            if (clipboard.matches("[a-zA-Z0-9]{9}")) pasteButton.setVisibility(View.VISIBLE);
-            pasteButton.setOnClickListener((v1) -> {
-                editText.setText(clipboard);
-            });
-
-            builder.setView(view);
-            builder.show();
+            Navigation.INSTANCE.navigate(R.id.loadingFragment);
 
         });
 
