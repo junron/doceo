@@ -32,7 +32,7 @@ object Students {
         "h1710092@nushigh.edu.sg",
         "h1710078@nushigh.edu.sg",
         "h1710072@nushigh.edu.sg",
-        "h1710074@nushigh.edu.sg",
+        // "h1710074@nushigh.edu.sg",
         "h1710159@nushigh.edu.sg",
         "h1930009@nushigh.edu.sg"
     )
@@ -49,7 +49,7 @@ object Students {
     fun getStudentByName(name: String) = students.find { it.name == name }
     fun filterStudents(
         query: List<String>,
-        _students: List<Student> = Students.students
+        _students: List<Student> = students
     ): List<Student> {
         var students = _students
         query.forEach {

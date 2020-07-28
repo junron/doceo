@@ -46,8 +46,10 @@ class AssignmentsListFragment : Fragment() {
             )
             applyLayoutManager(recycler)
             root.frameLayout.addView(this)
+            expansionLayout.expand(true)
         }
         if (!authorized) {
+            root.fab.visibility = View.GONE
             with(inflater.inflate(R.layout.assignment_category, container, false)) {
                 assignmentCategory.text = "Completed (0)"
                 recycler.adapter = AssignmentListAdapter(

@@ -1,7 +1,6 @@
 package com.example.attendance.fragments.snapmit.submit;
 
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,37 +8,19 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.attendance.R;
-import com.example.attendance.util.android.CloudStorage;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
+import com.example.attendance.viewmodels.SubmitViewModel;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import kotlinx.coroutines.GlobalScope;
 
 public class LoadingFragment extends Fragment {
 
@@ -70,7 +51,7 @@ public class LoadingFragment extends Fragment {
         final TextView loadingText = view.findViewById(R.id.loading_text);
 
         images = new ArrayList<>();
-        for (File f : submitViewModel.imagesData.getValue()) images.add(0, f);
+        for (File f : submitViewModel.getImagesData().getValue()) images.add(0, f);
 
         Fragment fragment = this;
 
@@ -98,7 +79,6 @@ public class LoadingFragment extends Fragment {
     private ArrayList<String> uploadImages() {
         ExecutorService executorService = Executors.newFixedThreadPool(10   );
         ArrayList<Future<JsonElement>> uploadTasks = new ArrayList<>();
-
 
 
         ArrayList<String> titles = new ArrayList<>();

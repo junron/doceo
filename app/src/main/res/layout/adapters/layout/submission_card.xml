@@ -62,9 +62,9 @@
                 android:id="@+id/overdueChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Overdue"
+                android:text="Late"
                 android:textColor="@color/white"
-                app:chipBackgroundColor="@color/errorRed" />
+                app:chipBackgroundColor="#e65100" />
         </LinearLayout>
 
 

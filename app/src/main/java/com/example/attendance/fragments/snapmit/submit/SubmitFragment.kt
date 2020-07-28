@@ -27,15 +27,15 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.activityViewModels
 import androidx.preference.PreferenceManager
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.fragments.snapmit.ImagesBottomFragment
-import com.example.attendance.fragments.snapmit.assignments.AssignmentFragment
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.SafeLiveData
 import com.example.attendance.util.android.ocr.MyImageProcessing
+import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.example.attendance.viewmodels.SubmitViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -59,25 +59,20 @@ import java.io.IOException
 import kotlin.math.sqrt
 
 class SubmitFragment : Fragment() {
-    companion object {
-        public lateinit var submitViewModel: SubmitViewModel
-    }
+    val submitViewModel: SubmitViewModel by activityViewModels()
+    private val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
     private lateinit var imageCapture: ImageCapture
     lateinit var previewView: PreviewView
     lateinit var root: View
     private var scannerType = 0
     var latestImage: Mat? = null
-    lateinit var camPath: String
+    private lateinit var camPath: String
     private var overflowState = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        submitViewModel = ViewModelProviders.of(MainActivity.activity)
-            .get<SubmitViewModel>(
-                SubmitViewModel::class.java
-            )
-        submitViewModel.assignmentUUID.postValue(AssignmentFragment.assignmentUUID);
+        submitViewModel.assignmentUUID.value = assignmentsViewModel.currentAssignmentId!!
 
         val root = inflater.inflate(R.layout.fragment_submit, container, false)
         with(root) {
@@ -190,20 +185,24 @@ class SubmitFragment : Fragment() {
             scannerType = (preferences.getInt("scannerType", 0) + 1) % 3
             preferences.edit().putInt("scannerType", scannerType).apply()
             val newIcon: Int
-            if (scannerType == 1) {
-                newIcon = R.drawable.ic_scan_diamond
-                overlayHolder.scaleType = ImageView.ScaleType.CENTER_CROP
-                overlayHolder.animate().alpha(1f)
-                Toast.makeText(root.context, "Page detection mode", Toast.LENGTH_SHORT).show()
-            } else if (scannerType == 2) {
-                newIcon = R.drawable.ic_scan_lightning
-                overlayHolder.scaleType = ImageView.ScaleType.CENTER_INSIDE
-                overlayHolder.animate().alpha(1f)
-                Toast.makeText(root.context, "Page view mode", Toast.LENGTH_SHORT).show()
-            } else {
-                newIcon = R.drawable.ic_scan_blank
-                overlayHolder.animate().alpha(0f)
-                Toast.makeText(root.context, "Normal mode", Toast.LENGTH_SHORT).show()
+            when (scannerType) {
+                1 -> {
+                    newIcon = R.drawable.ic_scan_diamond
+                    overlayHolder.scaleType = ImageView.ScaleType.CENTER_CROP
+                    overlayHolder.animate().alpha(1f)
+                    Toast.makeText(root.context, "Page detection mode", Toast.LENGTH_SHORT).show()
+                }
+                2 -> {
+                    newIcon = R.drawable.ic_scan_lightning
+                    overlayHolder.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    overlayHolder.animate().alpha(1f)
+                    Toast.makeText(root.context, "Page view mode", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    newIcon = R.drawable.ic_scan_blank
+                    overlayHolder.animate().alpha(0f)
+                    Toast.makeText(root.context, "Normal mode", Toast.LENGTH_SHORT).show()
+                }
             }
             scannerButton.setImageResource(newIcon)
         }
@@ -211,14 +210,18 @@ class SubmitFragment : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(context)
         val newIcon: Int
         scannerType = preferences.getInt("scannerType", 0)
-        if (scannerType == 1) {
-            newIcon = R.drawable.ic_scan_diamond
-            overlayHolder.scaleType = ImageView.ScaleType.CENTER_CROP
-        } else if (scannerType == 2) {
-            newIcon = R.drawable.ic_scan_lightning
-            overlayHolder.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        } else {
-            newIcon = R.drawable.ic_scan_blank
+        when (scannerType) {
+            1 -> {
+                newIcon = R.drawable.ic_scan_diamond
+                overlayHolder.scaleType = ImageView.ScaleType.CENTER_CROP
+            }
+            2 -> {
+                newIcon = R.drawable.ic_scan_lightning
+                overlayHolder.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            }
+            else -> {
+                newIcon = R.drawable.ic_scan_blank
+            }
         }
         scannerButton.setImageResource(newIcon)
         submitViewModel.imagesData.observe({ viewLifecycleOwner.lifecycle }, { files ->

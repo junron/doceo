@@ -30,11 +30,15 @@ import com.bumptech.glide.request.transition.Transition
 import com.example.attendance.MainActivity
 import com.example.attendance.R
 import com.example.attendance.adapters.snapmit.ZoomableImageAdapter
+import com.example.attendance.models.snapmit.Assignment
+import com.example.attendance.models.snapmit.Submission
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.ocr.MyImageProcessing
 import com.example.attendance.util.android.onTextChange
+import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.viewmodels.AssignmentsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfWriter
@@ -62,6 +66,43 @@ class SubmissionViewFragment : Fragment() {
     private val assignmentsViewModel: AssignmentsViewModel by activityViewModels()
     private var comment = ""
     private var commentInit: String? = ""
+    private lateinit var submission: Submission
+    private lateinit var assignment: Assignment
+
+    private fun updateDisplay(root: View? = view) {
+        root ?: return
+        val isOwner = assignment.owner == currentUserEmail()
+        if (comment == commentInit) {
+            comment = submission.comment
+            commentInit = submission.comment
+            root.edit_comment_box.setText(comment)
+        }
+        with(root) {
+            toolbarMain.title = assignment.name
+            val currentItem = images.currentItem
+            images.adapter = ZoomableImageAdapter(submission.images, this@SubmissionViewFragment)
+            images.currentItem = currentItem
+            val sfd = SimpleDateFormat("d MMMM yyyy  HH:mm")
+            submissionDescription.text =
+                "Submitted by ${submission.name}\nat " + sfd.format(submission.submissionTime.toDate())
+            numPages.text = "${images.currentItem + 1}/${submission.images.size}"
+            if (isOwner) {
+                oasButton.visibility = View.VISIBLE
+                comment_button.text = "Edit comment"
+                email_button.visibility = View.VISIBLE
+                edit_comment_box.isEnabled = true
+                edit_comment_box.hint =
+                    "Write a comment here! ${submission.name} will be able to see it!"
+            } else {
+                oasButton.visibility = View.GONE
+                comment_button.text = "Show comment"
+                email_button.visibility = View.GONE
+                edit_comment_box.isEnabled = false
+                edit_comment_box.hint = "There are currently no comments"
+            }
+        }
+
+    }
 
     @SuppressLint("CheckResult")
     override fun onCreateView(
@@ -73,9 +114,38 @@ class SubmissionViewFragment : Fragment() {
         val root =
             inflater.inflate(R.layout.fragment_submission_view, container, false)
         // Shouldn't NPE but could
-        val submission = assignmentsViewModel.getSubmission()!!
-        val assignment = assignmentsViewModel.getAssignment()!!
-        val isOwner = assignment.owner == FirebaseAuth.getInstance().currentUser?.email
+        submission = assignmentsViewModel.getSubmission()!!
+        assignment = assignmentsViewModel.getAssignment()!!
+        updateDisplay(root)
+        assignmentsViewModel.assignments.observe({ lifecycle }) {
+            if (assignmentsViewModel.currentAssignmentId in it.map { assignment -> assignment.id }) {
+                assignment = assignmentsViewModel.getAssignment()!!
+                updateDisplay()
+            } else {
+                Snackbar.make(
+                    container!!,
+                    "You no longer have access to this assignment",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                assignmentsViewModel.currentAssignmentId = null
+                assignmentsViewModel.currentSubmissionId = null
+                Navigation.navigate(R.id.assignmentsListFragment)
+            }
+        }
+        assignmentsViewModel.submissions.observe({ lifecycle }) {
+            if (assignmentsViewModel.currentSubmissionId in it.map { submissions -> submissions.id }) {
+                submission = assignmentsViewModel.getSubmission()!!
+                updateDisplay()
+            } else {
+                Snackbar.make(
+                    container!!,
+                    "You no longer have access to this submission",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                assignmentsViewModel.currentSubmissionId = null
+                Navigation.navigate(R.id.assignmentFragment)
+            }
+        }
         root.toolbarMain.apply {
             setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
             navigationIcon?.setTint(Color.WHITE)
@@ -83,32 +153,11 @@ class SubmissionViewFragment : Fragment() {
                 assignmentsViewModel.currentSubmissionId = null
                 Navigation.navigate(R.id.assignmentFragment)
             }
-            title = assignment.name
         }
-        comment = if (comment.isEmpty()) "" else comment
-        comment = submission.comment
-        commentInit = comment
-        val viewPager = root.images
-        viewPager.adapter = ZoomableImageAdapter(submission.images, this)
+
+
         with(root) {
-            val sfd = SimpleDateFormat("d MMMM yyyy  HH:mm")
-            submissionDescription.text =
-                "Submitted by ${submission.name}\nat " + sfd.format(submission.submissionTime.toDate())
-            numPages.text = "1/${submission.images.size}"
-            if (isOwner) {
-                oasButton.visibility = View.VISIBLE
-                comment_button.text = "Edit comment"
-                email_button.visibility = View.VISIBLE
-                edit_comment_box.isEnabled = true
-                edit_comment_box.hint =
-                    "Write a comment here! ${submission.name} will be able to see it!"
-            } else {
-                oasButton.visibility = View.GONE
-                comment_button.text = "View comment"
-                email_button.visibility = View.GONE
-                edit_comment_box.isEnabled = false
-                edit_comment_box.hint = "There are currently no comments"
-            }
+            val viewPager = images
             backButton.setOnClickListener {
                 val curr = viewPager.currentItem
                 if (curr == 0) return@setOnClickListener
@@ -125,13 +174,16 @@ class SubmissionViewFragment : Fragment() {
             edit_comment_box.onTextChange {
                 comment = it
             }
-            edit_comment_box.setText(comment)
             comment_button.setOnClickListener { v: View ->
                 if (comment_button.text == "Edit comment") {
                     comment_button.text = "Save comment"
                 } else if (comment_button.text == "Save comment") {
                     comment_button.text = "Edit comment"
                     updateComment()
+                } else if (comment_button.text == "Show comment") {
+                    comment_button.text = "Hide comment"
+                } else if (comment_button.text == "Hide comment") {
+                    comment_button.text = "Show comment"
                 }
                 v.isClickable = false
                 val a: Animation = object : Animation() {
@@ -404,7 +456,7 @@ class SubmissionViewFragment : Fragment() {
         return root
     }
 
-    fun updateComment() {
+    private fun updateComment() {
         if (commentInit == null) return
         if (commentInit == comment) return
         assignmentsViewModel.updateComment(comment)
