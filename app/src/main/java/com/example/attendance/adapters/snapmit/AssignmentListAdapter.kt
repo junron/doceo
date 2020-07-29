@@ -12,8 +12,8 @@ import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.currentUserEmail
 import com.example.attendance.util.toShortString
 import kotlinx.android.synthetic.main.assignment_card.view.*
+import java.text.SimpleDateFormat
 import java.util.*
-import java.text.SimpleDateFormat as SimpleDateFormat1
 
 class AssignmentListAdapter(
     private val fragment: AssignmentsListFragment,
@@ -51,10 +51,11 @@ class AssignmentListAdapter(
                 numSubmissions.text = assignment.submissions.size.toString()
                 status.text = "Submissions"
             } else {
+                // TODO: watch submissions too
                 val submissions = getSubmissions(assignment.id)
                 val submitted = submissions.isNotEmpty()
                 if (submitted) {
-                    val sdf = SimpleDateFormat1("d MMMM yyyy  HH:mm")
+                    val sdf = SimpleDateFormat("d MMMM yyyy  HH:mm")
                     status.text = "Submitted at"
                     numSubmissions.text = sdf.format(submissions.first().submissionTime.toDate())
                 } else {
