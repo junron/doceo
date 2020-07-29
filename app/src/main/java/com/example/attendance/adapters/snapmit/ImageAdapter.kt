@@ -33,16 +33,17 @@ internal class ImageAdapter(var images: SafeLiveData<List<File>>) :
         val target =
             holder.view.image
         val imageValue = images.value
+        val image = imageValue[imageValue.lastIndex - position]
         Glide.with(MainActivity.activity)
-            .load(imageValue[imageValue.lastIndex - position].path)
+            .load(image.path)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .placeholder(R.drawable.ic_placeholder)
             .into(target)
         holder.view.remove_button
             .setOnClickListener {
-                val newVal = images.value.toMutableList()
-                newVal.removeAt(newVal.lastIndex - position)
-                images.postValue(newVal)
+                images.value = images.value.filter {
+                    it.absolutePath != image.path
+                }
                 notifyDataSetChanged()
             }
     }
