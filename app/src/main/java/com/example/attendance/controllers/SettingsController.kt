@@ -31,14 +31,18 @@ object SettingsController : FragmentController() {
             toolbarSettings.setOnClickListener {
                 taps++
                 if (taps == 7) {
-                    Toast.makeText(context.context!!, "You are now a developer", Toast.LENGTH_LONG)
+                    Toast.makeText(
+                        context.requireContext(),
+                        "You are now a developer",
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                     taps = 0
                     Preferences.setDeveloper(true)
                     developerMode.visibility = View.VISIBLE
                 } else {
                     Toast.makeText(
-                        context.context!!,
+                        context.requireContext(),
                         "You are ${7 - taps suffix "tap"} away from being a developer",
                         Toast.LENGTH_LONG
                     )

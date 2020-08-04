@@ -13,7 +13,7 @@ import com.example.attendance.models.ClasslistGroup
 import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.auth.UserLoader
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_attendance.*
+import kotlinx.android.synthetic.main.fragment_attendance_list.*
 
 object MainController : FragmentController() {
     private var signedIn: Boolean = false

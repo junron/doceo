@@ -19,7 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.attendance_item.view.*
 import kotlinx.android.synthetic.main.document_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.fragment_attendance.*
+import kotlinx.android.synthetic.main.fragment_attendance_list.*
 
 class ClasslistGroupItemsAdapter(val fragment: MainFragment, var data: List<ClasslistGroup>) :
     BaseAdapter() {
