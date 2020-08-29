@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:alpha="0"
-                android:text="No assignments! 🎉"
+                android:text="All cleared up!"
                 android:textColor="@color/colorPrimary"
                 android:textSize="24sp" />
 

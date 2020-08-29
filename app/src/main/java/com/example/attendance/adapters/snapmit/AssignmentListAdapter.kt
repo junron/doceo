@@ -55,7 +55,7 @@ class AssignmentListAdapter(
                 val submissions = getSubmissions(assignment.id)
                 val submitted = submissions.isNotEmpty()
                 if (submitted) {
-                    val sdf = SimpleDateFormat("d MMMM yyyy  HH:mm")
+                    val sdf = SimpleDateFormat("d MMM HH:mm")
                     status.text = "Submitted at"
                     numSubmissions.text = sdf.format(submissions.first().submissionTime.toDate())
                 } else {
@@ -85,7 +85,7 @@ class AssignmentListAdapter(
         viewModel.submissions.value.filter { it.assignmentId == id && user == it.owner }
 
 
-    inner class Card(var view: ViewGroup) : RecyclerView.ViewHolder(view)
+    class Card(var view: ViewGroup) : RecyclerView.ViewHolder(view)
 
     init {
         hideOnInflate.animate().alpha(0f)
