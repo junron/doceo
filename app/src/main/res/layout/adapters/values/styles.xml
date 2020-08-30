@@ -9,10 +9,6 @@
         <item name="materialAlertDialogTitleIconStyle">@style/IconSuccess</item>
     </style>
 
-    <style name="TitlePaneStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Title.Panel.CenterStacked">
-        <item name="android:padding">16dp</item>
-    </style>
-
     <style name="IconSuccess" parent="MaterialAlertDialog.MaterialComponents.Title.Icon.CenterStacked">
         <item name="android:tint">@color/successGreen</item>
     </style>
@@ -21,15 +17,4 @@
         <item name="android:tint">@color/errorRed</item>
     </style>
 
-    <style name="TitleTextStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Title.Text.CenterStacked">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/onBack</item>
-    </style>
-
-    <style name="BodyTextStyleCenter" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
-        <item name="android:padding">16dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/onBack</item>
-    </style>
 </resources>

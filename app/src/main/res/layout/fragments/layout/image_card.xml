@@ -7,7 +7,6 @@
     android:orientation="horizontal">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/image_parent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

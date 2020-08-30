@@ -9,7 +9,6 @@
         android:icon="@drawable/ic_eye_24"
         android:title="View" />
     <item
-        android:id="@+id/permissions_none"
         android:icon="@drawable/ic_baseline_close_24"
         android:title="No access" />
 </menu>

@@ -94,7 +94,9 @@ class AssignmentListAdapter(
             relevantAssignments = it.filter { assignment ->
                 if (ownerOnly && assignment.owner != user) return@filter false
                 return@filter when (this.restrictions) {
-                    0 -> assignment.dueDate.toDate().after(Date())
+                    0 -> assignment.dueDate.toDate().after(Date()) && (ownerOnly || getSubmissions(
+                        assignment.id
+                    ).isEmpty())
                     1 -> getSubmissions(assignment.id).isNotEmpty()
                     2 -> assignment.dueDate.toDate()
                         .before(Date()) && getSubmissions(assignment.id).isEmpty()

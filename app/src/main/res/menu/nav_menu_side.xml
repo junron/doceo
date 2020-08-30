@@ -16,8 +16,6 @@
             android:icon="@drawable/ic_cell_tower"
             android:title="Nearby" />
 
-        <item
-            android:id="@+id/logout"
-            android:title="Logout" />
+        <item android:title="Logout" />
     </group>
 </menu>

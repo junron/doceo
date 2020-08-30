@@ -7,12 +7,10 @@
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/classlistParent"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/classlistAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -111,7 +109,6 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/endNavView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="end">

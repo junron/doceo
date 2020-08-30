@@ -7,7 +7,6 @@
     tools:context=".fragments.NearbyFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -40,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:src="@drawable/ic_cell_tower2"
-                android:tint="?android:attr/textColorPrimaryNoDisable" />
+                app:tint="?android:attr/textColorPrimaryNoDisable" />
 
             <TextView
                 android:id="@+id/nearbyStatus"

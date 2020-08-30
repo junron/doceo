@@ -1,7 +1,4 @@
 <resources>
-    <string name="app_name">NUSH Attendance</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">Doceo</string>
 
-    <string name="settings">Settings</string>
-    <string name="dark_mode">Dark mode</string>
 </resources>

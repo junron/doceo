@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#FFFFFF</color>
-    <color name="searchBarClearIconTintColorDark">#FFFFFF</color>
-    <color name="searchBarBackIconTintColorDark">#FFFFFF</color>
     <color name="colorPrimary">#25ba81</color>
     <color name="colorPrimaryDark">#0b6939</color>
     <color name="colorAccent">#5b79ff</color>
     <color name="textColor">@color/onBack</color>
-    <color name="back1">#f7f7f7</color>
     <color name="back2">#eaeaea</color>
-    <color name="bottomBarColor">#000000</color>
     <color name="onBack">#3d373f</color>
 
     <color name="errorRed">#d4484a</color>
     <color name="successGreen">#3dd47a</color>
 
-    <color name="bluegrey1">#102027</color>
-    <color name="bluegrey2">#263238</color>
-    <color name="bluegrey3">#37474f</color>
-    <color name="bluegrey4">#607d8b</color>
-    <color name="bluegrey5">#8eacbb</color>
-    <color name="bluegrey6">#b8d7e6</color>
-
-    <color name="black_overlay">#66000000</color>
 </resources>
