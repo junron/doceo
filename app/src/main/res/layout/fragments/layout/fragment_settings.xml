@@ -32,9 +32,9 @@
 
             <TextView
                 style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:layout_width="wrap_content"
                 android:text="App version" />
 
             <View
@@ -57,6 +57,13 @@
                     android:textSize="16sp" />
 
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/scanningSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Advanced" />
 
             <LinearLayout
                 android:id="@+id/developerMode"

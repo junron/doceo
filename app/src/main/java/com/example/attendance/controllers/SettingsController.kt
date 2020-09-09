@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.example.attendance.BuildConfig
 import com.example.attendance.MainActivity
 import com.example.attendance.R
+import com.example.attendance.util.android.Navigation
 import com.example.attendance.util.android.Preferences
 import com.example.attendance.util.auth.UserLoader
 import com.example.attendance.util.auth.models.SignedCertificateWithToken
@@ -28,6 +29,9 @@ object SettingsController : FragmentController() {
                 else this
             }
             appVersion.text = versionName
+            scanningSettings.setOnClickListener {
+                Navigation.navigate(R.id.slideshowFragment)
+            }
             toolbarSettings.setOnClickListener {
                 taps++
                 if (taps == 7) {

@@ -70,4 +70,8 @@
         android:id="@+id/newAssignmentFragment"
         android:name="com.example.attendance.fragments.snapmit.assignments.NewAssignmentFragment"
         android:label="NewAssignmentFragment" />
+    <fragment
+        android:id="@+id/slideshowFragment"
+        android:name="com.example.attendance.fragments.snapmit.slideshow.SlideshowFragment"
+        android:label="SlideshowFragment" />
 </navigation>
